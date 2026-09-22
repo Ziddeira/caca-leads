@@ -24,3 +24,8 @@ Cole o conteúdo desse arquivo no SQL Editor do Supabase e rode.
 npm install
 npm run dev
 ```
+
+## Deploy
+
+Projeto conectado à Vercel. Cada push nesta branch gera um deploy de
+pré-visualização automático.
