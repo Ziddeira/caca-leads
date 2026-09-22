@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Caça-leads sem site</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --canvas:#F3F5F9; --surface:#FFFFFF; --ink:#172033; --ink-2:#4A5568; --muted:#8792A6;
+  --line:#E4E8EF; --line-2:#EEF1F5;
+  --primary:#2F54EB; --primary-soft:#EAF0FF; --primary-ink:#FFFFFF;
+  --hot:#F5A300; --hot-soft:#FFF4DB;
+  --wa:#12A150; --wa-soft:#E6F6EC;
+  --none:#E0552B; --none-soft:#FDEDE7;
+  --booking:#8B3FE0; --booking-soft:#F3EAFD;
+  --third:#1F7ACC; --third-soft:#E6F1FB;
+  --own:#6B7688; --own-soft:#EEF0F3;
+  --danger:#C62828;
+  --r-lg:16px; --r-md:10px; --r-sm:8px;
+  --shadow:0 1px 2px rgba(23,32,51,.04), 0 4px 16px rgba(23,32,51,.05);
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--canvas);color:var(--ink);font:15px/1.5 Onest,"Segoe UI",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+h1,h2,h3{margin:0;line-height:1.2;font-weight:700}
+p{margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid color-mix(in srgb,var(--primary) 40%,transparent);outline-offset:2px}
+a{color:inherit}
+
+/* Barra superior */
+.topbar{position:sticky;top:0;z-index:10;background:rgba(255,255,255,.88);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.topbar-in{max-width:1320px;margin:0 auto;padding:12px 24px;display:flex;align-items:center;gap:16px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:17px;letter-spacing:-.01em}
+.brand-mark{width:32px;height:32px;border-radius:9px;background:var(--primary);display:grid;place-items:center;color:#fff}
+.modes{margin-left:auto;display:flex;background:var(--canvas);border:1px solid var(--line);border-radius:999px;padding:3px}
+.modes button{border:0;background:transparent;padding:7px 16px;border-radius:999px;font-weight:600;font-size:14px;color:var(--ink-2);cursor:pointer}
+.modes button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(23,32,51,.12)}
+.progress{height:3px;background:transparent;overflow:hidden}
+body.loading .progress::after{content:"";display:block;height:100%;width:35%;background:var(--primary);animation:slide 1.1s ease-in-out infinite}
+@keyframes slide{from{transform:translateX(-100%)}to{transform:translateX(300%)}}
+
+.wrap{max-width:1320px;margin:0 auto;padding:28px 24px 60px}
+
+/* Busca */
+.hero{margin-bottom:22px}
+.hero h1{font-size:clamp(26px,3.2vw,34px);font-weight:800;letter-spacing:-.025em}
+.hero p{color:var(--ink-2);margin-top:6px;max-width:64ch}
+.search{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow);padding:10px;display:grid;grid-template-columns:1fr 1.4fr auto;gap:8px;margin-top:20px}
+.field{padding:8px 12px;border-radius:var(--r-md);transition:background .15s}
+.field:focus-within{background:var(--canvas)}
+.field + .field{border-left:1px solid var(--line-2)}
+.field label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:2px}
+.field input{width:100%;border:0;background:transparent;padding:2px 0;font-size:16px;font-weight:500;outline:none}
+.field input::placeholder{color:#B4BCCB;font-weight:400}
+.hint{font-size:12px;color:var(--muted);margin-top:3px}
+.go{align-self:stretch;background:var(--primary);color:var(--primary-ink);border:0;border-radius:var(--r-md);padding:0 26px;font-weight:700;font-size:15px;cursor:pointer;white-space:nowrap;transition:filter .15s}
+.go:hover{filter:brightness(1.08)}
+.go:disabled{opacity:.7;cursor:wait}
+
+/* Layout */
+.layout{display:grid;grid-template-columns:290px 1fr;gap:22px;align-items:start}
+aside{display:flex;flex-direction:column;gap:14px;position:sticky;top:84px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:18px}
+.card h2{font-size:14px;font-weight:700;margin-bottom:12px}
+.key-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.key-head h2{margin:0}
+.dot{width:8px;height:8px;border-radius:50%;background:#CBD2DC}
+.dot.ok{background:var(--wa);box-shadow:0 0 0 3px var(--wa-soft)}
+.in{width:100%;padding:9px 12px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--surface);transition:border-color .15s,box-shadow .15s}
+.in:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-soft)}
+textarea.in{resize:vertical;min-height:80px;font-size:13px;line-height:1.45}
+.lbl{display:block;font-size:13px;font-weight:600;color:var(--ink-2);margin:12px 0 5px}
+.lbl:first-of-type{margin-top:0}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.row2 .lbl{margin-top:0}
+
+/* Interruptores */
+.sw{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:14px;padding:7px 0;cursor:pointer}
+.sw input{appearance:none;width:36px;height:20px;border-radius:999px;background:#D5DBE4;position:relative;cursor:pointer;flex:none;transition:background .15s;margin:0}
+.sw input::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.2);transition:transform .15s}
+.sw input:checked{background:var(--primary)}
+.sw input:checked::after{transform:translateX(16px)}
+.sw.sm{font-size:13px;color:var(--ink-2);padding-top:10px}
+
+details{border-top:1px solid var(--line-2);padding-top:12px;margin-top:4px}
+details + details{margin-top:12px}
+summary{cursor:pointer;font-weight:600;font-size:14px;list-style:none;display:flex;justify-content:space-between;align-items:center}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";color:var(--muted);font-size:18px;font-weight:400}
+details[open] summary::after{content:"–"}
+details .hint{margin:6px 0 4px}
+
+/* Resultados */
+main{min-width:0}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow);overflow:hidden}
+.panel-head{padding:18px 20px 14px;border-bottom:1px solid var(--line-2)}
+.ph-top{display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.ph-top h2{font-size:19px;font-weight:700;letter-spacing:-.01em}
+.ph-top .sub{color:var(--muted);font-size:13px;margin-top:2px}
+.ph-tools{margin-left:auto;display:flex;gap:8px;align-items:center}
+.ph-tools select{padding:8px 10px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--surface);font-size:13px;font-weight:500}
+.ghost{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm);padding:8px 12px;cursor:pointer;font-weight:600;font-size:13px}
+.ghost:hover{background:var(--canvas)}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.chip{display:inline-flex;align-items:center;gap:7px;padding:6px 12px 6px 10px;border-radius:999px;border:1px solid var(--line);font-size:13px;font-weight:600;color:var(--ink-2);cursor:pointer;user-select:none;transition:all .15s}
+.chip input{position:absolute;opacity:0;pointer-events:none}
+.chip i{width:8px;height:8px;border-radius:50%;background:var(--c)}
+.chip b{font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums}
+.chip:has(input:checked){background:var(--cs);border-color:transparent;color:var(--ink)}
+.chip:has(input:checked) b{color:var(--c)}
+.chip:has(input:focus-visible){outline:3px solid color-mix(in srgb,var(--primary) 40%,transparent)}
+.chip.none{--c:var(--none);--cs:var(--none-soft)} .chip.booking{--c:var(--booking);--cs:var(--booking-soft)}
+.chip.third{--c:var(--third);--cs:var(--third-soft)} .chip.own{--c:var(--own);--cs:var(--own-soft)}
+
+.lead{display:grid;grid-template-columns:52px minmax(0,1fr) 170px 244px;gap:16px;align-items:center;padding:16px 20px;border-bottom:1px solid var(--line-2);transition:background .12s}
+.lead:last-child{border-bottom:0}
+.lead:hover{background:#FAFBFD}
+.lead.done{opacity:.6}
+.ring{--rc:var(--primary);width:46px;height:46px;border-radius:50%;background:conic-gradient(var(--rc) calc(var(--p)*1%),var(--line-2) 0);display:grid;place-items:center}
+.ring span{width:36px;height:36px;border-radius:50%;background:var(--surface);display:grid;place-items:center;font-weight:800;font-size:14px;font-variant-numeric:tabular-nums}
+.ring.hot{--rc:var(--hot)}
+.ring.hot span{background:var(--hot-soft);color:#8A5A00}
+.name{font-size:15.5px;font-weight:700;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.done-badge{display:inline-flex;align-items:center;gap:3px;font-size:11.5px;font-weight:600;color:var(--wa);background:var(--wa-soft);padding:1px 8px 1px 5px;border-radius:999px}
+.done-badge svg{width:12px;height:12px}
+.tags{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:5px}
+.tag{font-size:12px;font-weight:600;padding:2px 9px;border-radius:6px}
+.tag.none{color:var(--none);background:var(--none-soft)} .tag.booking{color:var(--booking);background:var(--booking-soft)}
+.tag.third{color:var(--third);background:var(--third-soft)} .tag.own{color:var(--own);background:var(--own-soft)}
+.type{font-size:12px;color:var(--muted)}
+.addr{font-size:13px;color:var(--ink-2);margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stats{font-size:13.5px}
+.rating{font-weight:700;display:flex;align-items:baseline;gap:5px}
+.rating small{font-weight:500;color:var(--muted);font-size:12px}
+.star{color:var(--hot)}
+.phone{color:var(--ink-2);margin-top:3px;font-variant-numeric:tabular-nums}
+.actions{display:flex;gap:6px;align-items:center;justify-content:flex-end}
+.btn{display:inline-flex;align-items:center;gap:6px;text-decoration:none;border-radius:var(--r-sm);padding:8px 13px;font-weight:600;font-size:13.5px;white-space:nowrap}
+.btn.wa{background:var(--wa);color:#fff;transition:filter .15s}
+.btn.wa:hover{filter:brightness(1.07)}
+.btn.wa.off{background:var(--canvas);color:var(--muted);font-weight:500}
+.icon-btn{width:36px;height:36px;display:grid;place-items:center;border-radius:var(--r-sm);border:1px solid var(--line);background:var(--surface);color:var(--ink-2);cursor:pointer;text-decoration:none;transition:all .12s}
+.icon-btn:hover{background:var(--canvas);color:var(--ink)}
+.icon-btn.on{background:var(--wa-soft);border-color:transparent;color:var(--wa)}
+
+.empty{padding:64px 24px;text-align:center;color:var(--ink-2)}
+.empty .illu{width:64px;height:64px;margin:0 auto 16px;border-radius:18px;background:var(--primary-soft);color:var(--primary);display:grid;place-items:center}
+.empty h3{font-size:17px;color:var(--ink);margin-bottom:6px}
+.empty p{max-width:46ch;margin:0 auto;font-size:14px}
+.error{background:#FDECEC;color:#7A1B1B;border:1px solid #F6CACA;padding:12px 16px;border-radius:var(--r-md);margin-bottom:14px;font-size:14px}
+
+@media (max-width:1100px){
+  .lead{grid-template-columns:48px minmax(0,1fr) auto}
+  .stats{grid-column:2;display:flex;gap:14px;align-items:baseline}
+  .phone{margin-top:0}
+  .actions{grid-column:3;grid-row:1 / span 2}
+}
+@media (max-width:860px){
+  .search{grid-template-columns:1fr}
+  .field + .field{border-left:0;border-top:1px solid var(--line-2)}
+  .go{padding:13px}
+  .layout{grid-template-columns:1fr}
+  aside{position:static}
+  .lead{grid-template-columns:44px minmax(0,1fr);padding:16px}
+  .stats,.actions{grid-column:1 / -1;grid-row:auto;justify-content:flex-start}
+  .brand span{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="brand">
+      <div class="brand-mark"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg></div>
+      <span>Caça-leads</span>
+    </div>
+    <div class="modes" role="group" aria-label="Tipo de busca">
+      <button id="modeBiz" aria-pressed="true">Negócios</button>
+      <button id="modeStay" aria-pressed="false">Hospedagem</button>
+    </div>
+  </div>
+  <div class="progress"></div>
+</header>
+
+<div class="wrap">
+  <section class="hero">
+    <h1>Encontre empresas sem site próprio</h1>
+    <p>Busca no Google Maps e separa quem não tem site, quem depende de Airbnb ou Booking e quem só usa app ou rede social.</p>
+    <div class="search">
+      <div class="field">
+        <label for="niche" id="nicheLabel">Nicho (pode separar por vírgula)</label>
+        <input id="niche" type="text" placeholder="barbearia" autocomplete="off">
+        <div class="hint" id="estimate"></div>
+      </div>
+      <div class="field">
+        <label for="areas">Regiões (separe por vírgula)</label>
+        <input id="areas" type="text" placeholder="Pagani Palhoça SC, Centro Palhoça SC" autocomplete="off">
+        <div class="hint">Até 60 empresas por região. Para cobrir uma cidade, liste bairros.</div>
+      </div>
+      <button class="go" id="goBtn">Buscar leads</button>
+    </div>
+  </section>
+
+  <div class="layout">
+    <aside>
+      <div class="card">
+        <div class="key-head"><span class="dot" id="keyDot"></span><h2>Chave da API do Google</h2></div>
+        <input id="apiKey" class="in" type="password" placeholder="AIza..." autocomplete="off">
+        <label class="sw sm">Lembrar neste computador <input type="checkbox" id="rememberKey"></label>
+      </div>
+
+      <div class="card">
+        <h2>Filtros</h2>
+        <div class="row2">
+          <div>
+            <label class="lbl" for="minRating">Nota mínima</label>
+            <select id="minRating" class="in">
+              <option value="0">Qualquer</option><option value="3.5">3,5+</option>
+              <option value="4">4,0+</option><option value="4.5">4,5+</option>
+            </select>
+          </div>
+          <div>
+            <label class="lbl" for="minReviews">Avaliações</label>
+            <input id="minReviews" class="in" type="number" min="0" value="0">
+          </div>
+        </div>
+        <label class="lbl" for="textFilter">Endereço contém</label>
+        <input id="textFilter" class="in" type="text" placeholder="ex.: Ponte do Imaruim">
+        <div style="margin-top:10px">
+          <label class="sw">Só com celular <input type="checkbox" id="fMobile"></label>
+          <label class="sw">Só em funcionamento <input type="checkbox" id="fOpen" checked></label>
+          <label class="sw">Esconder já contatados <input type="checkbox" id="fHideDone"></label>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Ajustes</h2>
+        <details>
+          <summary>Mensagens do WhatsApp</summary>
+          <p class="hint">Use {nome} para o nome e {plataforma} para onde a empresa aparece hoje.</p>
+          <label class="lbl" for="msg">Negócios</label>
+          <textarea id="msg" class="in" rows="6"></textarea>
+          <label class="lbl" for="msgStay">Hospedagem</label>
+          <textarea id="msgStay" class="in" rows="8"></textarea>
+        </details>
+        <details>
+          <summary>Plataformas de reserva</summary>
+          <p class="hint">Links destas plataformas geram a etiqueta Depende do Airbnb/Booking.</p>
+          <textarea id="bookingList" class="in" rows="8"></textarea>
+        </details>
+        <details>
+          <summary>Apps e redes sociais</summary>
+          <p class="hint">Links destes domínios não contam como site próprio.</p>
+          <textarea id="thirdList" class="in" rows="10"></textarea>
+        </details>
+      </div>
+    </aside>
+
+    <main>
+      <div id="err"></div>
+      <div class="panel">
+        <div class="panel-head" id="status" hidden>
+          <div class="ph-top">
+            <div>
+              <h2 id="count">0 leads</h2>
+              <p class="sub" id="countSub"></p>
+            </div>
+            <div class="ph-tools">
+              <select id="sortBy" aria-label="Ordenar por">
+                <option value="score">Maior pontuação</option>
+                <option value="reviews">Mais avaliações</option>
+                <option value="rating">Melhor nota</option>
+                <option value="name">Nome (A–Z)</option>
+              </select>
+              <button class="ghost" id="csvBtn">Exportar CSV</button>
+            </div>
+          </div>
+          <div class="chips" role="group" aria-label="Categorias">
+            <label class="chip none"><input type="checkbox" id="fNone" checked><i></i>Sem site <b id="cNone">0</b></label>
+            <label class="chip booking"><input type="checkbox" id="fBooking" checked><i></i>Depende do Airbnb/Booking <b id="cBooking">0</b></label>
+            <label class="chip third"><input type="checkbox" id="fThird" checked><i></i>Só app ou rede social <b id="cThird">0</b></label>
+            <label class="chip own"><input type="checkbox" id="fOwn"><i></i>Site próprio <b id="cOwn">0</b></label>
+          </div>
+        </div>
+        <div id="list">
+          <div class="empty">
+            <div class="illu"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg></div>
+            <h3>Comece por um nicho e uma região</h3>
+            <p>A pontuação de cada lead sobe com avaliações, nota alta, celular e presença em apps ou plataformas de reserva, sinais de quem tem movimento e já investe em digital.</p>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script>
+const DEFAULT_THIRD = `appbarber.com.br
+booksy.com
+trinks.com
+avec.app
+salaovip.com.br
+simplybook.me
+calendly.com
+instagram.com
+facebook.com
+fb.com
+fb.me
+tiktok.com
+youtube.com
+linktr.ee
+linkin.bio
+bio.link
+beacons.ai
+taplink.cc
+carrd.co
+wa.me
+wa.link
+whatsapp.com
+api.whatsapp.com
+ifood.com.br
+aiqfome.com
+anota.ai
+goomer.app
+cardapioweb.com
+ubereats.com
+doctoralia.com.br
+boaconsulta.com
+google.com
+g.page
+goo.gl
+business.site
+sites.google.com
+wixsite.com
+blogspot.com
+wordpress.com
+webnode.page
+negocio.site
+bit.ly`;
+
+const DEFAULT_BOOKING = `airbnb.com
+airbnb.com.br
+abnb.me
+booking.com
+expedia.com
+expedia.com.br
+hoteis.com
+hotels.com
+decolar.com
+vrbo.com
+tripadvisor.com
+tripadvisor.com.br
+trivago.com.br
+agoda.com
+hostelworld.com`;
+
+const STAY_TERMS = "chalé, cabana, pousada, casa de temporada, hostel";
+
+const DEFAULT_MSG_STAY = `Oi, tudo bem? Vi a {nome} no Google Maps e percebi que as reservas hoje passam pelo {plataforma}. Trabalho com anfitriões aqui de SC criando um canal de reserva direta: uma página própria com calendário e reserva pelo WhatsApp, sem comissão por reserva. Ela também serve para quem já se hospedou com vocês voltar direto, sem passar pela plataforma de novo. Posso te mostrar como ficaria?`;
+
+const DEFAULT_MSG = `Oi, tudo bem? Vi a {nome} no Google Maps e notei que vocês ainda não têm um site próprio. Trabalho com isso aqui na região. Posso te mostrar uma ideia rápida de como ficaria?`;
+
+const $ = id => document.getElementById(id);
+const store = {
+  get(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } },
+  set(k,v){ try{ localStorage.setItem(k,v); }catch(e){} },
+  del(k){ try{ localStorage.removeItem(k); }catch(e){} }
+};
+
+let leads = [];
+let contacted = {};
+try{ contacted = JSON.parse(store.get("cl_contacted") || "{}"); }catch(e){ contacted = {}; }
+
+// estado salvo
+$("thirdList").value = store.get("cl_third") || DEFAULT_THIRD;
+$("msg").value = store.get("cl_msg") || DEFAULT_MSG;
+$("msgStay").value = store.get("cl_msgStay") || DEFAULT_MSG_STAY;
+$("bookingList").value = store.get("cl_booking") || DEFAULT_BOOKING;
+const savedKey = store.get("cl_key");
+if(savedKey){ $("apiKey").value = savedKey; $("rememberKey").checked = true; }
+function keyState(){ $("keyDot").classList.toggle("ok", !!$("apiKey").value.trim()); }
+$("apiKey").addEventListener("input", keyState); keyState();
+$("niche").value = store.get("cl_niche") || "";
+$("areas").value = store.get("cl_areas") || "";
+
+$("thirdList").addEventListener("input", () => { store.set("cl_third", $("thirdList").value); classifyAll(); render(); });
+$("msg").addEventListener("input", () => { store.set("cl_msg", $("msg").value); render(); });
+$("msgStay").addEventListener("input", () => { store.set("cl_msgStay", $("msgStay").value); render(); });
+$("bookingList").addEventListener("input", () => { store.set("cl_booking", $("bookingList").value); classifyAll(); render(); });
+
+let mode = store.get("cl_mode") || "biz";
+let bizNiche = store.get("cl_niche") || "";
+function setMode(m){
+  if(mode === "biz") bizNiche = $("niche").value;
+  mode = m;
+  store.set("cl_mode", m);
+  $("modeBiz").setAttribute("aria-pressed", m === "biz");
+  $("modeStay").setAttribute("aria-pressed", m === "stay");
+  $("niche").value = m === "stay" ? (store.get("cl_stayTerms") || STAY_TERMS) : bizNiche;
+  $("nicheLabel").textContent = m === "stay" ? "Tipos de hospedagem (separe por vírgula)" : "Nicho (pode separar por vírgula)";
+  $("niche").placeholder = m === "stay" ? STAY_TERMS : "barbearia";
+  updateEstimate();
+}
+$("modeBiz").addEventListener("click", () => setMode("biz"));
+$("modeStay").addEventListener("click", () => setMode("stay"));
+function splitList(v){ return v.split(",").map(s => s.trim()).filter(Boolean); }
+function updateEstimate(){
+  const n = splitList($("niche").value).length, a = splitList($("areas").value).length;
+  $("estimate").textContent = n && a ? `${n} termo(s) × ${a} região(ões): até ${n*a*3} consultas à API.` : "";
+}
+$("niche").addEventListener("input", () => {
+  if(mode === "stay") store.set("cl_stayTerms", $("niche").value);
+  updateEstimate();
+});
+$("areas").addEventListener("input", updateEstimate);
+$("rememberKey").addEventListener("change", saveKey);
+$("apiKey").addEventListener("change", saveKey);
+function saveKey(){
+  if($("rememberKey").checked) store.set("cl_key", $("apiKey").value.trim());
+  else store.del("cl_key");
+}
+["fNone","fBooking","fThird","fOwn","minRating","minReviews","fMobile","fOpen","fHideDone","textFilter","sortBy"]
+  .forEach(id => $(id).addEventListener("input", render));
+
+function thirdDomains(){
+  return $("thirdList").value.split(/\s+/).map(s => s.trim().toLowerCase().replace(/^www\./,"")).filter(Boolean);
+}
+
+function domainsOf(id){
+  return $(id).value.split(/\s+/).map(s => s.trim().toLowerCase().replace(/^www\./,"")).filter(Boolean);
+}
+function classify(url){
+  if(!url) return "none";
+  let host;
+  try{ host = new URL(url).hostname.toLowerCase().replace(/^www\./,""); }catch(e){ return "none"; }
+  const hit = list => list.some(d => host === d || host.endsWith("." + d));
+  if(hit(domainsOf("bookingList"))) return "booking";
+  if(hit(domainsOf("thirdList"))) return "third";
+  return "own";
+}
+
+function mobileDigits(p){
+  // Retorna 55 + DDD + número se for celular brasileiro
+  const src = p.internationalPhoneNumber || p.nationalPhoneNumber || "";
+  let d = src.replace(/\D/g, "");
+  if(!d) return null;
+  if(d.startsWith("0")) d = d.replace(/^0+/, "");
+  if(!d.startsWith("55")) d = "55" + d;
+  const local = d.slice(4);
+  if(d.length === 13 && local.startsWith("9")) return d;
+  return null;
+}
+
+function score(l){
+  let s = 0;
+  s += Math.min(l.reviews, 200) / 200 * 35;
+  s += l.rating >= 4.5 ? 20 : l.rating >= 4 ? 12 : l.rating ? 5 : 0;
+  s += l.kind === "booking" ? 25 : l.kind === "third" ? 20 : l.kind === "none" ? 10 : 0;
+  s += l.mobile ? 15 : 0;
+  s += l.hasHours ? 10 : 0;
+  return Math.round(s);
+}
+
+function classifyAll(){
+  leads.forEach(l => { l.kind = classify(l.website); l.score = score(l); });
+}
+
+const FIELDS = [
+  "places.id","places.displayName","places.formattedAddress","places.nationalPhoneNumber",
+  "places.internationalPhoneNumber","places.websiteUri","places.rating","places.userRatingCount",
+  "places.googleMapsUri","places.businessStatus","places.regularOpeningHours","places.primaryTypeDisplayName",
+  "nextPageToken"
+].join(",");
+
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+async function searchText(key, query, pageToken){
+  const body = { textQuery: query, languageCode: "pt-BR", regionCode: "BR", pageSize: 20 };
+  if(pageToken) body.pageToken = pageToken;
+  const res = await fetch("https://places.googleapis.com/v1/places:searchText", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "X-Goog-Api-Key": key, "X-Goog-FieldMask": FIELDS },
+    body: JSON.stringify(body)
+  });
+  const data = await res.json().catch(() => ({}));
+  if(!res.ok){
+    const msg = data?.error?.message || ("Erro " + res.status);
+    throw new Error(msg);
+  }
+  return data;
+}
+
+$("goBtn").addEventListener("click", run);
+[$("niche"), $("areas")].forEach(el => el.addEventListener("keydown", e => { if(e.key === "Enter") run(); }));
+
+async function run(){
+  const key = $("apiKey").value.trim();
+  const niches = splitList($("niche").value);
+  const niche = niches.join(", ");
+  const areas = splitList($("areas").value);
+  $("err").innerHTML = "";
+  if(!key) return showErr("Cole sua chave da API do Google no painel à esquerda.");
+  if(!niche) return showErr("Digite um nicho, por exemplo barbearia.");
+  if(!areas.length) return showErr("Digite pelo menos uma região, por exemplo Palhoça SC.");
+  saveKey();
+  if(mode === "biz") store.set("cl_niche", $("niche").value); store.set("cl_areas", $("areas").value);
+
+  const btn = $("goBtn");
+  btn.disabled = true;
+  document.body.classList.add("loading");
+  const byId = new Map();
+  let calls = 0;
+  try{
+    const jobs = [];
+    areas.forEach(a => niches.forEach(n => jobs.push({ q: `${n} em ${a}`, area: a })));
+    for(let i = 0; i < jobs.length; i++){
+      const q = jobs[i].q;
+      let token = null, page = 0;
+      do{
+        btn.textContent = `Buscando ${i+1}/${jobs.length}…`;
+        if(token) await sleep(1500);
+        const data = await searchText(key, q, token);
+        calls++;
+        (data.places || []).forEach(p => {
+          if(byId.has(p.id)) return;
+          byId.set(p.id, {
+            id: p.id,
+            name: p.displayName?.text || "Sem nome",
+            address: p.formattedAddress || "",
+            phone: p.nationalPhoneNumber || p.internationalPhoneNumber || "",
+            mobile: mobileDigits(p),
+            website: p.websiteUri || "",
+            rating: p.rating || 0,
+            reviews: p.userRatingCount || 0,
+            maps: p.googleMapsUri || "",
+            open: !p.businessStatus || p.businessStatus === "OPERATIONAL",
+            hasHours: !!p.regularOpeningHours,
+            type: p.primaryTypeDisplayName?.text || "",
+            area: jobs[i].area,
+            mode: mode
+          });
+        });
+        token = data.nextPageToken || null;
+        page++;
+      }while(token && page < 3);
+    }
+  }catch(e){
+    showErr("A busca parou: " + e.message + (leads.length ? "" : " Confira se a chave está correta e se a Places API (New) está ativada no projeto."));
+  }finally{
+    btn.disabled = false;
+    btn.textContent = "Buscar leads";
+    document.body.classList.remove("loading");
+  }
+  leads = [...byId.values()];
+  classifyAll();
+  $("countSub").dataset.calls = calls;
+  render();
+}
+
+function showErr(t){
+  $("err").innerHTML = `<div class="error"><strong>Algo deu errado.</strong> ${esc(t)}</div>`;
+}
+
+function esc(s){
+  return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+
+function filtered(){
+  const show = { none: $("fNone").checked, booking: $("fBooking").checked, third: $("fThird").checked, own: $("fOwn").checked };
+  const minR = parseFloat($("minRating").value) || 0;
+  const minN = parseInt($("minReviews").value) || 0;
+  const txt = $("textFilter").value.trim().toLowerCase();
+  let out = leads.filter(l =>
+    show[l.kind] &&
+    l.rating >= minR &&
+    l.reviews >= minN &&
+    (!$("fMobile").checked || l.mobile) &&
+    (!$("fOpen").checked || l.open) &&
+    (!$("fHideDone").checked || !contacted[l.id]) &&
+    (!txt || l.address.toLowerCase().includes(txt))
+  );
+  const by = $("sortBy").value;
+  const cmp = {
+    score: (a,b) => b.score - a.score,
+    reviews: (a,b) => b.reviews - a.reviews,
+    rating: (a,b) => b.rating - a.rating || b.reviews - a.reviews,
+    name: (a,b) => a.name.localeCompare(b.name, "pt-BR")
+  }[by];
+  return out.sort(cmp);
+}
+
+const ICON = {
+  chat:'<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg>',
+  pin:'<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>',
+  link:'<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>',
+  check:'<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>'
+};
+
+function render(){
+  if(!leads.length) return;
+  const counts = {none:0,booking:0,third:0,own:0};
+  leads.forEach(l => counts[l.kind]++);
+  $("cNone").textContent = counts.none; $("cBooking").textContent = counts.booking;
+  $("cThird").textContent = counts.third; $("cOwn").textContent = counts.own;
+
+  const list = filtered();
+  $("status").hidden = false;
+  $("count").textContent = list.length === 1 ? "1 lead na lista" : `${list.length} leads na lista`;
+  $("countSub").textContent = `${leads.length} empresas encontradas em ${$("countSub").dataset.calls || 0} consultas à API`;
+
+  if(!list.length){
+    $("list").innerHTML = `<div class="empty"><h3>Nenhum lead com esses filtros</h3><p>Reduza a nota ou o mínimo de avaliações, ou ative mais categorias acima da lista.</p></div>`;
+    return;
+  }
+  $("list").innerHTML = list.map(l => {
+    const stay = l.mode === "stay" || l.kind === "booking";
+    const tpl = stay ? $("msgStay").value : $("msg").value;
+    const plat = l.website ? platName(l.website) : (stay ? "Airbnb ou Booking" : "redes sociais");
+    const tag = l.kind === "none" ? `<span class="tag none">Sem site</span>`
+      : l.kind === "booking" ? `<span class="tag booking">Depende do ${esc(platName(l.website))}</span>`
+      : l.kind === "third" ? `<span class="tag third">Só ${esc(platName(l.website))}</span>`
+      : `<span class="tag own">Site próprio</span>`;
+    const text = encodeURIComponent(tpl.replaceAll("{nome}", l.name).replaceAll("{plataforma}", plat));
+    const wa = l.mobile
+      ? `<a class="btn wa" target="_blank" rel="noopener" href="https://wa.me/${l.mobile}?text=${text}" data-id="${l.id}">${ICON.chat}<span>WhatsApp</span></a>`
+      : `<span class="btn wa off" title="O número não parece ser celular">${l.phone ? "Telefone fixo" : "Sem telefone"}</span>`;
+    const done = !!contacted[l.id];
+    const hot = l.score >= 60;
+    return `<article class="lead ${done ? "done" : ""}">
+      <div class="ring ${hot ? "hot" : ""}" style="--p:${l.score}" title="Pontuação de lead: ${l.score} de 100"><span>${l.score}</span></div>
+      <div class="info">
+        <h3 class="name">${esc(l.name)}${done ? ` <span class="done-badge">${ICON.check}Contatado</span>` : ""}</h3>
+        <div class="tags">${tag}${l.type ? `<span class="type">${esc(l.type)}</span>` : ""}</div>
+        <p class="addr">${esc(l.address)}</p>
+      </div>
+      <div class="stats">
+        <div class="rating">${l.rating ? `<span class="star">★</span> ${l.rating.toFixed(1).replace(".", ",")} <small>${l.reviews} avaliações</small>` : `<small>Sem avaliações</small>`}</div>
+        <div class="phone">${l.phone ? esc(l.phone) : "—"}</div>
+      </div>
+      <div class="actions">
+        ${wa}
+        ${l.maps ? `<a class="icon-btn" target="_blank" rel="noopener" href="${esc(l.maps)}" title="Ver no Google Maps" aria-label="Ver no Google Maps">${ICON.pin}</a>` : ""}
+        ${l.website ? `<a class="icon-btn" target="_blank" rel="noopener" href="${esc(l.website)}" title="Abrir link atual" aria-label="Abrir link atual">${ICON.link}</a>` : ""}
+        <button class="icon-btn ${done ? "on" : ""}" data-toggle="${l.id}" title="${done ? "Desmarcar contato" : "Marcar como contatado"}" aria-label="${done ? "Desmarcar contato" : "Marcar como contatado"}">${ICON.check}</button>
+      </div>
+    </article>`;
+  }).join("");
+}
+
+function platName(u){
+  const h = hostOf(u);
+  const names = {airbnb:"Airbnb",abnb:"Airbnb",booking:"Booking",expedia:"Expedia",hoteis:"Hoteis.com",hotels:"Hotels.com",
+    decolar:"Decolar",vrbo:"Vrbo",tripadvisor:"TripAdvisor",trivago:"Trivago",agoda:"Agoda",hostelworld:"Hostelworld",
+    instagram:"Instagram",facebook:"Facebook",appbarber:"AppBarber",booksy:"Booksy",linktr:"Linktree"};
+  const k = Object.keys(names).find(k => h.startsWith(k + ".") || h.includes("." + k + "."));
+  return k ? names[k] : h;
+}
+
+function hostOf(u){
+  try{ return new URL(u).hostname.replace(/^www\./,""); }catch(e){ return "link externo"; }
+}
+
+$("list").addEventListener("click", e => {
+  const t = e.target.closest("[data-toggle]");
+  const w = e.target.closest("a.wa[data-id]");
+  if(t){
+    const id = t.dataset.toggle;
+    if(contacted[id]) delete contacted[id]; else contacted[id] = Date.now();
+    store.set("cl_contacted", JSON.stringify(contacted));
+    render();
+  }else if(w){
+    contacted[w.dataset.id] = Date.now();
+    store.set("cl_contacted", JSON.stringify(contacted));
+    setTimeout(render, 300);
+  }
+});
+
+$("csvBtn").addEventListener("click", () => {
+  const rows = [["Nome","Situação","Link atual","Telefone","WhatsApp","Nota","Avaliações","Endereço","Região","Pontuação","Contatado","Maps"]];
+  filtered().forEach(l => rows.push([
+    l.name, {none:"Sem site",booking:"Depende de plataforma de reserva",third:"App ou rede social",own:"Site próprio"}[l.kind], l.website, l.phone,
+    l.mobile ? "https://wa.me/" + l.mobile : "", l.rating || "", l.reviews, l.address, l.area, l.score,
+    contacted[l.id] ? "Sim" : "Não", l.maps
+  ]));
+  const csv = "\uFEFF" + rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(";")).join("\n");
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([csv], {type:"text/csv;charset=utf-8"}));
+  a.download = `leads-${($("niche").value || "busca").replace(/\s+/g,"-")}.csv`;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+});
+setMode(mode);
+</script>
+</body>
+</html>
