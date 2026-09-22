@@ -1,0 +1,55 @@
+@import "tailwindcss";
+
+:root {
+  --color-canvas: #f3f5f9;
+  --color-surface: #ffffff;
+  --color-ink: #172033;
+  --color-ink-2: #4a5568;
+  --color-muted: #8792a6;
+  --color-line: #e4e8ef;
+  --color-line-2: #eef1f5;
+  --color-primary: #2f54eb;
+  --color-primary-soft: #eaf0ff;
+  --color-primary-ink: #ffffff;
+  --color-hot: #f5a300;
+  --color-hot-soft: #fff4db;
+  --color-wa: #12a150;
+  --color-wa-soft: #e6f6ec;
+  --color-danger: #c62828;
+  --radius-lg: 16px;
+  --radius-md: 10px;
+  --radius-sm: 8px;
+}
+
+@theme inline {
+  --color-canvas: var(--color-canvas);
+  --color-surface: var(--color-surface);
+  --color-ink: var(--color-ink);
+  --color-ink-2: var(--color-ink-2);
+  --color-muted: var(--color-muted);
+  --color-line: var(--color-line);
+  --color-line-2: var(--color-line-2);
+  --color-primary: var(--color-primary);
+  --color-primary-soft: var(--color-primary-soft);
+  --color-primary-ink: var(--color-primary-ink);
+  --color-hot: var(--color-hot);
+  --color-hot-soft: var(--color-hot-soft);
+  --color-wa: var(--color-wa);
+  --color-wa-soft: var(--color-wa-soft);
+  --color-danger: var(--color-danger);
+  --radius-lg: var(--radius-lg);
+  --radius-md: var(--radius-md);
+  --radius-sm: var(--radius-sm);
+  --font-sans: var(--font-onest);
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  -webkit-font-smoothing: antialiased;
+}
