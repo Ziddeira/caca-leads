@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { createClient } from "@/lib/supabase/client";
 
@@ -9,10 +9,15 @@ type Mode = "login" | "cadastro";
 
 export default function AuthForm({ mode }: { mode: Mode }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(() =>
+    mode === "login" && searchParams.get("erro") === "confirmacao"
+      ? "Não foi possível confirmar seu e-mail. O link pode ter expirado — tente se cadastrar de novo."
+      : null,
+  );
   const [info, setInfo] = useState<string | null>(null);
 
   async function handleSubmit(e: FormEvent) {
@@ -48,6 +53,9 @@ export default function AuthForm({ mode }: { mode: Mode }) {
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+        },
       });
       setLoading(false);
       if (error) {
