@@ -20,7 +20,17 @@ export default function AuthForm({ mode }: { mode: Mode }) {
     setError(null);
     setInfo(null);
     setLoading(true);
-    const supabase = createClient();
+
+    let supabase;
+    try {
+      supabase = createClient();
+    } catch {
+      setLoading(false);
+      setError(
+        "O sistema de login ainda não foi configurado neste ambiente. Tente novamente mais tarde.",
+      );
+      return;
+    }
 
     if (mode === "login") {
       const { error } = await supabase.auth.signInWithPassword({
