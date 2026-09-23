@@ -35,8 +35,13 @@ export default async function ComunidadePage() {
             A Comunidade vem aí
           </h1>
           <p className="mx-auto mt-3 max-w-md text-base text-ink-2">
-            Um espaço para web designers trocarem abordagens, mensagens que dão resposta e
-            indicações de clientes. Estamos levantando as paredes — chega em breve.
+            Uma vitrine de templates feita por web designers. Veja os sites da comunidade, curta
+            os que gostar e, se quiser, acesse o prompt e o design para usar nos seus trabalhos.
+          </p>
+          <p className="mx-auto mt-3 max-w-md text-base text-ink-2">
+            Quem capta um cliente, fecha a venda e entrega o site publica o resultado aqui. Assim
+            a comunidade cresce sozinha, a cada projeto. Estamos levantando as paredes e ela chega
+            em breve.
           </p>
           <div className="mt-6 flex justify-center">
             <BotaoAvisar jaInscrito={jaInscrito} />
