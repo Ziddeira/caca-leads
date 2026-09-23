@@ -23,6 +23,17 @@ export async function POST() {
 
   const { error } = await supabase.rpc("quero_ser_avisado_comunidade");
   if (error) {
+    console.error("[comunidade/avisar] Falha ao registrar interesse:", error.code, error.message);
+    // PGRST202 / 42883: a função não existe. 42P01: a tabela não existe.
+    // Os dois casos querem dizer que o script da etapa 4 não foi rodado.
+    if (["PGRST202", "42883", "42P01"].includes(error.code)) {
+      return NextResponse.json(
+        {
+          erro: "A lista de espera ainda não foi ativada no banco. Rode o script supabase/etapa4-cache-leads-comunidade.sql no Supabase.",
+        },
+        { status: 503 },
+      );
+    }
     return NextResponse.json(
       { erro: "Não foi possível registrar agora. Tente de novo em instantes." },
       { status: 500 },
