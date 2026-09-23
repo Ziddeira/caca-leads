@@ -9,6 +9,28 @@ import {
   montarMensagem,
 } from "@/lib/leads/mensagens";
 import EtiquetaSituacao from "@/components/leads/EtiquetaSituacao";
+import { ListaEsqueleto } from "@/components/leads/CartaoLeadEsqueleto";
+import {
+  ALERTA_AVISO,
+  ALERTA_ERRO,
+  BOTAO,
+  BOTAO_SECUNDARIO,
+  BOTAO_WHATSAPP,
+  CAMPO,
+  CARTAO,
+  EstadoVazio,
+  ROTULO,
+  TituloPagina,
+} from "@/components/ui";
+import {
+  IconeBuscar,
+  IconeCadeado,
+  IconeEstrela,
+  IconeFiltro,
+  IconeLink,
+  IconeMapa,
+  IconeWhatsapp,
+} from "@/components/Icones";
 
 type Modo = "negocios" | "hospedagem";
 
@@ -23,6 +45,8 @@ const ROTULO_PLANO: Record<string, string> = {
   solo: "Solo",
   pro: "Pro",
 };
+
+const CHECKBOX = "h-5 w-5 shrink-0 cursor-pointer accent-primary";
 
 const ORDENS = {
   pontuacao: (a: LeadResultado, b: LeadResultado) => b.pontuacao - a.pontuacao,
@@ -56,6 +80,7 @@ export default function BuscaClient({ perfilInicial }: { perfilInicial: Perfil }
   const [aviso, setAviso] = useState<string | null>(null);
   const [buscaFeita, setBuscaFeita] = useState(false);
   const [desbloqueando, setDesbloqueando] = useState<Record<string, boolean>>({});
+  const [filtrosAbertos, setFiltrosAbertos] = useState(false);
 
   const [minNota, setMinNota] = useState(0);
   const [minAvaliacoes, setMinAvaliacoes] = useState(0);
@@ -185,28 +210,30 @@ export default function BuscaClient({ perfilInicial }: { perfilInicial: Perfil }
 
   return (
     <div>
-      <h1 className="text-2xl font-extrabold tracking-tight text-ink">Buscar leads</h1>
-      <p className="mt-2 max-w-2xl text-ink-2">
-        Busca no Google Maps e separa quem não tem site, quem depende de Airbnb/Booking e
-        quem só usa app ou rede social.
-      </p>
+      <TituloPagina
+        titulo="Buscar leads"
+        descricao="Busca no Google Maps e separa quem não tem site, quem depende de Airbnb/Booking e quem só usa app ou rede social."
+      />
 
-      <div className="mt-4 flex flex-wrap items-center gap-3 rounded-md border border-line bg-surface px-4 py-3 text-sm">
-        <span className="font-semibold text-ink">Plano {ROTULO_PLANO[perfil.plano] ?? perfil.plano}</span>
-        <span className="text-ink-2">
-          <strong className="text-ink">{perfil.buscasRestantes}</strong> busca(s) restante(s)
+      <div className="mt-5 flex flex-wrap gap-2 text-sm">
+        <span className="inline-flex items-center rounded-full bg-primary-soft px-3 py-1.5 font-semibold text-primary">
+          Plano {ROTULO_PLANO[perfil.plano] ?? perfil.plano}
         </span>
-        <span className="text-ink-2">
-          <strong className="text-ink">{perfil.creditosDesbloqueio}</strong> crédito(s) de desbloqueio
+        <span className="inline-flex items-center rounded-full border border-line bg-surface px-3 py-1.5 text-ink-2">
+          <strong className="mr-1 text-ink">{perfil.buscasRestantes}</strong> busca(s) restante(s)
+        </span>
+        <span className="inline-flex items-center rounded-full border border-line bg-surface px-3 py-1.5 text-ink-2">
+          <strong className="mr-1 text-ink">{perfil.creditosDesbloqueio}</strong> crédito(s) de desbloqueio
         </span>
       </div>
 
-      <div className="mt-4 rounded-lg border border-line bg-surface p-4 shadow-[0_1px_2px_rgba(23,32,51,.04),0_4px_16px_rgba(23,32,51,.05)]">
-        <div className="flex gap-2 rounded-full bg-canvas p-1 w-fit">
+      <div className={`${CARTAO} mt-4 p-4 sm:p-6`}>
+        <div role="group" aria-label="Tipo de busca" className="grid w-full grid-cols-2 gap-1 rounded-full bg-canvas p-1 sm:inline-grid sm:w-auto">
           <button
             type="button"
             onClick={() => alternarModo("negocios")}
-            className={`rounded-full px-4 py-1.5 text-sm font-semibold transition ${
+            aria-pressed={modo === "negocios"}
+            className={`min-h-11 rounded-full px-5 text-sm font-semibold transition ${
               modo === "negocios" ? "bg-surface text-ink shadow-sm" : "text-ink-2"
             }`}
           >
@@ -216,35 +243,42 @@ export default function BuscaClient({ perfilInicial }: { perfilInicial: Perfil }
             type="button"
             onClick={() => alternarModo("hospedagem")}
             disabled={!podeHospedagem}
+            aria-pressed={modo === "hospedagem"}
             title={!podeHospedagem ? "Disponível no plano Pro" : undefined}
-            className={`rounded-full px-4 py-1.5 text-sm font-semibold transition ${
+            className={`inline-flex min-h-11 items-center justify-center gap-1.5 rounded-full px-5 text-sm font-semibold transition ${
               modo === "hospedagem" ? "bg-surface text-ink shadow-sm" : "text-ink-2"
-            } ${!podeHospedagem ? "cursor-not-allowed opacity-50" : ""}`}
+            } ${!podeHospedagem ? "cursor-not-allowed opacity-60" : ""}`}
           >
-            Hospedagem {!podeHospedagem && "🔒"}
+            Hospedagem
+            {!podeHospedagem && (
+              <>
+                <IconeCadeado width={14} height={14} />
+                <span className="sr-only">(exclusivo do plano Pro)</span>
+              </>
+            )}
           </button>
         </div>
 
-        <div className="mt-3 grid gap-3 sm:grid-cols-2">
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
           <div>
-            <label htmlFor="nicho" className="mb-1 block text-sm font-semibold text-ink-2">
+            <label htmlFor="nicho" className={ROTULO}>
               {modo === "hospedagem" ? "Tipos de hospedagem (separe por vírgula)" : "Nicho (pode separar por vírgula)"}
             </label>
             <input
               id="nicho"
-              className="w-full rounded-md border border-line bg-surface px-3 py-2 outline-none focus:border-primary focus:ring-4 focus:ring-primary-soft"
+              className={CAMPO}
               placeholder={modo === "hospedagem" ? "chalé, cabana, pousada" : "barbearia, salão de beleza"}
               value={nicho}
               onChange={(e) => setNicho(e.target.value)}
             />
           </div>
           <div>
-            <label htmlFor="areas" className="mb-1 block text-sm font-semibold text-ink-2">
+            <label htmlFor="areas" className={ROTULO}>
               Regiões (separe por vírgula)
             </label>
             <input
               id="areas"
-              className="w-full rounded-md border border-line bg-surface px-3 py-2 outline-none focus:border-primary focus:ring-4 focus:ring-primary-soft"
+              className={CAMPO}
               placeholder="Centro Palhoça SC, Pagani Palhoça SC"
               value={areas}
               onChange={(e) => setAreas(e.target.value)}
@@ -252,8 +286,8 @@ export default function BuscaClient({ perfilInicial }: { perfilInicial: Perfil }
           </div>
         </div>
 
-        <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
-          <p className="text-xs text-muted">
+        <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm text-muted">
             {estimativaBuscas > 0
               ? `${termos.length} termo(s) × ${listaAreas.length} região(ões): vai gastar ${estimativaBuscas} busca(s) do seu saldo (até ${estimativaBuscas * 3} chamadas à API do Google).`
               : "Até 3 páginas de resultado do Google por busca."}
@@ -262,30 +296,59 @@ export default function BuscaClient({ perfilInicial }: { perfilInicial: Perfil }
             type="button"
             onClick={buscar}
             disabled={carregando}
-            className="rounded-md bg-primary px-6 py-2.5 font-semibold text-primary-ink transition hover:brightness-110 disabled:cursor-wait disabled:opacity-70"
+            className={`${BOTAO} w-full shrink-0 px-7! text-base! sm:w-auto`}
           >
+            <IconeBuscar width={18} height={18} />
             {carregando ? "Buscando..." : "Buscar leads"}
           </button>
         </div>
 
         {erro && (
-          <div className="mt-3 rounded-md border border-[#F6CACA] bg-[#FDECEC] px-3 py-2 text-sm text-danger">
+          <div role="alert" className={`${ALERTA_ERRO} mt-4`}>
             {erro}
           </div>
         )}
         {aviso && (
-          <div className="mt-3 rounded-md border border-hot/30 bg-hot-soft px-3 py-2 text-sm text-[#8A5A00]">
+          <div role="status" className={`${ALERTA_AVISO} mt-4`}>
             {aviso}
           </div>
         )}
       </div>
 
+      {carregando && !buscaFeita && <ListaEsqueleto quantidade={3} />}
+
+      {!buscaFeita && !carregando && (
+        <div className="mt-6">
+          <EstadoVazio
+            icone={<IconeBuscar width={26} height={26} />}
+            titulo="Sua lista de leads aparece aqui"
+            texto={
+              <>
+                Comece simples: um nicho e o seu bairro, como <strong>“barbearia”</strong> em{" "}
+                <strong>“Centro Palhoça SC”</strong>. Depois é só filtrar e desbloquear os melhores.
+              </>
+            }
+          />
+        </div>
+      )}
+
       {buscaFeita && (
-        <div className="mt-6 grid gap-5 lg:grid-cols-[260px_1fr]">
-          <aside className="flex flex-col gap-3">
-            <div className="rounded-lg border border-line bg-surface p-4">
-              <h2 className="mb-3 text-sm font-bold text-ink">Categorias</h2>
-              <div className="flex flex-col gap-2 text-sm">
+        <div className="mt-6 grid gap-5 lg:grid-cols-[260px_minmax(0,1fr)]">
+          <button
+            type="button"
+            onClick={() => setFiltrosAbertos((a) => !a)}
+            aria-expanded={filtrosAbertos}
+            aria-controls="filtros-busca"
+            className={`${BOTAO_SECUNDARIO} w-full lg:hidden`}
+          >
+            <IconeFiltro width={18} height={18} />
+            {filtrosAbertos ? "Esconder filtros" : "Categorias e filtros"}
+          </button>
+
+          <aside id="filtros-busca" className={`${filtrosAbertos ? "flex" : "hidden"} flex-col gap-3 lg:flex`}>
+            <div className={`${CARTAO} p-4`}>
+              <h2 className="mb-2 text-sm font-bold text-ink">Categorias</h2>
+              <div className="flex flex-col text-sm">
                 {(
                   [
                     ["sem_site", "Sem site"],
@@ -294,10 +357,11 @@ export default function BuscaClient({ perfilInicial }: { perfilInicial: Perfil }
                     ["site_proprio", "Site próprio"],
                   ] as [Situacao, string][]
                 ).map(([chave, rotulo]) => (
-                  <label key={chave} className="flex items-center justify-between gap-2 text-ink-2">
-                    <span className="flex items-center gap-2">
+                  <label key={chave} className="flex min-h-11 cursor-pointer items-center justify-between gap-2 text-ink-2">
+                    <span className="flex items-center gap-2.5">
                       <input
                         type="checkbox"
+                        className={CHECKBOX}
                         checked={situacoesAtivas[chave]}
                         onChange={(e) =>
                           setSituacoesAtivas((s) => ({ ...s, [chave]: e.target.checked }))
@@ -311,13 +375,14 @@ export default function BuscaClient({ perfilInicial }: { perfilInicial: Perfil }
               </div>
             </div>
 
-            <div className="rounded-lg border border-line bg-surface p-4">
+            <div className={`${CARTAO} p-4`}>
               <h2 className="mb-3 text-sm font-bold text-ink">Filtros</h2>
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="mb-1 block text-xs font-semibold text-ink-2">Nota mínima</label>
+                  <label htmlFor="min-nota" className="mb-1 block text-xs font-semibold text-ink-2">Nota mínima</label>
                   <select
-                    className="w-full rounded-md border border-line px-2 py-1.5 text-sm"
+                    id="min-nota"
+                    className={CAMPO}
                     value={minNota}
                     onChange={(e) => setMinNota(parseFloat(e.target.value))}
                   >
@@ -328,35 +393,39 @@ export default function BuscaClient({ perfilInicial }: { perfilInicial: Perfil }
                   </select>
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs font-semibold text-ink-2">Avaliações</label>
+                  <label htmlFor="min-avaliacoes" className="mb-1 block text-xs font-semibold text-ink-2">Avaliações</label>
                   <input
+                    id="min-avaliacoes"
                     type="number"
+                    inputMode="numeric"
                     min={0}
-                    className="w-full rounded-md border border-line px-2 py-1.5 text-sm"
+                    className={CAMPO}
                     value={minAvaliacoes}
                     onChange={(e) => setMinAvaliacoes(parseInt(e.target.value) || 0)}
                   />
                 </div>
               </div>
-              <label className="mb-1 mt-3 block text-xs font-semibold text-ink-2">Bairro contém</label>
+              <label htmlFor="bairro-contem" className="mb-1 mt-3 block text-xs font-semibold text-ink-2">Bairro contém</label>
               <input
-                className="w-full rounded-md border border-line px-2 py-1.5 text-sm"
+                id="bairro-contem"
+                className={CAMPO}
                 placeholder="ex.: Centro"
                 value={textoEndereco}
                 onChange={(e) => setTextoEndereco(e.target.value)}
               />
-              <div className="mt-3 flex flex-col gap-2 text-sm text-ink-2">
-                <label className="flex items-center gap-2">
-                  <input type="checkbox" checked={apenasCelular} onChange={(e) => setApenasCelular(e.target.checked)} />
+              <div className="mt-2 flex flex-col text-sm text-ink-2">
+                <label className="flex min-h-11 cursor-pointer items-center gap-2.5">
+                  <input type="checkbox" className={CHECKBOX} checked={apenasCelular} onChange={(e) => setApenasCelular(e.target.checked)} />
                   Só com celular
                 </label>
-                <label className="flex items-center gap-2">
-                  <input type="checkbox" checked={apenasAberto} onChange={(e) => setApenasAberto(e.target.checked)} />
+                <label className="flex min-h-11 cursor-pointer items-center gap-2.5">
+                  <input type="checkbox" className={CHECKBOX} checked={apenasAberto} onChange={(e) => setApenasAberto(e.target.checked)} />
                   Só em funcionamento
                 </label>
-                <label className="flex items-center gap-2">
+                <label className="flex min-h-11 cursor-pointer items-center gap-2.5">
                   <input
                     type="checkbox"
+                    className={CHECKBOX}
                     checked={esconderDesbloqueados}
                     onChange={(e) => setEsconderDesbloqueados(e.target.checked)}
                   />
@@ -366,13 +435,15 @@ export default function BuscaClient({ perfilInicial }: { perfilInicial: Perfil }
             </div>
           </aside>
 
-          <main>
+          <section aria-label="Resultados" className="min-w-0">
             <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-              <p className="text-sm text-ink-2">
-                {leadsFiltrados.length} de {leads.length} leads
+              <p className="text-sm text-ink-2" aria-live="polite">
+                <strong className="text-ink">{leadsFiltrados.length}</strong> de {leads.length} leads
               </p>
+              <label htmlFor="ordenar" className="sr-only">Ordenar por</label>
               <select
-                className="rounded-md border border-line px-2 py-1.5 text-sm"
+                id="ordenar"
+                className={`${CAMPO} w-auto! text-sm!`}
                 value={ordenarPor}
                 onChange={(e) => setOrdenarPor(e.target.value as keyof typeof ORDENS)}
               >
@@ -393,12 +464,18 @@ export default function BuscaClient({ perfilInicial }: { perfilInicial: Perfil }
                 />
               ))}
               {!leadsFiltrados.length && (
-                <div className="rounded-lg border border-line bg-surface p-10 text-center text-ink-2">
-                  Nenhum lead com esses filtros. Ajuste a nota mínima ou ative mais categorias.
-                </div>
+                <EstadoVazio
+                  icone={<IconeFiltro width={26} height={26} />}
+                  titulo={leads.length ? "Nenhum lead com esses filtros" : "A busca não trouxe resultados"}
+                  texto={
+                    leads.length
+                      ? "Baixe a nota mínima, zere as avaliações ou ative mais categorias para ver mais leads."
+                      : "Tente um nicho mais comum ou uma região maior (o nome da cidade, por exemplo)."
+                  }
+                />
               )}
             </div>
-          </main>
+          </section>
         </div>
       )}
     </div>
@@ -420,37 +497,41 @@ function LeadCard({
   const quente = lead.pontuacao >= 60;
 
   return (
-    <article className="flex items-center gap-4 rounded-lg border border-line bg-surface p-4">
-      <div
-        className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-sm font-extrabold ${
-          quente ? "bg-hot-soft text-[#8A5A00]" : "bg-canvas text-ink"
-        }`}
-        title={`Pontuação de lead: ${lead.pontuacao} de 100`}
-      >
-        {lead.pontuacao}
+    <article className={`${CARTAO} flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:p-5`}>
+      <div className="flex min-w-0 flex-1 items-start gap-3 sm:items-center sm:gap-4">
+        <div
+          className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-sm font-extrabold ${
+            quente ? "bg-hot-soft text-hot-ink" : "bg-canvas text-ink"
+          }`}
+          title={`Pontuação de lead: ${lead.pontuacao} de 100`}
+        >
+          <span className="sr-only">Pontuação </span>
+          {lead.pontuacao}
+        </div>
+
+        <div className="min-w-0 flex-1">
+          <h3 className="break-words text-base font-bold text-ink">{lead.nome}</h3>
+          <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1">
+            <EtiquetaSituacao situacao={lead.situacao} plataforma={lead.plataforma} />
+            {lead.tipo && <span className="text-xs text-muted">{lead.tipo}</span>}
+          </div>
+          <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-ink-2">
+            <span className="min-w-0 break-words">{lead.bairro || lead.area}</span>
+            {lead.nota ? (
+              <span className="inline-flex items-center gap-1">
+                <IconeEstrela className="text-hot" />
+                {lead.nota.toFixed(1).replace(".", ",")}{" "}
+                <span className="text-muted">({lead.avaliacoes})</span>
+              </span>
+            ) : (
+              <span className="text-muted">Sem avaliações</span>
+            )}
+            {!lead.aberto && <span className="font-semibold text-danger">Fechado</span>}
+          </div>
+        </div>
       </div>
 
-      <div className="min-w-0 flex-1">
-        <div className="flex flex-wrap items-center gap-2">
-          <h3 className="font-bold text-ink">{lead.nome}</h3>
-          <EtiquetaSituacao situacao={lead.situacao} plataforma={lead.plataforma} />
-          {lead.tipo && <span className="text-xs text-muted">{lead.tipo}</span>}
-        </div>
-        <p className="mt-1 truncate text-sm text-ink-2">{lead.bairro || lead.area}</p>
-        <div className="mt-1 flex items-center gap-3 text-sm text-ink-2">
-          {lead.nota ? (
-            <span>
-              <span className="text-hot">★</span> {lead.nota.toFixed(1).replace(".", ",")}{" "}
-              <span className="text-muted">({lead.avaliacoes})</span>
-            </span>
-          ) : (
-            <span className="text-muted">Sem avaliações</span>
-          )}
-          {!lead.aberto && <span className="text-danger">Fechado</span>}
-        </div>
-      </div>
-
-      <div className="flex shrink-0 items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2 sm:shrink-0 sm:flex-nowrap [&>*]:flex-1 sm:[&>*]:flex-none">
         {lead.contato ? (
           <>
             {lead.contato.whatsapp ? (
@@ -458,30 +539,23 @@ function LeadCard({
                 target="_blank"
                 rel="noopener"
                 href={linkWhatsapp(lead.contato.whatsapp, montarMensagem(modeloMsg, lead.nome, plataforma))}
-                className="rounded-md bg-wa px-3 py-2 text-sm font-semibold text-white transition hover:brightness-110"
+                className={BOTAO_WHATSAPP}
               >
+                <IconeWhatsapp width={18} height={18} />
                 WhatsApp
               </a>
             ) : (
               <span className="text-sm text-ink-2">{lead.contato.telefone || "Sem telefone"}</span>
             )}
             {lead.contato.maps && (
-              <a
-                target="_blank"
-                rel="noopener"
-                href={lead.contato.maps}
-                className="rounded-md border border-line px-3 py-2 text-sm font-semibold text-ink-2 hover:bg-canvas"
-              >
+              <a target="_blank" rel="noopener" href={lead.contato.maps} className={`${BOTAO_SECUNDARIO} px-4!`}>
+                <IconeMapa width={18} height={18} />
                 Maps
               </a>
             )}
             {lead.contato.site && (
-              <a
-                target="_blank"
-                rel="noopener"
-                href={lead.contato.site}
-                className="rounded-md border border-line px-3 py-2 text-sm font-semibold text-ink-2 hover:bg-canvas"
-              >
+              <a target="_blank" rel="noopener" href={lead.contato.site} className={`${BOTAO_SECUNDARIO} px-4!`}>
+                <IconeLink width={18} height={18} />
                 Link
               </a>
             )}
@@ -491,8 +565,9 @@ function LeadCard({
             type="button"
             onClick={onDesbloquear}
             disabled={carregando}
-            className="rounded-md bg-primary px-3 py-2 text-sm font-semibold text-primary-ink transition hover:brightness-110 disabled:cursor-wait disabled:opacity-70"
+            className={`${BOTAO} px-4!`}
           >
+            <IconeCadeado width={18} height={18} />
             {carregando ? "Desbloqueando..." : "Desbloquear (1 crédito)"}
           </button>
         )}

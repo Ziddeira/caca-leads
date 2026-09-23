@@ -1,11 +1,14 @@
 @import "tailwindcss";
 
+/* Paleta do Caça-leads. Azul (#2F54EB), dourado (#F5A300) e o fundo claro
+   são as cores da marca. Os tons de texto foram ajustados para passar do
+   contraste mínimo de 4,5:1 (WCAG AA) sobre branco e sobre o fundo. */
 :root {
   --color-canvas: #f3f5f9;
   --color-surface: #ffffff;
   --color-ink: #172033;
   --color-ink-2: #4a5568;
-  --color-muted: #8792a6;
+  --color-muted: #5f6b80;
   --color-line: #e4e8ef;
   --color-line-2: #eef1f5;
   --color-primary: #2f54eb;
@@ -13,20 +16,23 @@
   --color-primary-ink: #ffffff;
   --color-hot: #f5a300;
   --color-hot-soft: #fff4db;
-  --color-wa: #12a150;
+  --color-hot-ink: #8a5a00;
+  --color-wa: #0c7d3e;
   --color-wa-soft: #e6f6ec;
   --color-danger: #c62828;
-  --color-sem-site: #e0552b;
+  --color-danger-soft: #fdecec;
+  --color-sem-site: #b8431d;
   --color-sem-site-soft: #fdede7;
-  --color-booking: #8b3fe0;
+  --color-booking: #7a32cc;
   --color-booking-soft: #f3eafd;
-  --color-rede: #1f7acc;
+  --color-rede: #1a66ab;
   --color-rede-soft: #e6f1fb;
-  --color-proprio: #6b7688;
+  --color-proprio: #5a6477;
   --color-proprio-soft: #eef0f3;
   --radius-lg: 16px;
   --radius-md: 10px;
   --radius-sm: 8px;
+  --sombra-cartao: 0 1px 2px rgba(23, 32, 51, 0.04), 0 4px 16px rgba(23, 32, 51, 0.05);
 }
 
 @theme inline {
@@ -42,9 +48,11 @@
   --color-primary-ink: var(--color-primary-ink);
   --color-hot: var(--color-hot);
   --color-hot-soft: var(--color-hot-soft);
+  --color-hot-ink: var(--color-hot-ink);
   --color-wa: var(--color-wa);
   --color-wa-soft: var(--color-wa-soft);
   --color-danger: var(--color-danger);
+  --color-danger-soft: var(--color-danger-soft);
   --color-sem-site: var(--color-sem-site);
   --color-sem-site-soft: var(--color-sem-site-soft);
   --color-booking: var(--color-booking);
@@ -56,16 +64,134 @@
   --radius-lg: var(--radius-lg);
   --radius-md: var(--radius-md);
   --radius-sm: var(--radius-sm);
+  --shadow-cartao: var(--sombra-cartao);
   --font-sans: var(--font-onest);
 }
 
-html,
-body {
-  height: 100%;
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  html,
+  body {
+    height: 100%;
+  }
+
+  body {
+    background: var(--color-canvas);
+    color: var(--color-ink);
+    font-size: 1rem;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    /* Garantia extra contra rolagem lateral no celular. */
+    overflow-x: clip;
+  }
+
+  h1,
+  h2,
+  h3 {
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+
+  h1 {
+    letter-spacing: -0.035em;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* Foco sempre visível para quem navega pelo teclado. Campos que já têm
+     o próprio anel de foco (focus:ring) usam outline-none e ficam com ele. */
+  :focus-visible {
+    outline: 3px solid var(--color-primary);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+
+  /* No iPhone, campos com fonte menor que 16px dão zoom ao tocar. */
+  input,
+  select,
+  textarea {
+    font-size: 1rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 }
 
-body {
-  background: var(--color-canvas);
-  color: var(--color-ink);
-  -webkit-font-smoothing: antialiased;
+/* Esqueleto de carregamento: bloco cinza com brilho passando. */
+@utility esqueleto {
+  position: relative;
+  overflow: hidden;
+  background: var(--color-line-2);
+  border-radius: var(--radius-sm);
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.7), transparent);
+    animation: brilho-esqueleto 1.4s ease-in-out infinite;
+  }
+}
+
+@keyframes brilho-esqueleto {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Áreas seguras do iPhone (notch e barra inferior). */
+@utility pb-seguro {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+@utility pt-seguro {
+  padding-top: env(safe-area-inset-top);
+}
+
+@utility px-seguro {
+  padding-left: max(1rem, env(safe-area-inset-left));
+  padding-right: max(1rem, env(safe-area-inset-right));
+}
+
+/* Ilustração "Em construção": ferramentas balançando de leve. Quem pede
+   menos movimento no sistema vê tudo parado (regra no @layer base). */
+.balanco-ferramenta,
+.balanco-rolo {
+  transform-box: fill-box;
+  animation: balanco 1.8s ease-in-out infinite;
+}
+
+.balanco-ferramenta {
+  transform-origin: 0% 100%;
+}
+
+.balanco-rolo {
+  transform-origin: 0% 100%;
+  animation-delay: -0.9s;
+}
+
+@keyframes balanco {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(-8deg);
+  }
 }

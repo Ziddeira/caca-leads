@@ -1,11 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { detalhesLugar, ErroGooglePlaces } from "@/lib/leads/google";
-import {
-  celularBrasileiro,
-  classificar,
-  nomePlataforma,
-} from "@/lib/leads/classificacao";
+import { montarDadosLead } from "@/lib/leads/dadosLead";
 
 export const dynamic = "force-dynamic";
 
@@ -62,21 +58,25 @@ export async function POST(request: Request) {
 
   try {
     const lugar = await detalhesLugar(placeId);
-    await supabase.from("chamadas_google").insert({ user_id: user.id, tipo: "place_details" });
-
-    const situacao = classificar(lugar.websiteUri);
-    const ehPlataforma = situacao === "booking" || situacao === "rede_social";
+    const dados = montarDadosLead(lugar);
+    // Guarda os dados em cache (até 30 dias) para "Meus leads" abrir sem
+    // chamar o Google de novo. Se o cache falhar, o desbloqueio segue
+    // valendo normalmente.
+    await Promise.allSettled([
+      supabase.from("chamadas_google").insert({ user_id: user.id, tipo: "place_details" }),
+      supabase.rpc("salvar_dados_lead", { p_place_id: placeId, p_dados: dados }),
+    ]);
 
     return NextResponse.json({
       jaDesbloqueado: resultado.ja_desbloqueado,
       creditosRestantes: resultado.creditos_restantes,
       contato: {
-        telefone: lugar.nationalPhoneNumber || lugar.internationalPhoneNumber || null,
-        whatsapp: celularBrasileiro(lugar.nationalPhoneNumber, lugar.internationalPhoneNumber),
-        site: lugar.websiteUri || null,
-        maps: lugar.googleMapsUri || null,
-        situacao,
-        plataforma: ehPlataforma && lugar.websiteUri ? nomePlataforma(lugar.websiteUri) : null,
+        telefone: dados.telefone,
+        whatsapp: dados.whatsapp,
+        site: dados.site,
+        maps: dados.maps,
+        situacao: dados.situacao,
+        plataforma: dados.plataforma,
       },
     });
   } catch (e) {
