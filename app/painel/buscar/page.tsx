@@ -14,17 +14,11 @@ export default async function BuscarPage() {
     );
   }
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  const { data: perfil } = user
-    ? await supabase
-        .from("profiles")
-        .select("plano, buscas_restantes, creditos_desbloqueio")
-        .eq("id", user.id)
-        .single()
-    : { data: null };
+  // "meu_plano" aplica o vencimento do plano (volta ao Grátis se o ciclo
+  // pago acabou sem renovação) antes de devolver plano e saldo.
+  const { data: perfil } = await supabase
+    .rpc("meu_plano")
+    .single<{ plano: string; buscas_restantes: number; creditos_desbloqueio: number }>();
 
   return (
     <BuscaClient
