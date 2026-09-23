@@ -1,0 +1,229 @@
+"use client";
+
+import { useCallback, useEffect, useMemo, useState } from "react";
+import type { DadosLead } from "@/lib/leads/dadosLead";
+import {
+  MSG_PADRAO_HOSPEDAGEM,
+  MSG_PADRAO_NEGOCIOS,
+  linkWhatsapp,
+  montarMensagem,
+} from "@/lib/leads/mensagens";
+import EtiquetaSituacao from "@/components/leads/EtiquetaSituacao";
+import CartaoLeadEsqueleto from "@/components/leads/CartaoLeadEsqueleto";
+import { BOTAO_SECUNDARIO, BOTAO_WHATSAPP, CAMPO, CARTAO } from "@/components/ui";
+import {
+  IconeAtualizar,
+  IconeBuscar,
+  IconeEstrela,
+  IconeLink,
+  IconeMapa,
+  IconeTelefone,
+  IconeWhatsapp,
+} from "@/components/Icones";
+
+export interface LeadSalvo {
+  placeId: string;
+  desbloqueadoEm: string;
+  // null = sem cache válido: os dados são buscados depois que a página abre.
+  dados: DadosLead | null;
+}
+
+type Estado = { dados: DadosLead | null; carregando: boolean; erro: string | null };
+
+// Quantos leads sem cache são buscados ao mesmo tempo (poucos, para não
+// estourar a cota do Google de uma vez).
+const SIMULTANEOS = 3;
+
+export default function MeusLeadsClient({ leads }: { leads: LeadSalvo[] }) {
+  const [estados, setEstados] = useState<Record<string, Estado>>(() =>
+    Object.fromEntries(
+      leads.map((l) => [l.placeId, { dados: l.dados, carregando: !l.dados, erro: null }]),
+    ),
+  );
+  const [filtro, setFiltro] = useState("");
+
+  const atualizar = useCallback(async (placeId: string) => {
+    setEstados((e) => ({ ...e, [placeId]: { ...e[placeId], carregando: true, erro: null } }));
+    try {
+      const res = await fetch("/api/leads/atualizar", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ placeId }),
+      });
+      const corpo = await res.json().catch(() => ({}));
+      if (!res.ok || !corpo.dados) {
+        throw new Error(corpo.erro || "Não foi possível carregar os dados deste lead.");
+      }
+      setEstados((e) => ({ ...e, [placeId]: { dados: corpo.dados, carregando: false, erro: null } }));
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Não foi possível carregar os dados deste lead.";
+      setEstados((e) => ({ ...e, [placeId]: { ...e[placeId], carregando: false, erro: msg } }));
+    }
+  }, []);
+
+  // Só roda para leads sem cache válido; os demais já vieram do banco.
+  useEffect(() => {
+    const fila = leads.filter((l) => !l.dados).map((l) => l.placeId);
+    if (!fila.length) return;
+    let cancelado = false;
+    async function trabalhador() {
+      while (!cancelado && fila.length) {
+        const id = fila.shift();
+        if (id) await atualizar(id);
+      }
+    }
+    Promise.all(Array.from({ length: Math.min(SIMULTANEOS, fila.length) }, trabalhador));
+    return () => {
+      cancelado = true;
+    };
+  }, [leads, atualizar]);
+
+  const visiveis = useMemo(() => {
+    const texto = filtro.trim().toLowerCase();
+    if (!texto) return leads;
+    return leads.filter((l) => {
+      const d = estados[l.placeId]?.dados;
+      return !!d && `${d.nome} ${d.bairro}`.toLowerCase().includes(texto);
+    });
+  }, [leads, estados, filtro]);
+
+  return (
+    <div className="mt-6">
+      {leads.length > 4 && (
+        <div className="relative mb-4 max-w-md">
+          <label htmlFor="filtro-leads" className="sr-only">
+            Filtrar por nome ou bairro
+          </label>
+          <IconeBuscar className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
+          <input
+            id="filtro-leads"
+            type="search"
+            className={`${CAMPO} pl-10!`}
+            placeholder="Filtrar por nome ou bairro"
+            value={filtro}
+            onChange={(e) => setFiltro(e.target.value)}
+          />
+        </div>
+      )}
+
+      <ul className="grid gap-3 lg:grid-cols-2">
+        {visiveis.map((lead) => {
+          const estado = estados[lead.placeId];
+          return (
+            <li key={lead.placeId}>
+              {estado?.dados ? (
+                <CartaoLead
+                  dados={estado.dados}
+                  desbloqueadoEm={lead.desbloqueadoEm}
+                />
+              ) : estado?.erro ? (
+                <CartaoErro erro={estado.erro} onTentar={() => atualizar(lead.placeId)} />
+              ) : (
+                <CartaoLeadEsqueleto />
+              )}
+            </li>
+          );
+        })}
+      </ul>
+
+      {!visiveis.length && (
+        <p className="mt-2 rounded-lg border border-dashed border-line bg-surface px-4 py-8 text-center text-sm text-ink-2">
+          Nenhum lead com “{filtro}”. Tente só uma parte do nome ou o bairro.
+        </p>
+      )}
+    </div>
+  );
+}
+
+function iniciais(nome: string) {
+  const partes = nome.trim().split(/\s+/).filter((p) => /[\p{L}\p{N}]/u.test(p));
+  return ((partes[0]?.[0] ?? "") + (partes[1]?.[0] ?? "")).toUpperCase() || "?";
+}
+
+function CartaoLead({ dados, desbloqueadoEm }: { dados: DadosLead; desbloqueadoEm: string }) {
+  const eHospedagem = dados.situacao === "booking";
+  const modeloMsg = eHospedagem ? MSG_PADRAO_HOSPEDAGEM : MSG_PADRAO_NEGOCIOS;
+  const plataforma = dados.plataforma || (eHospedagem ? "Airbnb ou Booking" : "redes sociais");
+  const data = new Date(desbloqueadoEm).toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" });
+
+  return (
+    <article className={`${CARTAO} flex h-full flex-col p-4 sm:p-5`}>
+      <div className="flex items-start gap-3">
+        <div
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary-soft text-sm font-extrabold text-primary"
+          aria-hidden="true"
+        >
+          {iniciais(dados.nome)}
+        </div>
+        <div className="min-w-0 flex-1">
+          <h3 className="break-words text-base font-bold text-ink">{dados.nome}</h3>
+          {dados.bairro && <p className="mt-0.5 text-sm text-ink-2">{dados.bairro}</p>}
+        </div>
+      </div>
+
+      <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-ink-2">
+        <EtiquetaSituacao situacao={dados.situacao} plataforma={dados.plataforma} />
+        {dados.nota > 0 && (
+          <span className="inline-flex items-center gap-1">
+            <IconeEstrela className="text-hot" />
+            <span className="font-semibold text-ink">{dados.nota.toFixed(1).replace(".", ",")}</span>
+            <span className="text-muted">({dados.avaliacoes} avaliações)</span>
+          </span>
+        )}
+      </div>
+
+      <p className="mt-2 flex items-center gap-2 text-sm">
+        <IconeTelefone width={16} height={16} className="shrink-0 text-muted" />
+        {dados.telefone ? (
+          <a href={`tel:${dados.telefone.replace(/[^\d+]/g, "")}`} className="inline-flex min-h-11 items-center font-semibold text-ink underline-offset-2 hover:underline">
+            {dados.telefone}
+          </a>
+        ) : (
+          <span className="text-muted">Sem telefone no Google</span>
+        )}
+      </p>
+
+      <div className="mt-4 flex flex-wrap gap-2 [&>*]:flex-1 sm:[&>*]:flex-none">
+        {dados.whatsapp && (
+          <a
+            target="_blank"
+            rel="noopener"
+            href={linkWhatsapp(dados.whatsapp, montarMensagem(modeloMsg, dados.nome, plataforma))}
+            className={BOTAO_WHATSAPP}
+          >
+            <IconeWhatsapp width={18} height={18} />
+            WhatsApp
+          </a>
+        )}
+        {dados.maps && (
+          <a target="_blank" rel="noopener" href={dados.maps} className={`${BOTAO_SECUNDARIO} px-4!`}>
+            <IconeMapa width={18} height={18} />
+            Maps
+          </a>
+        )}
+        {dados.site && (
+          <a target="_blank" rel="noopener" href={dados.site} className={`${BOTAO_SECUNDARIO} px-4!`}>
+            <IconeLink width={18} height={18} />
+            Link
+          </a>
+        )}
+      </div>
+
+      <p className="mt-auto pt-3 text-xs text-muted">Desbloqueado em {data}</p>
+    </article>
+  );
+}
+
+function CartaoErro({ erro, onTentar }: { erro: string; onTentar: () => void }) {
+  return (
+    <div className={`${CARTAO} flex h-full flex-col items-start gap-3 p-4 sm:p-5`}>
+      <p className="text-sm font-semibold text-ink">Lead desbloqueado</p>
+      <p className="text-sm text-danger">{erro}</p>
+      <button type="button" onClick={onTentar} className={BOTAO_SECUNDARIO}>
+        <IconeAtualizar width={18} height={18} />
+        Tentar de novo
+      </button>
+      <p className="text-xs text-muted">Tentar de novo não gasta crédito.</p>
+    </div>
+  );
+}

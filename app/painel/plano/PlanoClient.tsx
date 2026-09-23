@@ -10,6 +10,19 @@ import {
   type PlanoId,
   type PlanoPago,
 } from "@/lib/planos";
+import {
+  ALERTA_AVISO,
+  ALERTA_ERRO,
+  ALERTA_SUCESSO,
+  BOTAO,
+  BOTAO_SECUNDARIO,
+  CAMPO,
+  CARTAO as CARTAO_BASE,
+  ROTULO,
+  TituloPagina,
+} from "@/components/ui";
+
+const CARTAO = `${CARTAO_BASE} p-5 sm:p-6`;
 
 interface Perfil {
   plano: string;
@@ -27,15 +40,6 @@ interface Assinatura {
 }
 
 type Checkout = { tipo: "assinar"; plano: PlanoPago } | { tipo: "pacote" };
-
-const CARTAO =
-  "rounded-lg border border-line bg-surface p-5 shadow-[0_1px_2px_rgba(23,32,51,.04),0_4px_16px_rgba(23,32,51,.05)]";
-const BOTAO =
-  "rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-ink transition hover:brightness-110 disabled:cursor-wait disabled:opacity-70";
-const BOTAO_SECUNDARIO =
-  "rounded-md border border-line bg-surface px-4 py-2 text-sm font-semibold text-ink-2 transition hover:bg-canvas hover:text-ink disabled:cursor-wait disabled:opacity-70";
-const CAMPO =
-  "w-full rounded-md border border-line bg-surface px-3 py-2 outline-none focus:border-primary focus:ring-4 focus:ring-primary-soft";
 
 function formatarData(iso: string | null) {
   if (!iso) return null;
@@ -146,15 +150,14 @@ export default function PlanoClient({
 
   return (
     <div className="max-w-5xl">
-      <h1 className="text-2xl font-extrabold tracking-tight text-ink">Meu plano</h1>
-      <p className="mt-2 text-ink-2">Seu plano atual, seu saldo e as opções de assinatura.</p>
+      <TituloPagina titulo="Meu plano" descricao="Seu plano atual, seu saldo e as opções de assinatura." />
 
       {/* Resumo -------------------------------------------------------- */}
-      <section className={`${CARTAO} mt-5`}>
+      <section className={`${CARTAO} mt-6`}>
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wide text-muted">Plano atual</p>
-            <p className="mt-1 text-2xl font-extrabold text-ink">{nomePlano(perfil.plano)}</p>
+            <p className="mt-1 text-3xl font-extrabold tracking-tight text-ink">{nomePlano(perfil.plano)}</p>
             <p className="mt-1 text-sm text-ink-2">
               {!planoPago
                 ? "Sem cobrança."
@@ -210,20 +213,14 @@ export default function PlanoClient({
       </section>
 
       {(erro || mensagem) && (
-        <div
-          className={`mt-4 rounded-md border px-3 py-2 text-sm ${
-            erro
-              ? "border-[#F6CACA] bg-[#FDECEC] text-danger"
-              : "border-wa/30 bg-wa-soft text-[#0B6B35]"
-          }`}
-        >
+        <div role={erro ? "alert" : "status"} className={`mt-4 ${erro ? ALERTA_ERRO : ALERTA_SUCESSO}`}>
           {erro ?? mensagem}{" "}
           {linkPagamento && !erro && <LinkPagamento href={linkPagamento} />}
         </div>
       )}
 
       {/* Planos -------------------------------------------------------- */}
-      <h2 className="mt-8 text-lg font-bold text-ink">Planos</h2>
+      <h2 className="mt-10 text-2xl font-extrabold text-ink">Planos</h2>
       <div className="mt-3 grid gap-4 md:grid-cols-3">
         {(Object.keys(PLANOS) as PlanoId[]).map((id) => {
           const p = PLANOS[id];
@@ -297,13 +294,14 @@ export default function PlanoClient({
 
           <fieldset className="mt-3">
             <legend className="mb-1 text-sm font-semibold text-ink-2">Forma de pagamento</legend>
-            <div className="flex gap-2 rounded-full bg-canvas p-1 w-fit">
+            <div className="grid w-full grid-cols-2 gap-1 rounded-full bg-canvas p-1 sm:inline-grid sm:w-auto">
               {(["PIX", "CREDIT_CARD"] as const).map((f) => (
                 <button
                   key={f}
                   type="button"
                   onClick={() => setForma(f)}
-                  className={`rounded-full px-4 py-1.5 text-sm font-semibold transition ${
+                  aria-pressed={forma === f}
+                  className={`min-h-11 rounded-full px-4 text-sm font-semibold transition ${
                     forma === f ? "bg-surface text-ink shadow" : "text-ink-2"
                   }`}
                 >
@@ -316,7 +314,7 @@ export default function PlanoClient({
           {!perfil.temClienteAsaas && (
             <div className="mt-3 grid gap-3 sm:grid-cols-2">
               <div>
-                <label htmlFor="nome" className="mb-1 block text-sm font-semibold text-ink-2">
+                <label htmlFor="nome" className={ROTULO}>
                   Nome completo
                 </label>
                 <input
@@ -328,7 +326,7 @@ export default function PlanoClient({
                 />
               </div>
               <div>
-                <label htmlFor="cpfCnpj" className="mb-1 block text-sm font-semibold text-ink-2">
+                <label htmlFor="cpfCnpj" className={ROTULO}>
                   CPF ou CNPJ
                 </label>
                 <input
@@ -353,7 +351,7 @@ export default function PlanoClient({
             {checkout.tipo === "assinar" && " A cobrança se repete todo mês até você cancelar."}
           </p>
 
-          <div className="mt-4 flex gap-2">
+          <div className="mt-5 flex flex-col gap-2 sm:flex-row">
             <button type="submit" disabled={carregando} className={BOTAO}>
               {carregando ? "Gerando cobrança..." : "Gerar cobrança"}
             </button>
@@ -369,7 +367,7 @@ export default function PlanoClient({
 
 function Alerta({ children }: { children: React.ReactNode }) {
   return (
-    <div className="mt-4 rounded-md border border-hot/30 bg-hot-soft px-3 py-2 text-sm text-[#8A5A00]">
+    <div className={`mt-4 ${ALERTA_AVISO}`}>
       {children}
     </div>
   );
@@ -385,7 +383,7 @@ function Selo({ children }: { children: React.ReactNode }) {
 
 function LinkPagamento({ href }: { href: string }) {
   return (
-    <a href={href} target="_blank" rel="noopener noreferrer" className="font-semibold underline">
+    <a href={href} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center font-semibold underline">
       Abrir página de pagamento
     </a>
   );

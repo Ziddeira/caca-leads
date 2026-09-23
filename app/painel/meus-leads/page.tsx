@@ -1,209 +1,98 @@
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { detalhesLugar, ErroGooglePlaces } from "@/lib/leads/google";
-import { celularBrasileiro, classificar, extrairBairro, nomePlataforma } from "@/lib/leads/classificacao";
-import { MSG_PADRAO_HOSPEDAGEM, MSG_PADRAO_NEGOCIOS, linkWhatsapp, montarMensagem } from "@/lib/leads/mensagens";
-import EtiquetaSituacao from "@/components/leads/EtiquetaSituacao";
+import { cacheValido, type DadosLead } from "@/lib/leads/dadosLead";
+import { EstadoVazio, TituloPagina, BOTAO } from "@/components/ui";
+import { IconeLeads, IconeSeta } from "@/components/Icones";
+import MeusLeadsClient, { type LeadSalvo } from "./MeusLeadsClient";
 
 export const dynamic = "force-dynamic";
 
-type SupabaseServerClient = NonNullable<Awaited<ReturnType<typeof createClient>>>;
-
-interface LeadDesbloqueado {
-  placeId: string;
-  desbloqueadoEm: string;
-  nome: string;
-  bairro: string;
-  nota: number;
-  avaliacoes: number;
-  situacao: ReturnType<typeof classificar>;
-  plataforma: string | null;
-  telefone: string | null;
-  whatsapp: string | null;
-  site: string | null;
-  maps: string | null;
-  erro?: string;
+interface Linha {
+  place_id: string;
+  desbloqueado_em: string;
+  dados?: DadosLead | null;
+  dados_atualizados_em?: string | null;
 }
 
+// A página lê SÓ do banco: os dados de contato vêm do cache gravado no
+// desbloqueio (leads_desbloqueados.dados). O Google só é consultado,
+// depois que a página já apareceu, para os leads sem cache ou com cache
+// vencido (mais de 30 dias) — uma vez, não a cada visita.
 export default async function MeusLeadsPage() {
   const supabase = await createClient();
   if (!supabase) {
     return <Aviso texto="Supabase não configurado neste ambiente." />;
   }
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return null;
-
-  const { data: linhas, error } = await supabase
+  // O RLS já limita às linhas do usuário logado (o layout do painel já
+  // conferiu o login), então não precisa de outra ida ao Auth aqui.
+  let resposta = await supabase
     .from("leads_desbloqueados")
-    .select("place_id, desbloqueado_em")
-    .order("desbloqueado_em", { ascending: false });
+    .select("place_id, desbloqueado_em, dados, dados_atualizados_em")
+    .order("desbloqueado_em", { ascending: false })
+    .returns<Linha[]>();
 
-  if (error) {
-    return <Aviso texto="Não foi possível carregar seus leads desbloqueados agora." />;
+  // Se o script da etapa 4 ainda não foi rodado, as colunas de cache não
+  // existem: cai para a consulta antiga e os dados vêm do Google depois.
+  if (resposta.error) {
+    resposta = await supabase
+      .from("leads_desbloqueados")
+      .select("place_id, desbloqueado_em")
+      .order("desbloqueado_em", { ascending: false })
+      .returns<Linha[]>();
   }
+
+  if (resposta.error) {
+    return <Aviso texto="Não foi possível carregar seus leads desbloqueados agora. Tente recarregar a página." />;
+  }
+
+  const leads = montarLeads(resposta.data ?? []);
 
   return (
     <div>
-      <h1 className="text-2xl font-extrabold tracking-tight text-ink">Meus leads</h1>
-      <p className="mt-2 text-ink-2">
-        {linhas?.length
-          ? `${linhas.length} lead(s) desbloqueado(s).`
-          : "Você ainda não desbloqueou nenhum lead."}
-      </p>
+      <TituloPagina
+        titulo="Meus leads"
+        descricao={
+          leads.length
+            ? `${leads.length} ${leads.length === 1 ? "lead desbloqueado" : "leads desbloqueados"}, com contato pronto para chamar.`
+            : "Os leads que você desbloquear ficam guardados aqui."
+        }
+      />
 
-      {!linhas?.length ? (
-        <p className="mt-2 text-ink-2">
-          Vá em <strong>Buscar</strong> para encontrar leads e desbloquear os que interessarem.
-        </p>
-      ) : !process.env.GOOGLE_PLACES_API_KEY ? (
-        <Aviso texto="GOOGLE_PLACES_API_KEY não configurada no servidor." />
+      {leads.length ? (
+        <MeusLeadsClient leads={leads} />
       ) : (
-        <ListaLeads userId={user.id} linhas={linhas} supabase={supabase} />
+        <div className="mt-8">
+          <EstadoVazio
+            icone={<IconeLeads width={26} height={26} />}
+            titulo="Nenhum lead desbloqueado ainda"
+            texto="Busque por nicho e bairro e desbloqueie quem vale a conversa. O WhatsApp e o link do Maps ficam salvos aqui."
+          >
+            <Link href="/painel/buscar" className={BOTAO}>
+              Buscar leads <IconeSeta width={18} height={18} />
+            </Link>
+          </EstadoVazio>
+        </div>
       )}
     </div>
   );
 }
 
-async function ListaLeads({
-  userId,
-  linhas,
-  supabase,
-}: {
-  userId: string;
-  linhas: { place_id: string; desbloqueado_em: string }[];
-  supabase: SupabaseServerClient;
-}) {
-  const leads = await Promise.all(
-    linhas.map((linha) => buscarDadosLead(userId, linha, supabase)),
-  );
-
-  return (
-    <div className="mt-6 flex flex-col gap-3">
-      {leads.map((lead) => (
-        <LeadDesbloqueadoCard key={lead.placeId} lead={lead} />
-      ))}
-    </div>
-  );
-}
-
-async function buscarDadosLead(
-  userId: string,
-  linha: { place_id: string; desbloqueado_em: string },
-  supabase: SupabaseServerClient,
-): Promise<LeadDesbloqueado> {
-  try {
-    const lugar = await detalhesLugar(linha.place_id);
-    await supabase.from("chamadas_google").insert({ user_id: userId, tipo: "place_details" });
-    const situacao = classificar(lugar.websiteUri);
-    const ehPlataforma = situacao === "booking" || situacao === "rede_social";
-    return {
-      placeId: linha.place_id,
-      desbloqueadoEm: linha.desbloqueado_em,
-      nome: lugar.displayName?.text || "Sem nome",
-      bairro: extrairBairro(lugar.addressComponents, lugar.formattedAddress),
-      nota: lugar.rating || 0,
-      avaliacoes: lugar.userRatingCount || 0,
-      situacao,
-      plataforma: ehPlataforma && lugar.websiteUri ? nomePlataforma(lugar.websiteUri) : null,
-      telefone: lugar.nationalPhoneNumber || lugar.internationalPhoneNumber || null,
-      whatsapp: celularBrasileiro(lugar.nationalPhoneNumber, lugar.internationalPhoneNumber),
-      site: lugar.websiteUri || null,
-      maps: lugar.googleMapsUri || null,
-    };
-  } catch (e) {
-    const msg = e instanceof ErroGooglePlaces ? e.message : "Erro ao buscar dados no Google.";
-    return {
-      placeId: linha.place_id,
-      desbloqueadoEm: linha.desbloqueado_em,
-      nome: "Lead desbloqueado",
-      bairro: "",
-      nota: 0,
-      avaliacoes: 0,
-      situacao: "sem_site",
-      plataforma: null,
-      telefone: null,
-      whatsapp: null,
-      site: null,
-      maps: null,
-      erro: msg,
-    };
-  }
-}
-
-function LeadDesbloqueadoCard({ lead }: { lead: LeadDesbloqueado }) {
-  const eHospedagem = lead.situacao === "booking";
-  const modeloMsg = eHospedagem ? MSG_PADRAO_HOSPEDAGEM : MSG_PADRAO_NEGOCIOS;
-  const plataforma = lead.plataforma || (eHospedagem ? "Airbnb ou Booking" : "redes sociais");
-
-  return (
-    <article className="flex flex-wrap items-center gap-4 rounded-lg border border-line bg-surface p-4">
-      <div className="min-w-0 flex-1">
-        <div className="flex flex-wrap items-center gap-2">
-          <h3 className="font-bold text-ink">{lead.nome}</h3>
-          <EtiquetaSituacao situacao={lead.situacao} plataforma={lead.plataforma} />
-        </div>
-        <p className="mt-1 text-sm text-ink-2">{lead.bairro}</p>
-        {lead.erro ? (
-          <p className="mt-1 text-sm text-danger">{lead.erro}</p>
-        ) : (
-          <div className="mt-1 flex flex-wrap items-center gap-3 text-sm text-ink-2">
-            {lead.nota > 0 && (
-              <span>
-                <span className="text-hot">★</span> {lead.nota.toFixed(1).replace(".", ",")}{" "}
-                <span className="text-muted">({lead.avaliacoes})</span>
-              </span>
-            )}
-            <span>{lead.telefone || "Sem telefone"}</span>
-          </div>
-        )}
-        <p className="mt-1 text-xs text-muted">
-          Desbloqueado em {new Date(lead.desbloqueadoEm).toLocaleDateString("pt-BR")}
-        </p>
-      </div>
-
-      <div className="flex shrink-0 items-center gap-2">
-        {lead.whatsapp && (
-          <a
-            target="_blank"
-            rel="noopener"
-            href={linkWhatsapp(lead.whatsapp, montarMensagem(modeloMsg, lead.nome, plataforma))}
-            className="rounded-md bg-wa px-3 py-2 text-sm font-semibold text-white transition hover:brightness-110"
-          >
-            WhatsApp
-          </a>
-        )}
-        {lead.maps && (
-          <a
-            target="_blank"
-            rel="noopener"
-            href={lead.maps}
-            className="rounded-md border border-line px-3 py-2 text-sm font-semibold text-ink-2 hover:bg-canvas"
-          >
-            Maps
-          </a>
-        )}
-        {lead.site && (
-          <a
-            target="_blank"
-            rel="noopener"
-            href={lead.site}
-            className="rounded-md border border-line px-3 py-2 text-sm font-semibold text-ink-2 hover:bg-canvas"
-          >
-            Link
-          </a>
-        )}
-      </div>
-    </article>
-  );
+// Cache vencido (mais de 30 dias) conta como "sem dados": o componente
+// da lista busca de novo no Google, só para esses.
+function montarLeads(linhas: Linha[]): LeadSalvo[] {
+  return linhas.map((l) => ({
+    placeId: l.place_id,
+    desbloqueadoEm: l.desbloqueado_em,
+    dados: l.dados && cacheValido(l.dados_atualizados_em) ? l.dados : null,
+  }));
 }
 
 function Aviso({ texto }: { texto: string }) {
   return (
     <div>
-      <h1 className="text-2xl font-extrabold tracking-tight text-ink">Meus leads</h1>
-      <p className="mt-2 text-ink-2">{texto}</p>
+      <TituloPagina titulo="Meus leads" />
+      <p className="mt-4 text-ink-2">{texto}</p>
     </div>
   );
 }

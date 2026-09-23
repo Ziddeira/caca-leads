@@ -1,0 +1,149 @@
+// Ícones em SVG desenhados no código (traço de 2px, estilo linha), para
+// não depender de biblioteca externa. Todos são decorativos: o texto ao
+// lado é quem dá o nome da ação para leitores de tela.
+import type { SVGProps } from "react";
+
+type Props = SVGProps<SVGSVGElement>;
+
+function Base({ children, ...props }: Props) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width="20"
+      height="20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      focusable="false"
+      {...props}
+    >
+      {children}
+    </svg>
+  );
+}
+
+export function IconeBuscar(props: Props) {
+  return (
+    <Base {...props}>
+      <circle cx="11" cy="11" r="7" />
+      <path d="m20 20-3.5-3.5" />
+    </Base>
+  );
+}
+
+export function IconeLeads(props: Props) {
+  return (
+    <Base {...props}>
+      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <path d="m16 11 2 2 4-4" />
+    </Base>
+  );
+}
+
+export function IconeComunidade(props: Props) {
+  return (
+    <Base {...props}>
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+      <path d="M8 9h8M8 13h5" />
+    </Base>
+  );
+}
+
+export function IconePlano(props: Props) {
+  return (
+    <Base {...props}>
+      <rect x="2" y="5" width="20" height="14" rx="2" />
+      <path d="M2 10h20M6 15h4" />
+    </Base>
+  );
+}
+
+export function IconeSair(props: Props) {
+  return (
+    <Base {...props}>
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+      <path d="m16 17 5-5-5-5M21 12H9" />
+    </Base>
+  );
+}
+
+export function IconeFiltro(props: Props) {
+  return (
+    <Base {...props}>
+      <path d="M3 5h18M6 12h12M10 19h4" />
+    </Base>
+  );
+}
+
+export function IconeTelefone(props: Props) {
+  return (
+    <Base {...props}>
+      <path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z" />
+    </Base>
+  );
+}
+
+export function IconeMapa(props: Props) {
+  return (
+    <Base {...props}>
+      <path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z" />
+      <circle cx="12" cy="9.5" r="2.5" />
+    </Base>
+  );
+}
+
+export function IconeLink(props: Props) {
+  return (
+    <Base {...props}>
+      <path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7" />
+      <path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7" />
+    </Base>
+  );
+}
+
+export function IconeWhatsapp(props: Props) {
+  return (
+    <Base {...props}>
+      <path d="M3 21l1.7-5A8.5 8.5 0 1 1 8 19.3z" />
+      <path d="M9 9.5c0 3 2.5 5.5 5.5 5.5l1-1.5-2-1-1 .8a4 4 0 0 1-2-2l.8-1-1-2z" />
+    </Base>
+  );
+}
+
+export function IconeEstrela(props: Props) {
+  return (
+    <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true" focusable="false" {...props}>
+      <path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z" />
+    </svg>
+  );
+}
+
+export function IconeCadeado(props: Props) {
+  return (
+    <Base {...props}>
+      <rect x="4" y="11" width="16" height="10" rx="2" />
+      <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+    </Base>
+  );
+}
+
+export function IconeSeta(props: Props) {
+  return (
+    <Base {...props}>
+      <path d="M5 12h14M13 6l6 6-6 6" />
+    </Base>
+  );
+}
+
+export function IconeAtualizar(props: Props) {
+  return (
+    <Base {...props}>
+      <path d="M21 12a9 9 0 1 1-2.6-6.4L21 8" />
+      <path d="M21 3v5h-5" />
+    </Base>
+  );
+}

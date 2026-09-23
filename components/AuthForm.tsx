@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { ALERTA_ERRO, ALERTA_SUCESSO, BOTAO, CAMPO, CARTAO, ROTULO } from "@/components/ui";
 
 type Mode = "login" | "cadastro";
 
@@ -74,18 +75,22 @@ export default function AuthForm({ mode }: { mode: Mode }) {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-canvas px-6">
-      <div className="w-full max-w-sm rounded-lg border border-line bg-surface p-8 shadow-[0_1px_2px_rgba(23,32,51,.04),0_4px_16px_rgba(23,32,51,.05)]">
+    <div className="px-seguro flex min-h-screen flex-col items-center justify-center bg-canvas pt-[calc(2.5rem+env(safe-area-inset-top))] pb-[calc(2.5rem+env(safe-area-inset-bottom))]">
+      <Link href="/" className="mb-8 block rounded-md">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/logo-principal.svg"
-          alt="Caça-leads"
-          className="mb-6 h-8 w-auto"
+          alt="Caça-leads — voltar para o início"
+          width={808}
+          height={212}
+          className="h-12 w-auto"
         />
-        <h1 className="text-xl font-bold text-ink">
+      </Link>
+      <div className={`${CARTAO} w-full max-w-sm p-6 sm:p-8`}>
+        <h1 className="text-2xl font-extrabold text-ink">
           {mode === "login" ? "Entrar na sua conta" : "Criar conta grátis"}
         </h1>
-        <p className="mt-1 text-sm text-ink-2">
+        <p className="mt-1.5 text-ink-2">
           {mode === "login"
             ? "Use o e-mail e a senha do seu cadastro."
             : "Leva menos de um minuto."}
@@ -93,7 +98,7 @@ export default function AuthForm({ mode }: { mode: Mode }) {
 
         <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4">
           <div>
-            <label htmlFor="email" className="mb-1 block text-sm font-semibold text-ink-2">
+            <label htmlFor="email" className={ROTULO}>
               E-mail
             </label>
             <input
@@ -103,12 +108,12 @@ export default function AuthForm({ mode }: { mode: Mode }) {
               autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-md border border-line bg-surface px-3 py-2 text-ink outline-none transition focus:border-primary focus:ring-4 focus:ring-primary-soft"
+              className={CAMPO}
               placeholder="voce@exemplo.com"
             />
           </div>
           <div>
-            <label htmlFor="password" className="mb-1 block text-sm font-semibold text-ink-2">
+            <label htmlFor="password" className={ROTULO}>
               Senha
             </label>
             <input
@@ -119,18 +124,18 @@ export default function AuthForm({ mode }: { mode: Mode }) {
               autoComplete={mode === "login" ? "current-password" : "new-password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-md border border-line bg-surface px-3 py-2 text-ink outline-none transition focus:border-primary focus:ring-4 focus:ring-primary-soft"
+              className={CAMPO}
               placeholder="Mínimo 6 caracteres"
             />
           </div>
 
           {error && (
-            <div className="rounded-md border border-[#F6CACA] bg-[#FDECEC] px-3 py-2 text-sm text-danger">
+            <div role="alert" className={ALERTA_ERRO}>
               {error}
             </div>
           )}
           {info && (
-            <div className="rounded-md border border-wa/30 bg-wa-soft px-3 py-2 text-sm text-wa">
+            <div role="status" className={ALERTA_SUCESSO}>
               {info}
             </div>
           )}
@@ -138,7 +143,7 @@ export default function AuthForm({ mode }: { mode: Mode }) {
           <button
             type="submit"
             disabled={loading}
-            className="mt-2 rounded-md bg-primary px-4 py-2.5 font-semibold text-primary-ink transition hover:brightness-110 disabled:cursor-wait disabled:opacity-70"
+            className={`${BOTAO} mt-2 w-full text-base!`}
           >
             {loading
               ? "Aguarde..."
@@ -152,14 +157,14 @@ export default function AuthForm({ mode }: { mode: Mode }) {
           {mode === "login" ? (
             <>
               Ainda não tem conta?{" "}
-              <Link href="/cadastro" className="font-semibold text-primary">
+              <Link href="/cadastro" className="inline-flex min-h-11 items-center font-semibold text-primary underline-offset-2 hover:underline">
                 Criar conta
               </Link>
             </>
           ) : (
             <>
               Já tem conta?{" "}
-              <Link href="/login" className="font-semibold text-primary">
+              <Link href="/login" className="inline-flex min-h-11 items-center font-semibold text-primary underline-offset-2 hover:underline">
                 Entrar
               </Link>
             </>

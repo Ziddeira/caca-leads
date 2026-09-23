@@ -41,6 +41,12 @@ cada um no SQL Editor do Supabase:
    (aplica pagamentos de forma idempotente, só o servidor pode chamar),
    `meu_plano` e o vencimento automático para o Grátis. Também atualiza
    `iniciar_busca` e `desbloquear_lead` para aplicarem o vencimento.
+4. `supabase/etapa4-cache-leads-comunidade.sql` — guarda em cache (por no
+   máximo 30 dias, conforme a política de cache da Google Maps Platform)
+   os dados de contato de cada lead desbloqueado, para "Meus leads" abrir
+   sem chamar o Google a cada visita; cria a função `salvar_dados_lead` e
+   a lista de espera da Comunidade (`interesse_comunidade` e a função
+   `quero_ser_avisado_comunidade`). Não mexe em planos nem créditos.
 
 ## Webhook do Asaas
 
