@@ -76,7 +76,11 @@ cada um no SQL Editor do Supabase:
    não consegue gravar verificação nem pontos. Não mexe em planos nem
    créditos.
 
-8. `supabase/etapa8-score-rank.sql` — verificação das vendas, pontos,
+8. Etapa 8, em **três partes, nesta ordem** (cada uma cabe fácil no
+   editor; copie pelo botão "Copy raw file" do GitHub para não vir
+   cortada): `supabase/etapa8-1-verificacao.sql`,
+   `supabase/etapa8-2-comprovante-admin.sql` e
+   `supabase/etapa8-3-rank-premio.sql` — verificação das vendas, pontos,
    comprovante, rank e prêmio: novos status da venda (`aguardando_google`,
    `nao_verificada`, `em_analise`), pontos calculados por gatilho a partir
    do status (10 / 50 / 0), tabela `verificacoes_venda` (registro de cada
@@ -85,7 +89,7 @@ cada um no SQL Editor do Supabase:
    mensal (`rank_do_mes`), histórico (`rank_historico`) e prêmio do top 3
    em `profiles.creditos_premio` (separado dos créditos do plano, não
    vence; o desbloqueio gasta primeiro os do plano). Depois de rodar,
-   cadastre você como administrador (comando no fim do arquivo).
+   cadastre você como administrador (comando no fim da parte 3).
 
 ### Rotinas agendadas (Vercel Cron)
 

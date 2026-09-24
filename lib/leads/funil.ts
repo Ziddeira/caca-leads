@@ -52,7 +52,7 @@ export function situacaoFunilValida(valor: unknown): valor is SituacaoFunil {
 
 export const ANOTACAO_MAX = 500;
 
-// Situações da venda. Ver supabase/etapa8-score-rank.sql.
+// Situações da venda. Ver supabase/etapa8-1-verificacao.sql.
 export type StatusVenda =
   | "pendente_verificacao"
   | "aguardando_google"

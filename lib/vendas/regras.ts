@@ -1,9 +1,9 @@
 // Regras do score, da verificação e do rank usadas na tela. Quem decide
-// de verdade é o banco (supabase/etapa8-score-rank.sql): mantenha estes
+// de verdade é o banco (supabase/etapa8-*.sql): mantenha estes
 // números iguais aos de lá. Aqui é só para mostrar e avisar antes.
 
 export const MSG_FALTA_ETAPA8 =
-  "O score e o rank ainda não foram ativados no banco. Rode o script supabase/etapa8-score-rank.sql no Supabase.";
+  "O score e o rank ainda não foram ativados no banco. Rode as 3 partes supabase/etapa8-1, etapa8-2 e etapa8-3 no Supabase, nessa ordem.";
 
 // Função, coluna ou tabela inexistente = script da etapa 8 não rodado.
 export function faltaEtapa8(codigo: string | undefined) {
