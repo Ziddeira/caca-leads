@@ -24,7 +24,7 @@ function porcento(parte: number, total: number) {
   return (parte / total).toLocaleString("pt-BR", { style: "percent", maximumFractionDigits: 1 });
 }
 
-// Administração > Visão geral. Todos os números vêm da função SQL
+// Gestão > Visão geral. Todos os números vêm da função SQL
 // admin_visao_geral (etapa 11), que recusa quem não é administrador.
 export default async function VisaoGeralPage() {
   const supabase = await exigirAdminPagina();

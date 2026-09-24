@@ -5,7 +5,7 @@
 -- Pode rodar de novo sem problema (é idempotente).
 --
 -- Como funciona:
---   * você escreve o aviso na tela Administração > Avisos (título, texto,
+--   * você escreve o aviso na tela Gestão > Avisos (título, texto,
 --     link opcional, data de início e de fim, e para quem: todos ou um
 --     plano);
 --   * se a data de início já chegou, o aviso vai na hora para o sino de
@@ -140,7 +140,7 @@ $$;
 revoke all on function public.entregar_avisos() from public, anon, authenticated;
 grant execute on function public.entregar_avisos() to service_role;
 
--- 5. Funções da tela Administração > Avisos -------------------------------------
+-- 5. Funções da tela Gestão > Avisos -------------------------------------
 create or replace function public.admin_criar_aviso(
   p_titulo text,
   p_texto text,

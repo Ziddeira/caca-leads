@@ -19,7 +19,7 @@ const NOME_ORIGEM: Record<string, string> = {
   notificacoes: "Notificações",
 };
 
-// Administração > Erros: falhas das rotinas do servidor (tabela
+// Gestão > Erros: falhas das rotinas do servidor (tabela
 // erros_servidor, etapa 11). A leitura é direta na tabela: a regra de RLS
 // só deixa administradores verem as linhas. Erros com mais de 90 dias
 // somem sozinhos.

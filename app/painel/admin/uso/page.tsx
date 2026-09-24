@@ -26,7 +26,7 @@ interface Consumidor {
 const TIPOS = Object.keys(NOME_TIPO_CHAMADA);
 const soma = (t: Record<string, number>) => Object.values(t).reduce((a, b) => a + b, 0);
 
-// Administração > Uso e custo. Números do mês corrente (Brasília), da
+// Gestão > Uso e custo. Números do mês corrente (Brasília), da
 // tabela chamadas_google (etapa 2), buscas e desbloqueios.
 export default async function UsoPage() {
   const supabase = await exigirAdminPagina();

@@ -4,7 +4,7 @@ import AvisosClient, { type Aviso } from "./AvisosClient";
 
 export const dynamic = "force-dynamic";
 
-// Administração > Avisos: mensagens do sino escritas por você.
+// Gestão > Avisos: mensagens do sino escritas por você.
 export default async function AvisosPage() {
   const supabase = await exigirAdminPagina();
   const { data, error } = await supabase.rpc("admin_listar_avisos");

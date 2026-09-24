@@ -10,7 +10,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   await exigirAdminPagina();
   return (
     <div>
-      <TituloPagina titulo="Administração" />
+      <TituloPagina titulo="Gestão" />
       <AbasAdmin />
       {children}
     </div>

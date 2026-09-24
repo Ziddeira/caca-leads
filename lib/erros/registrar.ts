@@ -2,7 +2,7 @@ import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 // Grava uma falha das rotinas do servidor na tabela "erros_servidor"
-// (etapa 11), que aparece em Administração > Erros. Usa a chave
+// (etapa 11), que aparece em Gestão > Erros. Usa a chave
 // service_role, que só existe no servidor.
 //
 // Nunca derruba quem chamou: se a gravação falhar (ex.: script da etapa

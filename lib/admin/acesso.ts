@@ -16,7 +16,7 @@ import { createClient } from "@/lib/supabase/server";
 //   3. cada função SQL de administrador recusa quem não é admin.
 
 export const MSG_FALTA_ETAPA11 =
-  "O painel de Administração ainda não foi ativado no banco. Rode as 3 partes supabase/etapa11-1, etapa11-2 e etapa11-3 no Supabase, nessa ordem.";
+  "O painel de Gestão ainda não foi ativado no banco. Rode as 3 partes supabase/etapa11-1, etapa11-2 e etapa11-3 no Supabase, nessa ordem.";
 
 // Função, coluna ou tabela inexistente = script da etapa 11 não rodado.
 export function faltaEtapa11(codigo: string | undefined) {

@@ -51,7 +51,7 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // Administração: quem não é administrador recebe erro já aqui, antes de
+  // Gestão: quem não é administrador recebe erro já aqui, antes de
   // a página ou a rota ser montada. Quem decide é o banco (eh_admin lê
   // profiles.is_admin); as páginas, as rotas e as funções SQL conferem
   // de novo.

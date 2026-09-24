@@ -47,7 +47,7 @@ function inicioDoAlerta() {
   return Date.now() - DIAS_ALERTA * 86_400_000;
 }
 
-// Administração > Pagamentos: eventos recebidos do Asaas pelo webhook
+// Gestão > Pagamentos: eventos recebidos do Asaas pelo webhook
 // (tabela pagamentos_eventos, etapa 3).
 export default async function PagamentosPage() {
   const supabase = await exigirAdminPagina();

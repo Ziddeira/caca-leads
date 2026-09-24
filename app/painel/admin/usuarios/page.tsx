@@ -5,7 +5,7 @@ import UsuariosClient, { type Conta, type RegistroAuditoria } from "./UsuariosCl
 
 export const dynamic = "force-dynamic";
 
-// Administração > Usuários: busca por e-mail ou apelido e ajuste de
+// Gestão > Usuários: busca por e-mail ou apelido e ajuste de
 // plano e saldo. Sem busca, mostra as 20 contas mais novas.
 export default async function UsuariosPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
   const supabase = await exigirAdminPagina();

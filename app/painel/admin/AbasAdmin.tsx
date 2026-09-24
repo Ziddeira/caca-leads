@@ -13,11 +13,11 @@ const ABAS = [
   { href: "/painel/admin/vendas", rotulo: "Vendas a aprovar" },
 ];
 
-// Sub-abas da Administração. No celular, a faixa rola para o lado.
+// Sub-abas da Gestão. No celular, a faixa rola para o lado.
 export default function AbasAdmin() {
   const pathname = usePathname();
   return (
-    <nav aria-label="Seções da administração" className="-mx-4 mt-5 mb-6 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+    <nav aria-label="Seções da gestão" className="-mx-4 mt-5 mb-6 overflow-x-auto px-4 sm:mx-0 sm:px-0">
       <ul className="flex w-max gap-1 rounded-lg border border-line bg-surface p-1">
         {ABAS.map((a) => {
           const atual = a.href === "/painel/admin" ? pathname === a.href : pathname.startsWith(a.href);

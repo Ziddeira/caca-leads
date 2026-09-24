@@ -18,7 +18,7 @@ interface Linha {
   comprovante_enviado_em: string | null;
 }
 
-// Administração > Vendas a aprovar: comprovantes esperando análise.
+// Gestão > Vendas a aprovar: comprovantes esperando análise.
 // Quem não é administrador nem chega aqui (proxy e layout barram), e a
 // função SQL vendas_em_analise recusa de novo.
 export default async function VendasPage() {

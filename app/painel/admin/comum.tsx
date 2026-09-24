@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { CARTAO } from "@/components/ui";
 import { MSG_FALTA_ETAPA11, faltaEtapa11 } from "@/lib/admin/acesso";
 
-// Peças repetidas nas telas da Administração.
+// Peças repetidas nas telas da Gestão.
 
 export function Numero({ rotulo, valor, dica }: { rotulo: string; valor: ReactNode; dica?: ReactNode }) {
   return (

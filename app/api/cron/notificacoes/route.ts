@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 // Rotina agendada (Vercel Cron, todo dia de manhã no horário de
 // Brasília): gera as notificações do sino — renovação, saldo baixo,
 // novidades do site, o incentivo do dia, os retornos agendados para
-// hoje e os avisos escritos na Administração. Toda a regra fica nas
+// hoje e os avisos escritos na Gestão. Toda a regra fica nas
 // funções SQL "gerar_notificacoes" (etapa 9), "gerar_notificacoes_retorno"
 // (etapa 10) e "entregar_avisos" (etapa 11), que não repetem aviso já
 // dado; rodar duas vezes no mesmo dia não duplica nada.
