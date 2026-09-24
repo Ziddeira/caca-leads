@@ -354,3 +354,8 @@ $$;
 
 revoke all on function public.registrar_venda(text, text, date, numeric) from public, anon;
 grant execute on function public.registrar_venda(text, text, date, numeric) to authenticated;
+
+-- 7. Avisa a API do Supabase (PostgREST) para reler as tabelas e funções.
+-- Sem isso, às vezes o site continua sem enxergar as colunas e funções
+-- novas por alguns minutos.
+notify pgrst, 'reload schema';

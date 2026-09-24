@@ -8,7 +8,8 @@ import { MSG_FALTA_ETAPA7 } from "./funil";
 export function respostaErroFunil(error: { code?: string; message: string }, contexto: string) {
   // Função ou coluna inexistente: o script da etapa 7 não foi rodado.
   if (["PGRST202", "42883", "42703", "42P01"].includes(error.code ?? "")) {
-    return NextResponse.json({ erro: MSG_FALTA_ETAPA7 }, { status: 503 });
+    console.error(`[${contexto}] Etapa 7 não encontrada:`, error.code, error.message);
+    return NextResponse.json({ erro: `${MSG_FALTA_ETAPA7} (código: ${error.code})` }, { status: 503 });
   }
   if (error.code === "23505") {
     return NextResponse.json({ erro: "Você já registrou uma venda para este lead." }, { status: 409 });

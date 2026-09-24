@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 import type { DadosLead } from "@/lib/leads/dadosLead";
 import {
+  MSG_ERRO_FUNIL,
   MSG_FALTA_ETAPA7,
   ROTULO_FUNIL,
   SITUACOES_FUNIL,
@@ -50,7 +51,15 @@ type Estado = { dados: DadosLead | null; carregando: boolean; erro: string | nul
 // estourar a cota do Google de uma vez).
 const SIMULTANEOS = 3;
 
-export default function MeusLeadsClient({ leads, funilAtivo }: { leads: LeadSalvo[]; funilAtivo: boolean }) {
+export default function MeusLeadsClient({
+  leads,
+  funilAtivo,
+  erroFunil = null,
+}: {
+  leads: LeadSalvo[];
+  funilAtivo: boolean;
+  erroFunil?: string | null;
+}) {
   const [estados, setEstados] = useState<Record<string, Estado>>(() =>
     Object.fromEntries(
       leads.map((l) => [l.placeId, { dados: l.dados, carregando: !l.dados, erro: null }]),
@@ -202,7 +211,10 @@ export default function MeusLeadsClient({ leads, funilAtivo }: { leads: LeadSalv
           ))}
         </div>
       ) : (
-        <p className={`${ALERTA_AVISO} mb-4`}>{MSG_FALTA_ETAPA7}</p>
+        <p className={`${ALERTA_AVISO} mb-4`}>
+          {erroFunil === "42703" || erroFunil === "PGRST204" ? MSG_FALTA_ETAPA7 : MSG_ERRO_FUNIL}{" "}
+          <span className="whitespace-nowrap text-xs opacity-80">(código: {erroFunil ?? "?"})</span>
+        </p>
       )}
 
       {leads.length > 4 && (

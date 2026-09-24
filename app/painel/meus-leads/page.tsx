@@ -46,8 +46,14 @@ export default async function MeusLeadsPage() {
     .order("desbloqueado_em", { ascending: false })
     .returns<Linha[]>();
   // Sem o script da etapa 7, não há situação/anotação: a lista abre como
-  // antes e o funil fica desligado, com um aviso.
-  const funilAtivo = !resposta.error;
+  // antes e o funil fica desligado, com um aviso. O código do erro vai
+  // junto no aviso, para saber se é mesmo coluna faltando (42703) ou
+  // outra coisa (ex.: permissão, cache de esquema do Supabase).
+  const erroFunil = resposta.error ? resposta.error.code || "desconhecido" : null;
+  if (resposta.error) {
+    console.error("[meus-leads] Falha ao ler colunas da etapa 7:", resposta.error.code, resposta.error.message);
+  }
+  const funilAtivo = !erroFunil;
 
   if (resposta.error) {
     resposta = await supabase
@@ -96,7 +102,7 @@ export default async function MeusLeadsPage() {
       />
 
       {leads.length ? (
-        <MeusLeadsClient leads={leads} funilAtivo={funilAtivo} />
+        <MeusLeadsClient leads={leads} funilAtivo={funilAtivo} erroFunil={erroFunil} />
       ) : (
         <div className="mt-8">
           <EstadoVazio

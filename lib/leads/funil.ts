@@ -4,6 +4,11 @@
 export const MSG_FALTA_ETAPA7 =
   "O funil de leads ainda não foi ativado no banco. Rode o script supabase/etapa7-funil-vendas.sql no Supabase.";
 
+// Erro ao ler o funil que NÃO é "coluna faltando" (o script pode ter
+// rodado, mas o Supabase ainda não enxerga as mudanças, ou é permissão).
+export const MSG_ERRO_FUNIL =
+  "Não foi possível carregar o funil agora. Se você acabou de rodar o script da etapa 7, rode também no SQL Editor: notify pgrst, 'reload schema';";
+
 export const SITUACOES_FUNIL = ["desbloqueado", "contatado", "negociacao", "fechado", "perdido"] as const;
 
 export type SituacaoFunil = (typeof SITUACOES_FUNIL)[number];
