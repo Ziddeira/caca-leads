@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import Sidebar from "@/components/Sidebar";
+import { NotificacoesProvider, Sino } from "@/components/notificacoes/Notificacoes";
 import { createClient } from "@/lib/supabase/server";
 import { lerPerfil } from "@/lib/perfil/dados";
 
@@ -48,29 +49,45 @@ export default async function PainelLayout({
   // etapa 8, a função não existe e o link simplesmente não aparece.
   const { data: ehAdmin } = await supabase.rpc("eh_admin");
 
+  // Contador do sino. Sem o script da etapa 9, a tabela não existe e o
+  // sino simplesmente não aparece.
+  const { count: naoLidas, error: erroNotificacoes } = await supabase
+    .from("notificacoes")
+    .select("id", { count: "exact", head: true })
+    .is("lida_em", null);
+
   return (
-    <div className="min-h-screen bg-canvas md:flex">
-      <a
-        href="#conteudo"
-        className="sr-only z-50 rounded-md bg-primary px-4 py-3 font-semibold text-primary-ink focus:not-sr-only focus:fixed focus:left-4 focus:top-4"
-      >
-        Pular para o conteúdo
-      </a>
-      <Sidebar
-        email={user.email ?? null}
-        apelido={perfil?.apelido ?? null}
-        fotoUrl={perfil?.fotoUrl ?? null}
-        avatarPronto={perfil?.avatarPronto ?? null}
-        admin={ehAdmin === true}
-      />
-      {/* No celular, o espaço de baixo evita que o menu inferior fixo
-          cubra o fim da página (inclui a área segura do iPhone). */}
-      <main
-        id="conteudo"
-        className="px-seguro min-w-0 flex-1 pt-6 pb-[calc(6rem+env(safe-area-inset-bottom))] sm:px-6 md:px-10 md:py-10"
-      >
-        <div className="mx-auto w-full max-w-6xl">{children}</div>
-      </main>
-    </div>
+    <NotificacoesProvider naoLidasInicial={erroNotificacoes ? null : (naoLidas ?? 0)}>
+      <div className="min-h-screen bg-canvas md:flex">
+        <a
+          href="#conteudo"
+          className="sr-only z-50 rounded-md bg-primary px-4 py-3 font-semibold text-primary-ink focus:not-sr-only focus:fixed focus:left-4 focus:top-4"
+        >
+          Pular para o conteúdo
+        </a>
+        <Sidebar
+          email={user.email ?? null}
+          apelido={perfil?.apelido ?? null}
+          fotoUrl={perfil?.fotoUrl ?? null}
+          avatarPronto={perfil?.avatarPronto ?? null}
+          admin={ehAdmin === true}
+        />
+        {/* No celular, o espaço de baixo evita que o menu inferior fixo
+            cubra o fim da página (inclui a área segura do iPhone). */}
+        <main
+          id="conteudo"
+          className="px-seguro min-w-0 flex-1 pt-6 pb-[calc(6rem+env(safe-area-inset-bottom))] sm:px-6 md:px-10 md:py-10"
+        >
+          <div className="mx-auto w-full max-w-6xl">
+            {/* Computador: sino no canto superior direito. No celular ele
+                fica na barra do topo (dentro do Sidebar). */}
+            <div className="mb-2 hidden justify-end md:-mt-6 md:flex">
+              <Sino />
+            </div>
+            {children}
+          </div>
+        </main>
+      </div>
+    </NotificacoesProvider>
   );
 }

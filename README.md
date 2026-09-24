@@ -19,7 +19,7 @@ e, se for rodar localmente, copie `.env.example` para `.env.local`:
 - `ASAAS_WEBHOOK_TOKEN` — segredo que você inventa e cadastra igual no
   webhook do Asaas; a rota recusa (401) qualquer evento sem ele.
 - `CRON_SECRET` — segredo das rotinas agendadas (verificação semanal
-  das vendas e virada do mês). Texto aleatório de 32+ caracteres; a
+  das vendas, virada do mês e notificações do sino). Texto aleatório de 32+ caracteres; a
   Vercel envia sozinho nas execuções agendadas.
 
 Os valores do Supabase ficam em Supabase > Project Settings > API. A
@@ -91,9 +91,18 @@ cada um no SQL Editor do Supabase:
    vence; o desbloqueio gasta primeiro os do plano). Depois de rodar,
    cadastre você como administrador (comando no fim da parte 3).
 
+9. Etapa 9, em **duas partes, nesta ordem**:
+   `supabase/etapa9-1-notificacoes.sql` e
+   `supabase/etapa9-2-rotina-notificacoes.sql` — central de notificações
+   (sino): tabela `notificacoes` (o usuário só lê as próprias; marcar
+   como lida e apagar passam por funções), `notificacoes_enviadas`
+   (controle para nenhum aviso se repetir, mesmo depois de apagado),
+   `novidades` (avisos escritos por você) e a função
+   `gerar_notificacoes`, chamada pela rotina diária.
+
 ### Rotinas agendadas (Vercel Cron)
 
-O `vercel.json` agenda duas rotas, que só aceitam chamadas com o
+O `vercel.json` agenda três rotas, que só aceitam chamadas com o
 `CRON_SECRET`:
 
 - `/api/cron/verificar-vendas` — toda segunda às 6h (Brasília). Verifica
@@ -106,6 +115,26 @@ O `vercel.json` agenda duas rotas, que só aceitam chamadas com o
   Guarda o rank do mês que acabou e credita o prêmio (25, 15 e 10
   desbloqueios). Não paga duas vezes, e fecha meses que tenham ficado
   para trás.
+- `/api/cron/notificacoes` — todo dia às 8h (Brasília). Gera os avisos
+  do sino: renovação (3 dias antes, 1 vez por ciclo), saldo baixo
+  (3 buscas ou menos / 5 desbloqueios ou menos, 1 vez por ciclo),
+  novidades e no máximo 1 incentivo por dia (venda pendente há mais de
+  7 dias, negociação parada há mais de 7 dias, lead sem contato há mais
+  de 3 dias). Rodar duas vezes no mesmo dia não duplica nada.
+
+### Novidades do site (sino)
+
+Para avisar todos os usuários, escreva uma linha na tabela `novidades`
+(Supabase > SQL Editor):
+
+```sql
+insert into public.novidades (titulo, texto, publicar_em, link)
+values ('Título curto', 'Texto do aviso.', current_date, '/painel/buscar');
+```
+
+`publicar_em` é a data a partir da qual o aviso aparece e `link` é
+opcional. Ele chega a todos na próxima rodada diária; para mandar na
+hora, rode `select public.gerar_notificacoes();` logo depois.
 
 Para rodar na hora (teste), use o botão "Run" em Vercel > Settings >
 Cron Jobs.
