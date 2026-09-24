@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import Sidebar from "@/components/Sidebar";
 import { NotificacoesProvider, Sino } from "@/components/notificacoes/Notificacoes";
+import BotaoAjuda from "@/components/suporte/BotaoAjuda";
 import { createClient } from "@/lib/supabase/server";
 import { lerPerfil } from "@/lib/perfil/dados";
 
@@ -72,11 +73,12 @@ export default async function PainelLayout({
           avatarPronto={perfil?.avatarPronto ?? null}
           admin={ehAdmin === true}
         />
-        {/* No celular, o espaço de baixo evita que o menu inferior fixo
-            cubra o fim da página (inclui a área segura do iPhone). */}
+        {/* O espaço de baixo evita que o menu inferior fixo (celular) e o
+            botão "Preciso de ajuda" cubram o fim da página (inclui a área
+            segura do iPhone). */}
         <main
           id="conteudo"
-          className="px-seguro min-w-0 flex-1 pt-6 pb-[calc(6rem+env(safe-area-inset-bottom))] sm:px-6 md:px-10 md:py-10"
+          className="px-seguro min-w-0 flex-1 pt-6 pb-[calc(9rem+env(safe-area-inset-bottom))] sm:px-6 md:px-10 md:pt-10 md:pb-24"
         >
           <div className="mx-auto w-full max-w-6xl">
             {/* Computador: sino no canto superior direito. No celular ele
@@ -87,6 +89,7 @@ export default async function PainelLayout({
             {children}
           </div>
         </main>
+        <BotaoAjuda />
       </div>
     </NotificacoesProvider>
   );
