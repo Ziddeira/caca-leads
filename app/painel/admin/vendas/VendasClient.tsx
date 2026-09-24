@@ -24,7 +24,7 @@ function dataDoDia(aaaammdd: string) {
   return `${d}/${m}/${a}`;
 }
 
-export default function AdminClient({ vendas: iniciais }: { vendas: VendaAnalise[] }) {
+export default function VendasClient({ vendas: iniciais }: { vendas: VendaAnalise[] }) {
   const [vendas, setVendas] = useState(iniciais);
   const [feitas, setFeitas] = useState<string[]>([]);
 

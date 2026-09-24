@@ -108,6 +108,22 @@ cada um no SQL Editor do Supabase:
     arquivo de agenda (.ics) é gerado pelo próprio site, em
     `/api/leads/retorno/ics`.
 
+11. Etapa 11, em **três partes, nesta ordem**:
+    `supabase/etapa11-1-admin-base.sql`,
+    `supabase/etapa11-2-admin-paineis.sql` e
+    `supabase/etapa11-3-avisos.sql` — painel de Gestão: coluna
+    `profiles.is_admin` (quem já estava em `administradores` é copiado),
+    tabela `erros_servidor` (falhas do webhook, da verificação de vendas,
+    da busca e das notificações), tabela `admin_auditoria` (quem ajustou
+    o quê e quando), funções `admin_*` (todas recusam quem não é
+    administrador) e os avisos do sino escritos pela tela (`avisos`,
+    com período, público por plano e contagem de leitura). Depois de
+    rodar, marque a sua conta como administradora:
+
+    ```sql
+    update public.profiles set is_admin = true where email = 'seu-email@exemplo.com';
+    ```
+
 ### Rotinas agendadas (Vercel Cron)
 
 O `vercel.json` agenda três rotas, que só aceitam chamadas com o
@@ -128,12 +144,14 @@ O `vercel.json` agenda três rotas, que só aceitam chamadas com o
   (3 buscas ou menos / 5 desbloqueios ou menos, 1 vez por ciclo),
   novidades e no máximo 1 incentivo por dia (venda pendente há mais de
   7 dias, negociação parada há mais de 7 dias, lead sem contato há mais
-  de 3 dias), e o aviso dos retornos agendados para o dia (etapa 10).
+  de 3 dias), o aviso dos retornos agendados para o dia (etapa 10) e
+  os avisos escritos em Gestão > Avisos (etapa 11).
   Rodar duas vezes no mesmo dia não duplica nada.
 
 ### Novidades do site (sino)
 
-Para avisar todos os usuários, escreva uma linha na tabela `novidades`
+O jeito mais fácil agora é a tela Gestão > Avisos (etapa 11).
+Continua valendo o jeito antigo: para avisar todos os usuários, escreva uma linha na tabela `novidades`
 (Supabase > SQL Editor):
 
 ```sql

@@ -1,6 +1,7 @@
 import { timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { registrarErro } from "@/lib/erros/registrar";
 
 export const dynamic = "force-dynamic";
 
@@ -101,6 +102,13 @@ export async function POST(request: Request) {
     // Erro 500 faz o Asaas tentar entregar de novo mais tarde — e como o
     // processamento é idempotente, a nova tentativa não duplica crédito.
     console.error("processar_evento_asaas falhou:", error.message);
+    const e = evento as { event?: string; id?: string; payment?: { id?: string } };
+    await registrarErro("webhook_asaas", `processar_evento_asaas falhou: ${error.message}`, {
+      codigo: error.code,
+      evento: e.event,
+      evento_id: e.id,
+      pagamento: e.payment?.id,
+    });
     return NextResponse.json({ erro: "Falha ao processar o evento." }, { status: 500 });
   }
 

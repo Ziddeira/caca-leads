@@ -45,7 +45,7 @@ export default async function PainelLayout({
     redirect("/boas-vindas");
   }
 
-  // Link da tela de administração no menu (só para você). Sem o script da
+  // Link da tela de Gestão no menu (só para você). Sem o script da
   // etapa 8, a função não existe e o link simplesmente não aparece.
   const { data: ehAdmin } = await supabase.rpc("eh_admin");
 

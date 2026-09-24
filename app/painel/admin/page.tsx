@@ -1,86 +1,87 @@
-import { notFound } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
-import { COMPROVANTE_BUCKET, MSG_FALTA_ETAPA8, faltaEtapa8 } from "@/lib/vendas/regras";
-import { TituloPagina } from "@/components/ui";
-import AdminClient, { type VendaAnalise } from "./AdminClient";
+import { exigirAdminPagina } from "@/lib/admin/acesso";
+import { formatarPreco } from "@/lib/planos";
+import { FalhaCarregar, Numero, Secao, inteiro } from "./comum";
 
 export const dynamic = "force-dynamic";
 
-interface Linha {
-  venda_id: number;
-  apelido: string | null;
-  email: string | null;
-  place_id: string;
-  nome_empresa: string | null;
-  site_url: string;
-  fechado_em: string;
-  tentativas: number;
-  ultimo_motivo: string | null;
-  comprovante_path: string | null;
-  comprovante_enviado_em: string | null;
+interface VisaoGeral {
+  contas_total: number;
+  contas_gratis: number;
+  assinantes_por_plano: { solo: number; pro: number };
+  novos_cadastros_mes: number;
+  assinaturas_ativas: number;
+  assinaturas_inadimplentes: number;
+  receita_mensal_recorrente: number;
+  receita_em_risco: number;
+  recebido_no_mes: number;
+  cancelamentos_mes: number;
+  contas_que_pagaram: number;
+  novos_assinantes_mes: number;
 }
 
-// Tela do administrador: comprovantes esperando análise. Só aparece para
-// quem está na tabela "administradores" (função eh_admin do banco); para
-// qualquer outra pessoa a página simplesmente não existe (404).
-export default async function AdminPage() {
-  const supabase = await createClient();
-  if (!supabase) notFound();
+function porcento(parte: number, total: number) {
+  if (!total) return "—";
+  return (parte / total).toLocaleString("pt-BR", { style: "percent", maximumFractionDigits: 1 });
+}
 
-  const { data: ehAdmin, error: erroAdmin } = await supabase.rpc("eh_admin");
-  if (erroAdmin && faltaEtapa8(erroAdmin.code)) {
-    return (
-      <div>
-        <TituloPagina titulo="Administração" />
-        <p className="mt-4 text-ink-2">{MSG_FALTA_ETAPA8}</p>
-      </div>
-    );
-  }
-  if (ehAdmin !== true) notFound();
-
-  const { data: bruto, error } = await supabase.rpc("vendas_em_analise");
-  const data = bruto as Linha[] | null;
-  if (error) console.error("[admin]", error.code, error.message);
-
-  // Link temporário (1 hora) para abrir cada comprovante: o bucket é
-  // privado e as regras dele só deixam o dono e o administrador ler.
-  const vendas: VendaAnalise[] = await Promise.all(
-    (data ?? []).map(async (l) => {
-      let link: string | null = null;
-      if (l.comprovante_path) {
-        const { data: assinado } = await supabase.storage
-          .from(COMPROVANTE_BUCKET)
-          .createSignedUrl(l.comprovante_path, 3600);
-        link = assinado?.signedUrl ?? null;
-      }
-      return {
-        id: l.venda_id,
-        apelido: l.apelido,
-        email: l.email,
-        empresa: l.nome_empresa,
-        maps: `https://www.google.com/maps/place/?q=place_id:${encodeURIComponent(l.place_id)}`,
-        siteUrl: l.site_url,
-        fechadoEm: l.fechado_em,
-        tentativas: l.tentativas,
-        ultimoMotivo: l.ultimo_motivo,
-        comprovante: link,
-        ehPdf: l.comprovante_path?.endsWith(".pdf") ?? false,
-        enviadoEm: l.comprovante_enviado_em,
-      };
-    }),
-  );
+// Gestão > Visão geral. Todos os números vêm da função SQL
+// admin_visao_geral (etapa 11), que recusa quem não é administrador.
+export default async function VisaoGeralPage() {
+  const supabase = await exigirAdminPagina();
+  const { data, error } = await supabase.rpc("admin_visao_geral");
+  if (error) return <FalhaCarregar error={error} />;
+  const v = data as VisaoGeral;
+  const pagantes = v.assinantes_por_plano.solo + v.assinantes_por_plano.pro;
 
   return (
     <div>
-      <TituloPagina
-        titulo="Administração"
-        descricao="Comprovantes de venda esperando sua análise. Aprovar vale +40 pontos; recusar tira os 10 pontos do fechamento."
-      />
-      {error ? (
-        <p className="mt-6 text-ink-2">Não foi possível carregar a lista agora.</p>
-      ) : (
-        <AdminClient vendas={vendas} />
-      )}
+      <Secao titulo="Assinantes ativos" descricao="Contas com plano pago ainda válido.">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <Numero rotulo="Solo" valor={inteiro(v.assinantes_por_plano.solo)} />
+          <Numero rotulo="Pro" valor={inteiro(v.assinantes_por_plano.pro)} />
+          <Numero rotulo="Total pagante" valor={inteiro(pagantes)} />
+          <Numero rotulo="Grátis" valor={inteiro(v.contas_gratis)} dica={`de ${inteiro(v.contas_total)} contas`} />
+        </div>
+      </Secao>
+
+      <Secao titulo="Dinheiro">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <Numero
+            rotulo="Receita mensal recorrente"
+            valor={formatarPreco(Number(v.receita_mensal_recorrente))}
+            dica={`${inteiro(v.assinaturas_ativas)} assinatura(s) ativa(s) no Asaas`}
+          />
+          <Numero
+            rotulo="Em risco (pagamento atrasado)"
+            valor={formatarPreco(Number(v.receita_em_risco))}
+            dica={`${inteiro(v.assinaturas_inadimplentes)} assinatura(s) inadimplente(s)`}
+          />
+          <Numero rotulo="Recebido neste mês" valor={formatarPreco(Number(v.recebido_no_mes))} dica="Mensalidades e pacotes, sem estornos" />
+        </div>
+      </Secao>
+
+      <Secao titulo="Neste mês">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <Numero rotulo="Novos cadastros" valor={inteiro(v.novos_cadastros_mes)} />
+          <Numero rotulo="Novos assinantes" valor={inteiro(v.novos_assinantes_mes)} dica="Primeira mensalidade paga neste mês" />
+          <Numero rotulo="Cancelamentos" valor={inteiro(v.cancelamentos_mes)} dica="Assinaturas canceladas neste mês" />
+        </div>
+      </Secao>
+
+      <Secao titulo="Conversão de grátis para pago">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <Numero
+            rotulo="Contas que já pagaram"
+            valor={porcento(v.contas_que_pagaram, v.contas_total)}
+            dica={`${inteiro(v.contas_que_pagaram)} de ${inteiro(v.contas_total)} contas já tiveram uma mensalidade paga`}
+          />
+          <Numero
+            rotulo="Pagando agora"
+            valor={porcento(pagantes, v.contas_total)}
+            dica={`${inteiro(pagantes)} de ${inteiro(v.contas_total)} contas estão num plano pago`}
+          />
+        </div>
+      </Secao>
     </div>
   );
 }

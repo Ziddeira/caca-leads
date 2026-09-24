@@ -1,24 +1,17 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { exigirAdminApi, faltaEtapa11, respostaErroAdmin } from "@/lib/admin/acesso";
 import { respostaErroVenda } from "@/lib/vendas/erros";
 
 export const dynamic = "force-dynamic";
 
-// Aprovar ou recusar o comprovante de uma venda. Só funciona para quem
-// está na tabela "administradores": a função SQL analisar_comprovante
-// confere isso no banco, com o usuário logado — não dá para pular pela
-// tela nem chamando a rota direto.
+// Aprovar ou recusar o comprovante de uma venda. A rota confere o
+// administrador (profiles.is_admin) e a função SQL
+// admin_analisar_comprovante confere de novo no banco e anota na
+// auditoria quem decidiu — não dá para pular pela tela nem chamando a
+// rota direto.
 export async function POST(request: Request) {
-  const supabase = await createClient();
-  if (!supabase) {
-    return NextResponse.json({ erro: "Supabase não configurado neste ambiente." }, { status: 500 });
-  }
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) {
-    return NextResponse.json({ erro: "É preciso estar logado." }, { status: 401 });
-  }
+  const acesso = await exigirAdminApi();
+  if (acesso.resposta) return acesso.resposta;
 
   const corpo = await request.json().catch(() => null);
   const vendaId = Number(corpo?.vendaId);
@@ -31,12 +24,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ erro: "Explique o motivo da recusa (o usuário vai ver)." }, { status: 400 });
   }
 
-  const { data, error } = await supabase.rpc("analisar_comprovante", {
+  const { data, error } = await acesso.supabase.rpc("admin_analisar_comprovante", {
     p_venda_id: vendaId,
     p_aprovar: aprovar,
     p_motivo: motivo || null,
   });
-  if (error) return respostaErroVenda(error, "admin/vendas");
+  if (error) {
+    return faltaEtapa11(error.code) ? respostaErroAdmin(error, "admin/vendas") : respostaErroVenda(error, "admin/vendas");
+  }
 
   return NextResponse.json({ status: data });
 }

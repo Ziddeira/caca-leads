@@ -39,7 +39,7 @@ const ITENS_LATERAL = [
   { href: "/painel/perfil", label: "Perfil", curto: "Perfil", Icone: IconePerfil },
 ];
 
-const ITEM_ADMIN = { href: "/painel/admin", label: "Administração", curto: "Admin", Icone: IconeEscudo };
+const ITEM_ADMIN = { href: "/painel/admin", label: "Gestão", curto: "Gestão", Icone: IconeEscudo };
 
 // No computador (md para cima): barra lateral fixa com a logo grande.
 // No celular: barra fina no topo (logo, sino, perfil e Sair) e menu inferior fixo com
