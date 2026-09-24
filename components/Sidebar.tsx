@@ -34,10 +34,12 @@ export default function Sidebar({
   email,
   apelido,
   fotoUrl,
+  avatarPronto,
 }: {
   email: string | null;
   apelido: string | null;
   fotoUrl: string | null;
+  avatarPronto: string | null;
 }) {
   const pathname = usePathname();
   const router = useRouter();
@@ -93,7 +95,12 @@ export default function Sidebar({
             aria-current={ativo("/painel/perfil") ? "page" : undefined}
             className="mb-1 flex min-h-11 items-center gap-3 rounded-md px-3 py-2 transition hover:bg-canvas"
           >
-            <Avatar fotoUrl={fotoUrl} apelido={apelido ?? email} tamanho={36} />
+            <Avatar
+              fotoUrl={fotoUrl}
+              avatarPronto={avatarPronto}
+              apelido={apelido ?? email}
+              tamanho={36}
+            />
             <span className="min-w-0">
               {apelido && (
                 <span className="block truncate text-sm font-semibold text-ink">{apelido}</span>
@@ -133,6 +140,7 @@ export default function Sidebar({
             >
               <Avatar
                 fotoUrl={fotoUrl}
+                avatarPronto={avatarPronto}
                 apelido={apelido ?? email}
                 tamanho={36}
                 className={ativo("/painel/perfil") ? "ring-2 ring-primary ring-offset-2" : ""}

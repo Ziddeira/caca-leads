@@ -1,15 +1,12 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useRef, useState, type FormEvent } from "react";
-import Avatar from "@/components/Avatar";
-import { IconeCamera } from "@/components/Icones";
+import { useState, type FormEvent } from "react";
+import SeletorAvatar from "@/components/perfil/SeletorAvatar";
+import { Alerta, chamar, type Mensagem } from "@/components/perfil/comum";
 import {
   ALERTA_AVISO,
-  ALERTA_ERRO,
-  ALERTA_SUCESSO,
   BOTAO,
-  BOTAO_SECUNDARIO,
   CAMPO,
   CARTAO as CARTAO_BASE,
   ROTULO,
@@ -17,12 +14,8 @@ import {
 } from "@/components/ui";
 import { createClient } from "@/lib/supabase/client";
 import type { DadosPerfil } from "@/lib/perfil/dados";
-import RecorteFoto from "@/components/RecorteFoto";
-import { ErroFoto, abrirFoto, liberarFoto, recortarFoto, type AreaRecorte } from "@/lib/perfil/imagem";
 import {
   APELIDO_MAX,
-  FOTO_BUCKET,
-  FOTO_TIPOS,
   SENHA_MIN,
   mascararTelefone,
   situacaoTelefone,
@@ -34,36 +27,6 @@ import {
 const CARTAO = `${CARTAO_BASE} p-5 sm:p-6`;
 const TITULO_CARTAO = "text-lg font-bold text-ink";
 const AJUDA = "mt-1.5 text-sm text-muted";
-
-type Mensagem = { tipo: "ok" | "erro"; texto: string } | null;
-
-function Alerta({ mensagem }: { mensagem: Mensagem }) {
-  if (!mensagem) return null;
-  return mensagem.tipo === "ok" ? (
-    <p role="status" className={ALERTA_SUCESSO}>
-      {mensagem.texto}
-    </p>
-  ) : (
-    <p role="alert" className={ALERTA_ERRO}>
-      {mensagem.texto}
-    </p>
-  );
-}
-
-async function chamar(url: string, metodo: string, corpo?: unknown): Promise<string | null> {
-  try {
-    const res = await fetch(url, {
-      method: metodo,
-      headers: corpo ? { "Content-Type": "application/json" } : undefined,
-      body: corpo ? JSON.stringify(corpo) : undefined,
-    });
-    if (res.ok) return null;
-    const dados = await res.json().catch(() => ({}));
-    return dados.erro || "Não foi possível salvar agora.";
-  } catch {
-    return "Não foi possível falar com o servidor agora.";
-  }
-}
 
 export default function PerfilClient({
   userId,
@@ -78,7 +41,7 @@ export default function PerfilClient({
   emailPendente: string | null;
   avisoEmail: "confirmado" | "parcial" | null;
   perfil: DadosPerfil | null;
-  pendente: boolean;
+  pendente: "etapa5" | "etapa6" | null;
 }) {
   return (
     <div className="flex flex-col gap-6">
@@ -87,17 +50,23 @@ export default function PerfilClient({
         descricao="Seus dados de cadastro. Nada aqui muda seu plano, créditos ou buscas."
       />
 
-      {pendente && (
+      {pendente === "etapa5" && (
         <p role="alert" className={ALERTA_AVISO}>
           O perfil ainda não foi ativado no banco. Rode o script
           supabase/etapa5-perfil.sql no Supabase para liberar apelido, foto e telefone.
         </p>
       )}
+      {pendente === "etapa6" && (
+        <p role="alert" className={ALERTA_AVISO}>
+          Os avatares prontos ainda não foram ativados no banco. Rode o script
+          supabase/etapa6-boas-vindas.sql no Supabase para liberá-los.
+        </p>
+      )}
 
       <div className="grid gap-6 lg:grid-cols-2 lg:items-start">
         <div className="flex flex-col gap-6">
-          <CartaoFoto userId={userId} perfil={perfil} email={email} desativado={pendente} />
-          <CartaoDados perfil={perfil} desativado={pendente} />
+          <CartaoFoto userId={userId} perfil={perfil} email={email} pendente={pendente} />
+          <CartaoDados perfil={perfil} desativado={pendente === "etapa5"} />
         </div>
         <div className="flex flex-col gap-6">
           <CartaoEmail email={email} emailPendente={emailPendente} aviso={avisoEmail} />
@@ -108,148 +77,34 @@ export default function PerfilClient({
   );
 }
 
-// Foto ------------------------------------------------------------------
+// Foto ou avatar pronto ------------------------------------------------
 function CartaoFoto({
   userId,
   perfil,
   email,
-  desativado,
+  pendente,
 }: {
   userId: string;
   perfil: DadosPerfil | null;
   email: string;
-  desativado: boolean;
+  pendente: "etapa5" | "etapa6" | null;
 }) {
-  const router = useRouter();
-  const entrada = useRef<HTMLInputElement>(null);
-  const [enviando, setEnviando] = useState<"enviar" | "remover" | null>(null);
-  const [mensagem, setMensagem] = useState<Mensagem>(null);
-  const [recortando, setRecortando] = useState<HTMLImageElement | null>(null);
-  const botaoFoto = useRef<HTMLButtonElement>(null);
-
-  // 1º passo: confere o arquivo e abre a janela de recorte.
-  async function escolher(arquivo: File | undefined) {
-    if (entrada.current) entrada.current.value = "";
-    if (!arquivo) return;
-    setMensagem(null);
-    try {
-      setRecortando(await abrirFoto(arquivo));
-    } catch (e) {
-      setMensagem({
-        tipo: "erro",
-        texto: e instanceof ErroFoto ? e.message : "Não foi possível abrir a imagem.",
-      });
-    }
-  }
-
-  function fecharRecorte() {
-    if (recortando) liberarFoto(recortando);
-    setRecortando(null);
-    botaoFoto.current?.focus();
-  }
-
-  // 2º passo: gera o quadrado recortado (até 512×512) e envia.
-  async function enviar(area: AreaRecorte) {
-    if (!recortando) return;
-    const imagem = recortando;
-    setEnviando("enviar");
-    try {
-      const foto = await recortarFoto(imagem, area);
-      fecharRecorte();
-      const supabase = createClient();
-      // Nome novo a cada envio: o link muda e ninguém vê a foto antiga em cache.
-      const path = `${userId}/${Date.now()}.${foto.extensao}`;
-      const { error } = await supabase.storage
-        .from(FOTO_BUCKET)
-        .upload(path, foto.blob, { contentType: foto.tipo, cacheControl: "31536000", upsert: false });
-      if (error) {
-        console.error("[perfil] Falha no envio da foto:", error.message);
-        setMensagem({ tipo: "erro", texto: "Não foi possível enviar a foto. Tente de novo." });
-        return;
-      }
-      const erro = await chamar("/api/perfil/foto", "POST", { path });
-      if (erro) {
-        // Não ficou gravada no perfil: apaga o arquivo que acabou de subir.
-        await supabase.storage.from(FOTO_BUCKET).remove([path]);
-        setMensagem({ tipo: "erro", texto: erro });
-        return;
-      }
-      setMensagem({ tipo: "ok", texto: "Foto atualizada." });
-      router.refresh();
-    } catch (e) {
-      fecharRecorte();
-      setMensagem({
-        tipo: "erro",
-        texto: e instanceof ErroFoto ? e.message : "Não foi possível processar a imagem.",
-      });
-    } finally {
-      setEnviando(null);
-    }
-  }
-
-  async function remover() {
-    setMensagem(null);
-    setEnviando("remover");
-    const erro = await chamar("/api/perfil/foto", "DELETE");
-    setEnviando(null);
-    if (erro) {
-      setMensagem({ tipo: "erro", texto: erro });
-      return;
-    }
-    setMensagem({ tipo: "ok", texto: "Foto removida." });
-    router.refresh();
-  }
-
   return (
     <section aria-labelledby="titulo-foto" className={CARTAO}>
       <h2 id="titulo-foto" className={TITULO_CARTAO}>
         Foto de perfil
       </h2>
-      <div className="mt-4 flex flex-col items-center gap-4 sm:flex-row sm:items-center">
-        <Avatar fotoUrl={perfil?.fotoUrl ?? null} apelido={perfil?.apelido ?? email} tamanho={96} />
-        <div className="flex w-full flex-col gap-2 sm:w-auto">
-          <input
-            ref={entrada}
-            id="foto"
-            type="file"
-            accept={FOTO_TIPOS.join(",")}
-            className="sr-only"
-            disabled={desativado || enviando !== null}
-            onChange={(e) => escolher(e.target.files?.[0])}
-          />
-          <button
-            ref={botaoFoto}
-            type="button"
-            onClick={() => entrada.current?.click()}
-            disabled={desativado || enviando !== null}
-            className={`${BOTAO} w-full sm:w-auto`}
-          >
-            <IconeCamera />
-            {enviando === "enviar" ? "Enviando…" : perfil?.fotoUrl ? "Trocar foto" : "Enviar foto"}
-          </button>
-          {perfil?.fotoUrl && (
-            <button
-              type="button"
-              onClick={remover}
-              disabled={desativado || enviando !== null}
-              className={`${BOTAO_SECUNDARIO} w-full sm:w-auto`}
-            >
-              {enviando === "remover" ? "Removendo…" : "Remover foto"}
-            </button>
-          )}
-        </div>
-      </div>
-      <p className={`${AJUDA} text-center sm:text-left`}>
-        JPG, PNG ou WEBP de até 2 MB. Você ajusta o recorte antes de enviar; a
-        foto salva é quadrada, de no máximo 512×512, e fica visível para outros
-        usuários.
+      <p className="mt-1 mb-4 text-sm text-ink-2">
+        Aparece no menu e, mais adiante, no rank público.
       </p>
-      {recortando && (
-        <RecorteFoto imagem={recortando} onCancelar={fecharRecorte} onConfirmar={enviar} />
-      )}
-      <div className="mt-3">
-        <Alerta mensagem={mensagem} />
-      </div>
+      <SeletorAvatar
+        userId={userId}
+        apelido={perfil?.apelido ?? email}
+        fotoUrl={perfil?.fotoUrl ?? null}
+        avatarPronto={perfil?.avatarPronto ?? null}
+        desativado={pendente === "etapa5"}
+        semAvataresProntos={pendente !== null}
+      />
     </section>
   );
 }

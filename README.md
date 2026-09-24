@@ -55,6 +55,14 @@ cada um no SQL Editor do Supabase:
    bucket `avatares` no Storage com limite de 2 MB, só JPG/PNG/WEBP, e as
    regras para cada usuário só mexer na própria pasta. Não mexe em planos
    nem créditos.
+6. `supabase/etapa6-boas-vindas.sql` — tela de boas-vindas no primeiro
+   acesso e avatares prontos: colunas `avatar_pronto` e
+   `configuracao_inicial_em` (contas que já existiam são marcadas como
+   concluídas e não veem a tela); funções `definir_apelido`,
+   `definir_avatar_pronto` e `concluir_configuracao_inicial` (sorteia um
+   avatar para quem pular). A lista de avatares em `avatares_prontos()`
+   precisa ser igual à de `lib/perfil/avatares.ts`. Não mexe em planos
+   nem créditos.
 
 ### Links dos e-mails (Supabase Auth)
 

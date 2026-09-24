@@ -1,12 +1,18 @@
-// Foto de perfil redonda. Sem foto, mostra a inicial do apelido num
-// círculo azul-claro, no mesmo estilo dos outros destaques do site.
+import AvatarPronto from "@/components/AvatarPronto";
+import { ehAvatarPronto } from "@/lib/perfil/avatares";
+
+// Avatar redondo do usuário. Ordem de preferência: foto enviada, avatar
+// pronto escolhido e, por último, a inicial do apelido num círculo
+// azul-claro.
 export default function Avatar({
   fotoUrl,
+  avatarPronto = null,
   apelido,
   tamanho = 40,
   className = "",
 }: {
   fotoUrl: string | null;
+  avatarPronto?: string | null;
   apelido: string | null;
   tamanho?: number;
   className?: string;
@@ -26,6 +32,10 @@ export default function Avatar({
         className={`shrink-0 rounded-full border border-line bg-canvas object-cover ${className}`}
       />
     );
+  }
+
+  if (ehAvatarPronto(avatarPronto)) {
+    return <AvatarPronto id={avatarPronto} tamanho={tamanho} className={className} />;
   }
 
   return (

@@ -37,6 +37,13 @@ export default async function PainelLayout({
   // rodado, o menu só mostra o e-mail, como antes.
   const { perfil } = await lerPerfil(supabase, user.id);
 
+  // Primeiro acesso: antes do painel, a tela de boas-vindas (apelido e
+  // avatar). Aparece uma vez só; quem já tinha conta está marcado como
+  // concluído pelo script da etapa 6.
+  if (perfil && !perfil.configuracaoConcluida) {
+    redirect("/boas-vindas");
+  }
+
   return (
     <div className="min-h-screen bg-canvas md:flex">
       <a
@@ -49,6 +56,7 @@ export default async function PainelLayout({
         email={user.email ?? null}
         apelido={perfil?.apelido ?? null}
         fotoUrl={perfil?.fotoUrl ?? null}
+        avatarPronto={perfil?.avatarPronto ?? null}
       />
       {/* No celular, o espaço de baixo evita que o menu inferior fixo
           cubra o fim da página (inclui a área segura do iPhone). */}
