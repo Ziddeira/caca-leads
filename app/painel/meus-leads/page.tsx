@@ -25,8 +25,18 @@ interface LinhaVenda {
   status: StatusVenda;
 }
 
-const COLUNAS_ETAPA4 = "place_id, desbloqueado_em, dados, dados_atualizados_em";
-const COLUNAS_ETAPA7 = `${COLUNAS_ETAPA4}, situacao, anotacao, ultimo_contato_em`;
+const COLUNAS_BASE = "place_id, desbloqueado_em";
+const COLUNAS_CACHE = "dados, dados_atualizados_em"; // etapa 4
+const COLUNAS_FUNIL = "situacao, anotacao, ultimo_contato_em"; // etapa 7
+
+// Tentativas de leitura, da mais completa para a mais simples. Assim o
+// funil (etapa 7) funciona mesmo sem o cache (etapa 4), e vice-versa.
+const TENTATIVAS = [
+  { colunas: `${COLUNAS_BASE}, ${COLUNAS_CACHE}, ${COLUNAS_FUNIL}`, funil: true },
+  { colunas: `${COLUNAS_BASE}, ${COLUNAS_FUNIL}`, funil: true },
+  { colunas: `${COLUNAS_BASE}, ${COLUNAS_CACHE}`, funil: false },
+  { colunas: COLUNAS_BASE, funil: false },
+];
 
 // A página lê SÓ do banco: os dados de contato vêm do cache gravado no
 // desbloqueio (leads_desbloqueados.dados). O Google só é consultado,
@@ -40,42 +50,30 @@ export default async function MeusLeadsPage() {
 
   // O RLS já limita às linhas do usuário logado (o layout do painel já
   // conferiu o login), então não precisa de outra ida ao Auth aqui.
-  let resposta = await supabase
-    .from("leads_desbloqueados")
-    .select(COLUNAS_ETAPA7)
-    .order("desbloqueado_em", { ascending: false })
-    .returns<Linha[]>();
-  // Sem o script da etapa 7, não há situação/anotação: a lista abre como
-  // antes e o funil fica desligado, com um aviso. O código do erro vai
-  // junto no aviso, para saber se é mesmo coluna faltando (42703) ou
-  // outra coisa (ex.: permissão, cache de esquema do Supabase).
-  const erroFunil = resposta.error
-    ? `${resposta.error.code || "desconhecido"} — ${resposta.error.message}`
-    : null;
-  if (resposta.error) {
-    console.error("[meus-leads] Falha ao ler colunas da etapa 7:", resposta.error.code, resposta.error.message);
-  }
-  const funilAtivo = !erroFunil;
-
-  if (resposta.error) {
+  let resposta = null;
+  let funilAtivo = false;
+  // Guarda o erro da última tentativa COM funil, para o aviso mostrar o
+  // motivo real (ex.: 42703 = coluna da etapa 7 não existe).
+  let erroFunil: string | null = null;
+  for (const t of TENTATIVAS) {
     resposta = await supabase
       .from("leads_desbloqueados")
-      .select(COLUNAS_ETAPA4)
+      .select(t.colunas)
       .order("desbloqueado_em", { ascending: false })
       .returns<Linha[]>();
+    if (!resposta.error) {
+      funilAtivo = t.funil;
+      break;
+    }
+    if (t.funil) {
+      erroFunil = `${resposta.error.code || "desconhecido"} — ${resposta.error.message}`;
+    }
+  }
+  if (!funilAtivo && erroFunil) {
+    console.error("[meus-leads] Funil indisponível:", erroFunil);
   }
 
-  // Se o script da etapa 4 ainda não foi rodado, as colunas de cache não
-  // existem: cai para a consulta antiga e os dados vêm do Google depois.
-  if (resposta.error) {
-    resposta = await supabase
-      .from("leads_desbloqueados")
-      .select("place_id, desbloqueado_em")
-      .order("desbloqueado_em", { ascending: false })
-      .returns<Linha[]>();
-  }
-
-  if (resposta.error) {
+  if (!resposta || resposta.error) {
     return <Aviso texto="Não foi possível carregar seus leads desbloqueados agora. Tente recarregar a página." />;
   }
 
