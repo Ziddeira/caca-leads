@@ -124,6 +124,15 @@ cada um no SQL Editor do Supabase:
     update public.profiles set is_admin = true where email = 'seu-email@exemplo.com';
     ```
 
+12. `supabase/etapa12-suporte.sql` — botão "Preciso de ajuda": tabela
+    `chamados` (cada usuário vê só os próprios; o administrador vê todos),
+    bucket privado `suporte` (imagem até 5 MB), limite de 5 chamados
+    abertos por usuário, dados de diagnóstico da conta preenchidos pelo
+    banco, resposta pela aba Gestão > Suporte com aviso no sino (tipo
+    `suporte`). A cópia por e-mail está preparada em
+    `lib/suporte/email.ts`, mas desligada até existir um serviço de
+    e-mail.
+
 ### Rotinas agendadas (Vercel Cron)
 
 O `vercel.json` agenda três rotas, que só aceitam chamadas com o
