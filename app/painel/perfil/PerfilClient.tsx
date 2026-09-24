@@ -17,7 +17,8 @@ import {
 } from "@/components/ui";
 import { createClient } from "@/lib/supabase/client";
 import type { DadosPerfil } from "@/lib/perfil/dados";
-import { ErroFoto, prepararFoto } from "@/lib/perfil/imagem";
+import RecorteFoto from "@/components/RecorteFoto";
+import { ErroFoto, abrirFoto, liberarFoto, recortarFoto, type AreaRecorte } from "@/lib/perfil/imagem";
 import {
   APELIDO_MAX,
   FOTO_BUCKET,
@@ -123,14 +124,38 @@ function CartaoFoto({
   const entrada = useRef<HTMLInputElement>(null);
   const [enviando, setEnviando] = useState<"enviar" | "remover" | null>(null);
   const [mensagem, setMensagem] = useState<Mensagem>(null);
+  const [recortando, setRecortando] = useState<HTMLImageElement | null>(null);
+  const botaoFoto = useRef<HTMLButtonElement>(null);
 
+  // 1º passo: confere o arquivo e abre a janela de recorte.
   async function escolher(arquivo: File | undefined) {
     if (entrada.current) entrada.current.value = "";
     if (!arquivo) return;
     setMensagem(null);
+    try {
+      setRecortando(await abrirFoto(arquivo));
+    } catch (e) {
+      setMensagem({
+        tipo: "erro",
+        texto: e instanceof ErroFoto ? e.message : "Não foi possível abrir a imagem.",
+      });
+    }
+  }
+
+  function fecharRecorte() {
+    if (recortando) liberarFoto(recortando);
+    setRecortando(null);
+    botaoFoto.current?.focus();
+  }
+
+  // 2º passo: gera o quadrado recortado (até 512×512) e envia.
+  async function enviar(area: AreaRecorte) {
+    if (!recortando) return;
+    const imagem = recortando;
     setEnviando("enviar");
     try {
-      const foto = await prepararFoto(arquivo);
+      const foto = await recortarFoto(imagem, area);
+      fecharRecorte();
       const supabase = createClient();
       // Nome novo a cada envio: o link muda e ninguém vê a foto antiga em cache.
       const path = `${userId}/${Date.now()}.${foto.extensao}`;
@@ -152,6 +177,7 @@ function CartaoFoto({
       setMensagem({ tipo: "ok", texto: "Foto atualizada." });
       router.refresh();
     } catch (e) {
+      fecharRecorte();
       setMensagem({
         tipo: "erro",
         texto: e instanceof ErroFoto ? e.message : "Não foi possível processar a imagem.",
@@ -192,6 +218,7 @@ function CartaoFoto({
             onChange={(e) => escolher(e.target.files?.[0])}
           />
           <button
+            ref={botaoFoto}
             type="button"
             onClick={() => entrada.current?.click()}
             disabled={desativado || enviando !== null}
@@ -213,9 +240,13 @@ function CartaoFoto({
         </div>
       </div>
       <p className={`${AJUDA} text-center sm:text-left`}>
-        JPG, PNG ou WEBP de até 2 MB. A foto é reduzida para no máximo 512×512
-        antes de ser salva e fica visível para outros usuários.
+        JPG, PNG ou WEBP de até 2 MB. Você ajusta o recorte antes de enviar; a
+        foto salva é quadrada, de no máximo 512×512, e fica visível para outros
+        usuários.
       </p>
+      {recortando && (
+        <RecorteFoto imagem={recortando} onCancelar={fecharRecorte} onConfirmar={enviar} />
+      )}
       <div className="mt-3">
         <Alerta mensagem={mensagem} />
       </div>
