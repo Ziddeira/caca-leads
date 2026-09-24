@@ -100,6 +100,14 @@ cada um no SQL Editor do Supabase:
    `novidades` (avisos escritos por você) e a função
    `gerar_notificacoes`, chamada pela rotina diária.
 
+10. `supabase/etapa10-retorno.sql` — lembrete de retorno: colunas
+    `retorno_em` e `retorno_obs` em `leads_desbloqueados`, a função
+    `agendar_retorno_lead` (única porta de escrita; só aceita data futura,
+    até 1 ano à frente) e a função `gerar_notificacoes_retorno`, chamada
+    pela mesma rotina diária do sino para avisar no dia do retorno. O
+    arquivo de agenda (.ics) é gerado pelo próprio site, em
+    `/api/leads/retorno/ics`.
+
 ### Rotinas agendadas (Vercel Cron)
 
 O `vercel.json` agenda três rotas, que só aceitam chamadas com o
@@ -120,7 +128,8 @@ O `vercel.json` agenda três rotas, que só aceitam chamadas com o
   (3 buscas ou menos / 5 desbloqueios ou menos, 1 vez por ciclo),
   novidades e no máximo 1 incentivo por dia (venda pendente há mais de
   7 dias, negociação parada há mais de 7 dias, lead sem contato há mais
-  de 3 dias). Rodar duas vezes no mesmo dia não duplica nada.
+  de 3 dias), e o aviso dos retornos agendados para o dia (etapa 10).
+  Rodar duas vezes no mesmo dia não duplica nada.
 
 ### Novidades do site (sino)
 

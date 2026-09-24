@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { MSG_FALTA_ETAPA7 } from "./funil";
+import { MSG_FALTA_ETAPA10 } from "./retorno";
 
 // Traduz o erro das funções SQL da etapa 7 numa resposta para a tela.
 // As regras (lead é do usuário, venda única, datas, tamanho da anotação)
@@ -22,5 +23,22 @@ export function respostaErroFunil(error: { code?: string; message: string }, con
     return NextResponse.json({ erro: error.message }, { status: 400 });
   }
   console.error(`[${contexto}]`, error.code, error.message);
+  return NextResponse.json({ erro: "Não foi possível salvar agora. Tente de novo em instantes." }, { status: 500 });
+}
+
+// Mesma ideia, para a função SQL da etapa 10 (agendar_retorno_lead).
+export function respostaErroRetorno(error: { code?: string; message: string }) {
+  if (["PGRST202", "42883", "42703", "42P01"].includes(error.code ?? "")) {
+    console.error("[retorno] Etapa 10 não encontrada:", error.code, error.message);
+    return NextResponse.json({ erro: `${MSG_FALTA_ETAPA10} (código: ${error.code})` }, { status: 503 });
+  }
+  // Data ou hora que não existe (ex.: 31/02, 25:00).
+  if (error.code === "22008" || error.code === "22007") {
+    return NextResponse.json({ erro: "Data ou horário inválido." }, { status: 400 });
+  }
+  if (error.code === "P0001" || error.code === "23514") {
+    return NextResponse.json({ erro: error.message }, { status: 400 });
+  }
+  console.error("[retorno]", error.code, error.message);
   return NextResponse.json({ erro: "Não foi possível salvar agora. Tente de novo em instantes." }, { status: 500 });
 }

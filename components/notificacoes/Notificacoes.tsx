@@ -23,7 +23,7 @@ import { IconeFechar, IconeSino } from "@/components/Icones";
 // mas os dados ficam num só lugar — este "provider" —, então a contagem
 // é buscada uma vez e as duas cópias mostram sempre o mesmo número.
 
-type Tipo = "renovacao" | "saldo" | "novidade" | "incentivo";
+type Tipo = "renovacao" | "saldo" | "novidade" | "incentivo" | "retorno";
 
 export interface Notificacao {
   id: number;
@@ -142,6 +142,7 @@ const ROTULO_TIPO: Record<Tipo, string> = {
   saldo: "Saldo",
   novidade: "Novidade",
   incentivo: "Dica",
+  retorno: "Retorno",
 };
 
 const COR_TIPO: Record<Tipo, string> = {
@@ -149,6 +150,7 @@ const COR_TIPO: Record<Tipo, string> = {
   saldo: "bg-hot-soft text-hot-ink",
   novidade: "bg-booking-soft text-booking",
   incentivo: "bg-wa-soft text-wa",
+  retorno: "bg-rede-soft text-rede",
 };
 
 function quando(iso: string) {

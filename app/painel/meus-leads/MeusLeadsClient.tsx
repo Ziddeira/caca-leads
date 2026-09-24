@@ -21,6 +21,9 @@ import EtiquetaSituacao from "@/components/leads/EtiquetaSituacao";
 import CartaoLeadEsqueleto from "@/components/leads/CartaoLeadEsqueleto";
 import FunilLead, { type FunilEstado } from "@/components/leads/FunilLead";
 import FormVenda from "@/components/leads/FormVenda";
+import FormRetorno from "@/components/leads/FormRetorno";
+import RetornoLead from "@/components/leads/RetornoLead";
+import { MSG_FALTA_ETAPA10, statusRetorno, type RetornoLead as Retorno } from "@/lib/leads/retorno";
 import { ALERTA_AVISO, BOTAO_SECUNDARIO, BOTAO_WHATSAPP, CAMPO, CARTAO } from "@/components/ui";
 import {
   IconeAtualizar,
@@ -41,9 +44,12 @@ export interface LeadSalvo {
   anotacao: string | null;
   ultimoContatoEm: string | null;
   venda: VendaResumo | null;
+  retorno: Retorno | null;
 }
 
-type FiltroFunil = "todos" | SituacaoFunil;
+// "retorno" = só os leads com retorno agendado, do mais próximo ao mais
+// distante (os atrasados vêm primeiro).
+type FiltroFunil = "todos" | "retorno" | SituacaoFunil;
 
 type Estado = { dados: DadosLead | null; carregando: boolean; erro: string | null };
 
@@ -55,10 +61,13 @@ export default function MeusLeadsClient({
   leads,
   funilAtivo,
   erroFunil = null,
+  retornoAtivo = false,
 }: {
   leads: LeadSalvo[];
   funilAtivo: boolean;
   erroFunil?: string | null;
+  // false = a etapa 10 ainda não foi rodada no Supabase.
+  retornoAtivo?: boolean;
 }) {
   const [estados, setEstados] = useState<Record<string, Estado>>(() =>
     Object.fromEntries(
@@ -78,6 +87,16 @@ export default function MeusLeadsClient({
   const [salvando, setSalvando] = useState<Record<string, boolean>>({});
   const [errosFunil, setErrosFunil] = useState<Record<string, string | null>>({});
   const [vendaAberta, setVendaAberta] = useState<string | null>(null);
+  const [retornos, setRetornos] = useState<Record<string, Retorno | null>>(() =>
+    Object.fromEntries(leads.map((l) => [l.placeId, l.retorno])),
+  );
+  const [retornoAberto, setRetornoAberto] = useState<string | null>(null);
+  // Relógio da tela: a cada minuto, um retorno que passou vira "atrasado".
+  const [agora, setAgora] = useState(() => Date.now());
+  useEffect(() => {
+    const t = setInterval(() => setAgora(Date.now()), 60_000);
+    return () => clearInterval(t);
+  }, []);
 
   // Troca a situação na hora (sem esperar o servidor) e desfaz se o banco
   // recusar. A data do último contato vem do banco.
@@ -122,6 +141,13 @@ export default function MeusLeadsClient({
   }
 
   const fecharVenda = useCallback(() => setVendaAberta(null), []);
+  const fecharRetorno = useCallback(() => setRetornoAberto(null), []);
+
+  const comRetorno = useMemo(() => leads.filter((l) => retornos[l.placeId]).length, [leads, retornos]);
+  const atrasados = useMemo(
+    () => leads.filter((l) => retornos[l.placeId] && statusRetorno(retornos[l.placeId]!.em, agora) === "atrasado").length,
+    [leads, retornos, agora],
+  );
 
   function vendaRegistrada(placeId: string, venda: VendaResumo) {
     setFunis((f) => ({
@@ -178,15 +204,28 @@ export default function MeusLeadsClient({
   // nesta visita); o filtro de texto, o nome e o bairro.
   const visiveis = useMemo(() => {
     const texto = filtro.trim().toLowerCase();
-    return leads.filter((l) => {
-      if (filtroFunil !== "todos" && funis[l.placeId]?.situacao !== filtroFunil) return false;
+    const lista = leads.filter((l) => {
+      if (filtroFunil === "retorno") {
+        if (!retornos[l.placeId]) return false;
+      } else if (filtroFunil !== "todos" && funis[l.placeId]?.situacao !== filtroFunil) return false;
       if (!texto) return true;
       const d = estados[l.placeId]?.dados;
       return !!d && `${d.nome} ${d.bairro}`.toLowerCase().includes(texto);
     });
-  }, [leads, estados, filtro, filtroFunil, funis]);
+    if (filtroFunil === "retorno") {
+      // Datas ISO do banco: comparar como instante, do mais próximo ao mais distante.
+      const t = (l: LeadSalvo) => new Date(retornos[l.placeId]!.em).getTime();
+      lista.sort((a, b) => t(a) - t(b));
+    }
+    return lista;
+  }, [leads, estados, filtro, filtroFunil, funis, retornos]);
+
+  const rotuloFiltro =
+    filtroFunil === "todos" ? "" : filtroFunil === "retorno" ? "Retornos" : ROTULO_FUNIL[filtroFunil];
 
   const leadVenda = vendaAberta ? leads.find((l) => l.placeId === vendaAberta) : null;
+  const leadRetorno = retornoAberto ? leads.find((l) => l.placeId === retornoAberto) : null;
+  const dadosRetorno = leadRetorno ? estados[leadRetorno.placeId]?.dados : null;
 
   return (
     <div className="mt-6">
@@ -199,6 +238,24 @@ export default function MeusLeadsClient({
           <BotaoFiltro ativo={filtroFunil === "todos"} onClick={() => setFiltroFunil("todos")}>
             Todos <span className="font-normal opacity-80">({leads.length})</span>
           </BotaoFiltro>
+          {retornoAtivo && (
+            <BotaoFiltro
+              ativo={filtroFunil === "retorno"}
+              onClick={() => setFiltroFunil("retorno")}
+              titulo={`Com retorno agendado: ${comRetorno}${atrasados ? ` (${atrasados} atrasado${atrasados === 1 ? "" : "s"})` : ""}`}
+            >
+              Retornos <span className="font-normal opacity-80">({comRetorno})</span>
+              {atrasados > 0 && (
+                <span
+                  className={`ml-0.5 rounded-full px-1.5 text-xs ${
+                    filtroFunil === "retorno" ? "bg-primary-ink text-danger" : "bg-danger-soft text-danger"
+                  }`}
+                >
+                  {atrasados} atrasado{atrasados === 1 ? "" : "s"}
+                </span>
+              )}
+            </BotaoFiltro>
+          )}
           {SITUACOES_FUNIL.map((s) => (
             <BotaoFiltro
               key={s}
@@ -216,6 +273,7 @@ export default function MeusLeadsClient({
           <span className="break-words text-xs opacity-80">(código: {erroFunil ?? "?"})</span>
         </p>
       )}
+      {funilAtivo && !retornoAtivo && <p className={`${ALERTA_AVISO} mb-4`}>{MSG_FALTA_ETAPA10}</p>}
 
       {leads.length > 4 && (
         <div className="relative mb-4 max-w-md">
@@ -250,6 +308,14 @@ export default function MeusLeadsClient({
                         onMarcarFechado={() => setVendaAberta(lead.placeId)}
                         onSalvarAnotacao={(t) => salvarAnotacao(lead.placeId, t)}
                       />
+                      {retornoAtivo && (
+                        <RetornoLead
+                          placeId={lead.placeId}
+                          retorno={retornos[lead.placeId] ?? null}
+                          agora={agora}
+                          onAgendar={() => setRetornoAberto(lead.placeId)}
+                        />
+                      )}
                       {errosFunil[lead.placeId] && (
                         <p role="alert" className="mt-2 text-sm text-danger">
                           {errosFunil[lead.placeId]}
@@ -271,8 +337,10 @@ export default function MeusLeadsClient({
       {!visiveis.length && (
         <p className="mt-2 rounded-lg border border-dashed border-line bg-surface px-4 py-8 text-center text-sm text-ink-2">
           {filtro.trim()
-            ? `Nenhum lead com “${filtro}”${filtroFunil !== "todos" ? ` em “${ROTULO_FUNIL[filtroFunil]}”` : ""}. Tente só uma parte do nome ou o bairro.`
-            : `Nenhum lead em “${filtroFunil !== "todos" ? ROTULO_FUNIL[filtroFunil] : ""}” por enquanto.`}
+            ? `Nenhum lead com “${filtro}”${rotuloFiltro ? ` em “${rotuloFiltro}”` : ""}. Tente só uma parte do nome ou o bairro.`
+            : filtroFunil === "retorno"
+              ? "Nenhum retorno agendado. Use “Agendar retorno” no cartão de um lead."
+              : `Nenhum lead em “${rotuloFiltro}” por enquanto.`}
         </p>
       )}
 
@@ -283,6 +351,20 @@ export default function MeusLeadsClient({
           desbloqueadoEm={leadVenda.desbloqueadoEm}
           onCancelar={fecharVenda}
           onRegistrada={(v) => vendaRegistrada(leadVenda.placeId, v)}
+        />
+      )}
+
+      {leadRetorno && (
+        <FormRetorno
+          placeId={leadRetorno.placeId}
+          lead={{
+            nome: dadosRetorno?.nome ?? "este lead",
+            telefone: dadosRetorno?.telefone ?? null,
+            situacao: ROTULO_FUNIL[funis[leadRetorno.placeId]?.situacao ?? "desbloqueado"],
+          }}
+          retorno={retornos[leadRetorno.placeId] ?? null}
+          onFechar={fecharRetorno}
+          onSalvo={(r) => setRetornos((atual) => ({ ...atual, [leadRetorno.placeId]: r }))}
         />
       )}
     </div>

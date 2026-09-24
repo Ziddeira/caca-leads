@@ -16,6 +16,8 @@ interface Linha {
   situacao?: string | null;
   anotacao?: string | null;
   ultimo_contato_em?: string | null;
+  retorno_em?: string | null;
+  retorno_obs?: string | null;
 }
 
 interface LinhaVenda {
@@ -28,14 +30,18 @@ interface LinhaVenda {
 const COLUNAS_BASE = "place_id, desbloqueado_em";
 const COLUNAS_CACHE = "dados, dados_atualizados_em"; // etapa 4
 const COLUNAS_FUNIL = "situacao, anotacao, ultimo_contato_em"; // etapa 7
+const COLUNAS_RETORNO = "retorno_em, retorno_obs"; // etapa 10
 
 // Tentativas de leitura, da mais completa para a mais simples. Assim o
-// funil (etapa 7) funciona mesmo sem o cache (etapa 4), e vice-versa.
+// funil (etapa 7) funciona mesmo sem o cache (etapa 4), e vice-versa; e
+// o retorno (etapa 10) só entra quando o funil também está ativo.
 const TENTATIVAS = [
-  { colunas: `${COLUNAS_BASE}, ${COLUNAS_CACHE}, ${COLUNAS_FUNIL}`, funil: true },
-  { colunas: `${COLUNAS_BASE}, ${COLUNAS_FUNIL}`, funil: true },
-  { colunas: `${COLUNAS_BASE}, ${COLUNAS_CACHE}`, funil: false },
-  { colunas: COLUNAS_BASE, funil: false },
+  { colunas: `${COLUNAS_BASE}, ${COLUNAS_CACHE}, ${COLUNAS_FUNIL}, ${COLUNAS_RETORNO}`, funil: true, retorno: true },
+  { colunas: `${COLUNAS_BASE}, ${COLUNAS_FUNIL}, ${COLUNAS_RETORNO}`, funil: true, retorno: true },
+  { colunas: `${COLUNAS_BASE}, ${COLUNAS_CACHE}, ${COLUNAS_FUNIL}`, funil: true, retorno: false },
+  { colunas: `${COLUNAS_BASE}, ${COLUNAS_FUNIL}`, funil: true, retorno: false },
+  { colunas: `${COLUNAS_BASE}, ${COLUNAS_CACHE}`, funil: false, retorno: false },
+  { colunas: COLUNAS_BASE, funil: false, retorno: false },
 ];
 
 // A página lê SÓ do banco: os dados de contato vêm do cache gravado no
@@ -52,6 +58,7 @@ export default async function MeusLeadsPage() {
   // conferiu o login), então não precisa de outra ida ao Auth aqui.
   let resposta = null;
   let funilAtivo = false;
+  let retornoAtivo = false;
   // Guarda o erro da última tentativa COM funil, para o aviso mostrar o
   // motivo real (ex.: 42703 = coluna da etapa 7 não existe).
   let erroFunil: string | null = null;
@@ -63,9 +70,10 @@ export default async function MeusLeadsPage() {
       .returns<Linha[]>();
     if (!resposta.error) {
       funilAtivo = t.funil;
+      retornoAtivo = t.retorno;
       break;
     }
-    if (t.funil) {
+    if (t.funil && !t.retorno) {
       erroFunil = `${resposta.error.code || "desconhecido"} — ${resposta.error.message}`;
     }
   }
@@ -102,7 +110,7 @@ export default async function MeusLeadsPage() {
       />
 
       {leads.length ? (
-        <MeusLeadsClient leads={leads} funilAtivo={funilAtivo} erroFunil={erroFunil} />
+        <MeusLeadsClient leads={leads} funilAtivo={funilAtivo} erroFunil={erroFunil} retornoAtivo={retornoAtivo} />
       ) : (
         <div className="mt-8">
           <EstadoVazio
@@ -134,6 +142,7 @@ function montarLeads(linhas: Linha[], vendas: LinhaVenda[]): LeadSalvo[] {
     anotacao: l.anotacao ?? null,
     ultimoContatoEm: l.ultimo_contato_em ?? null,
     venda: vendaPorLead.get(l.place_id) ?? null,
+    retorno: l.retorno_em ? { em: l.retorno_em, obs: l.retorno_obs ?? null } : null,
   }));
 }
 
