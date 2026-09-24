@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { ALERTA_ERRO, ALERTA_SUCESSO, BOTAO, CAMPO, CARTAO, ROTULO } from "@/components/ui";
+import { ALERTA_ERRO, ALERTA_SUCESSO, BOTAO, CAMPO, ROTULO } from "@/components/ui";
+import TelaAuth, { LINK_AUTH } from "@/components/TelaAuth";
 
 type Mode = "login" | "cadastro";
 
@@ -16,7 +17,7 @@ export default function AuthForm({ mode }: { mode: Mode }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(() =>
     mode === "login" && searchParams.get("erro") === "confirmacao"
-      ? "Não foi possível confirmar seu e-mail. O link pode ter expirado — tente se cadastrar de novo."
+      ? "Não foi possível validar o link do e-mail. Ele pode ter expirado ou ter sido aberto em outro navegador — peça um link novo."
       : null,
   );
   const [info, setInfo] = useState<string | null>(null);
@@ -75,103 +76,94 @@ export default function AuthForm({ mode }: { mode: Mode }) {
   }
 
   return (
-    <div className="px-seguro flex min-h-screen flex-col items-center justify-center bg-canvas pt-[calc(2.5rem+env(safe-area-inset-top))] pb-[calc(2.5rem+env(safe-area-inset-bottom))]">
-      <Link href="/" className="mb-8 block rounded-md">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/logo-principal.svg"
-          alt="Caça-leads — voltar para o início"
-          width={808}
-          height={212}
-          className="h-12 w-auto"
-        />
-      </Link>
-      <div className={`${CARTAO} w-full max-w-sm p-6 sm:p-8`}>
-        <h1 className="text-2xl font-extrabold text-ink">
-          {mode === "login" ? "Entrar na sua conta" : "Criar conta grátis"}
-        </h1>
-        <p className="mt-1.5 text-ink-2">
-          {mode === "login"
-            ? "Use o e-mail e a senha do seu cadastro."
-            : "Leva menos de um minuto."}
-        </p>
+    <TelaAuth
+      titulo={mode === "login" ? "Entrar na sua conta" : "Criar conta grátis"}
+      descricao={
+        mode === "login"
+          ? "Use o e-mail e a senha do seu cadastro."
+          : "Leva menos de um minuto."
+      }
+    >
+      <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4">
+        <div>
+          <label htmlFor="email" className={ROTULO}>
+            E-mail
+          </label>
+          <input
+            id="email"
+            type="email"
+            required
+            autoComplete="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className={CAMPO}
+            placeholder="voce@exemplo.com"
+          />
+        </div>
+        <div>
+          <label htmlFor="password" className={ROTULO}>
+            Senha
+          </label>
+          <input
+            id="password"
+            type="password"
+            required
+            minLength={6}
+            autoComplete={mode === "login" ? "current-password" : "new-password"}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className={CAMPO}
+            placeholder="Mínimo 6 caracteres"
+          />
+          {mode === "login" && (
+            <Link href="/esqueci-senha" className={`${LINK_AUTH} text-sm`}>
+              Esqueci minha senha
+            </Link>
+          )}
+        </div>
 
-        <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4">
-          <div>
-            <label htmlFor="email" className={ROTULO}>
-              E-mail
-            </label>
-            <input
-              id="email"
-              type="email"
-              required
-              autoComplete="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className={CAMPO}
-              placeholder="voce@exemplo.com"
-            />
+        {error && (
+          <div role="alert" className={ALERTA_ERRO}>
+            {error}
           </div>
-          <div>
-            <label htmlFor="password" className={ROTULO}>
-              Senha
-            </label>
-            <input
-              id="password"
-              type="password"
-              required
-              minLength={6}
-              autoComplete={mode === "login" ? "current-password" : "new-password"}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className={CAMPO}
-              placeholder="Mínimo 6 caracteres"
-            />
+        )}
+        {info && (
+          <div role="status" className={ALERTA_SUCESSO}>
+            {info}
           </div>
+        )}
 
-          {error && (
-            <div role="alert" className={ALERTA_ERRO}>
-              {error}
-            </div>
-          )}
-          {info && (
-            <div role="status" className={ALERTA_SUCESSO}>
-              {info}
-            </div>
-          )}
+        <button
+          type="submit"
+          disabled={loading}
+          className={`${BOTAO} mt-2 w-full text-base!`}
+        >
+          {loading
+            ? "Aguarde..."
+            : mode === "login"
+              ? "Entrar"
+              : "Criar conta"}
+        </button>
+      </form>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className={`${BOTAO} mt-2 w-full text-base!`}
-          >
-            {loading
-              ? "Aguarde..."
-              : mode === "login"
-                ? "Entrar"
-                : "Criar conta"}
-          </button>
-        </form>
-
-        <p className="mt-6 text-center text-sm text-ink-2">
-          {mode === "login" ? (
-            <>
-              Ainda não tem conta?{" "}
-              <Link href="/cadastro" className="inline-flex min-h-11 items-center font-semibold text-primary underline-offset-2 hover:underline">
-                Criar conta
-              </Link>
-            </>
-          ) : (
-            <>
-              Já tem conta?{" "}
-              <Link href="/login" className="inline-flex min-h-11 items-center font-semibold text-primary underline-offset-2 hover:underline">
-                Entrar
-              </Link>
-            </>
-          )}
-        </p>
-      </div>
-    </div>
+      <p className="mt-6 text-center text-sm text-ink-2">
+        {mode === "login" ? (
+          <>
+            Ainda não tem conta?{" "}
+            <Link href="/cadastro" className={LINK_AUTH}>
+              Criar conta
+            </Link>
+          </>
+        ) : (
+          <>
+            Já tem conta?{" "}
+            <Link href="/login" className={LINK_AUTH}>
+              Entrar
+            </Link>
+          </>
+        )}
+      </p>
+    </TelaAuth>
   );
 }
 
