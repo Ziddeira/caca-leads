@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import Sidebar from "@/components/Sidebar";
 import { createClient } from "@/lib/supabase/server";
+import { lerPerfil } from "@/lib/perfil/dados";
 
 export default async function PainelLayout({
   children,
@@ -32,6 +33,10 @@ export default async function PainelLayout({
     redirect("/login");
   }
 
+  // Apelido e foto para o menu. Se o script da etapa 5 ainda não foi
+  // rodado, o menu só mostra o e-mail, como antes.
+  const { perfil } = await lerPerfil(supabase, user.id);
+
   return (
     <div className="min-h-screen bg-canvas md:flex">
       <a
@@ -40,7 +45,11 @@ export default async function PainelLayout({
       >
         Pular para o conteúdo
       </a>
-      <Sidebar email={user.email ?? null} />
+      <Sidebar
+        email={user.email ?? null}
+        apelido={perfil?.apelido ?? null}
+        fotoUrl={perfil?.fotoUrl ?? null}
+      />
       {/* No celular, o espaço de baixo evita que o menu inferior fixo
           cubra o fim da página (inclui a área segura do iPhone). */}
       <main

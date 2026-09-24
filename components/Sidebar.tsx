@@ -7,9 +7,11 @@ import {
   IconeBuscar,
   IconeComunidade,
   IconeLeads,
+  IconePerfil,
   IconePlano,
   IconeSair,
 } from "@/components/Icones";
+import Avatar from "@/components/Avatar";
 
 const ITENS = [
   { href: "/painel/buscar", label: "Buscar", curto: "Buscar", Icone: IconeBuscar },
@@ -18,10 +20,25 @@ const ITENS = [
   { href: "/painel/plano", label: "Meu plano", curto: "Plano", Icone: IconePlano },
 ];
 
+// "Perfil" fica só na barra lateral do computador: no celular, o atalho
+// é a foto no topo (o menu inferior continua com 4 itens).
+const ITENS_LATERAL = [
+  ...ITENS,
+  { href: "/painel/perfil", label: "Perfil", curto: "Perfil", Icone: IconePerfil },
+];
+
 // No computador (md para cima): barra lateral fixa com a logo grande.
 // No celular: barra fina no topo (logo + Sair) e menu inferior fixo com
 // os 4 atalhos, respeitando as áreas seguras do iPhone.
-export default function Sidebar({ email }: { email: string | null }) {
+export default function Sidebar({
+  email,
+  apelido,
+  fotoUrl,
+}: {
+  email: string | null;
+  apelido: string | null;
+  fotoUrl: string | null;
+}) {
   const pathname = usePathname();
   const router = useRouter();
 
@@ -50,7 +67,7 @@ export default function Sidebar({ email }: { email: string | null }) {
         </Link>
 
         <nav aria-label="Menu principal" className="flex flex-1 flex-col gap-1">
-          {ITENS.map(({ href, label, Icone }) => {
+          {ITENS_LATERAL.map(({ href, label, Icone }) => {
             const atual = ativo(href);
             return (
               <Link
@@ -71,7 +88,19 @@ export default function Sidebar({ email }: { email: string | null }) {
         </nav>
 
         <div className="mt-auto border-t border-line-2 pt-4">
-          {email && <p className="mb-2 truncate px-3 text-xs text-muted">{email}</p>}
+          <Link
+            href="/painel/perfil"
+            aria-current={ativo("/painel/perfil") ? "page" : undefined}
+            className="mb-1 flex min-h-11 items-center gap-3 rounded-md px-3 py-2 transition hover:bg-canvas"
+          >
+            <Avatar fotoUrl={fotoUrl} apelido={apelido ?? email} tamanho={36} />
+            <span className="min-w-0">
+              {apelido && (
+                <span className="block truncate text-sm font-semibold text-ink">{apelido}</span>
+              )}
+              {email && <span className="block truncate text-xs text-muted">{email}</span>}
+            </span>
+          </Link>
           <button
             onClick={sair}
             className="flex min-h-11 w-full items-center gap-3 rounded-md px-3 py-2 text-left text-sm font-semibold text-ink-2 transition hover:bg-canvas hover:text-ink"
@@ -95,13 +124,28 @@ export default function Sidebar({ email }: { email: string | null }) {
               className="h-10 w-auto"
             />
           </Link>
-          <button
-            onClick={sair}
-            className="flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-md px-3 text-sm font-semibold text-ink-2 transition hover:bg-canvas"
-          >
-            <IconeSair />
-            Sair
-          </button>
+          <div className="flex items-center gap-1">
+            <Link
+              href="/painel/perfil"
+              aria-label="Meu perfil"
+              aria-current={ativo("/painel/perfil") ? "page" : undefined}
+              className="flex min-h-11 min-w-11 items-center justify-center rounded-full"
+            >
+              <Avatar
+                fotoUrl={fotoUrl}
+                apelido={apelido ?? email}
+                tamanho={36}
+                className={ativo("/painel/perfil") ? "ring-2 ring-primary ring-offset-2" : ""}
+              />
+            </Link>
+            <button
+              onClick={sair}
+              className="flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-md px-3 text-sm font-semibold text-ink-2 transition hover:bg-canvas"
+            >
+              <IconeSair />
+              Sair
+            </button>
+          </div>
         </div>
       </header>
 

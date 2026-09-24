@@ -47,6 +47,21 @@ cada um no SQL Editor do Supabase:
    sem chamar o Google a cada visita; cria a função `salvar_dados_lead` e
    a lista de espera da Comunidade (`interesse_comunidade` e a função
    `quero_ser_avisado_comunidade`). Não mexe em planos nem créditos.
+5. `supabase/etapa5-perfil.sql` — perfil do usuário: colunas `apelido`
+   (único, com apelido padrão para quem não escolher), `foto_path`,
+   `telefone` e `telefone_verificado_em` (reservada para a verificação
+   por SMS futura); funções `atualizar_perfil` e `definir_foto_perfil`
+   (só mexem nesses campos, sempre no perfil de quem está logado); cria o
+   bucket `avatares` no Storage com limite de 2 MB, só JPG/PNG/WEBP, e as
+   regras para cada usuário só mexer na própria pasta. Não mexe em planos
+   nem créditos.
+
+### Links dos e-mails (Supabase Auth)
+
+Em Supabase > Authentication > URL Configuration > Redirect URLs, deixe
+liberado `https://<seu-domínio>/auth/callback**` (com os dois asteriscos,
+para aceitar o `?next=...` usado na troca de e-mail e no "esqueci minha
+senha"). Adicione também a URL de pré-visualização da Vercel, se usar.
 
 ## Webhook do Asaas
 
