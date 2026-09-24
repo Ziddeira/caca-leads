@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { buscarTexto, ErroGooglePlaces } from "@/lib/leads/google";
+import { registrarErro } from "@/lib/erros/registrar";
 import {
   celularBrasileiro,
   classificar,
@@ -132,6 +133,13 @@ export async function POST(request: Request) {
       e instanceof ErroGooglePlaces
         ? `A busca parou antes do fim: ${e.message}`
         : "A busca parou antes do fim por um erro inesperado.";
+    if (!(e instanceof ErroGooglePlaces)) console.error("[leads/buscar]", e);
+    await registrarErro(
+      "busca",
+      `A busca parou antes do fim: ${e instanceof Error ? e.message : String(e)}`,
+      { termos, areas, modo, chamadas_google: chamadasGoogle, leads_ate_parar: porId.size },
+      user.id,
+    );
   }
 
   // Para quem já tinha desbloqueado algum desses leads antes, mostra o
