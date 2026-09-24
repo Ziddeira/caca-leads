@@ -63,6 +63,15 @@ cada um no SQL Editor do Supabase:
    avatar para quem pular). A lista de avatares em `avatares_prontos()`
    precisa ser igual à de `lib/perfil/avatares.ts`. Não mexe em planos
    nem créditos.
+7. `supabase/etapa7-funil-vendas.sql` — funil de leads e venda fechada:
+   colunas `situacao`, `anotacao` (até 500 caracteres) e
+   `ultimo_contato_em` em `leads_desbloqueados`; tabela `vendas` (nasce
+   "pendente_verificacao", com os campos de verificação e pontos já
+   criados e vazios); funções `atualizar_situacao_lead`,
+   `salvar_anotacao_lead` e `registrar_venda`. Só dá para registrar venda
+   de lead que o próprio usuário desbloqueou, uma por lead, e o usuário
+   não consegue gravar verificação nem pontos. Não mexe em planos nem
+   créditos.
 
 ### Links dos e-mails (Supabase Auth)
 

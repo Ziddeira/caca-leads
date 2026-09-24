@@ -1,7 +1,16 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 import type { DadosLead } from "@/lib/leads/dadosLead";
+import {
+  MSG_ERRO_FUNIL,
+  MSG_FALTA_ETAPA7,
+  ROTULO_FUNIL,
+  SITUACOES_FUNIL,
+  contagemFunil,
+  type SituacaoFunil,
+  type VendaResumo,
+} from "@/lib/leads/funil";
 import {
   MSG_PADRAO_HOSPEDAGEM,
   MSG_PADRAO_NEGOCIOS,
@@ -10,7 +19,9 @@ import {
 } from "@/lib/leads/mensagens";
 import EtiquetaSituacao from "@/components/leads/EtiquetaSituacao";
 import CartaoLeadEsqueleto from "@/components/leads/CartaoLeadEsqueleto";
-import { BOTAO_SECUNDARIO, BOTAO_WHATSAPP, CAMPO, CARTAO } from "@/components/ui";
+import FunilLead, { type FunilEstado } from "@/components/leads/FunilLead";
+import FormVenda from "@/components/leads/FormVenda";
+import { ALERTA_AVISO, BOTAO_SECUNDARIO, BOTAO_WHATSAPP, CAMPO, CARTAO } from "@/components/ui";
 import {
   IconeAtualizar,
   IconeBuscar,
@@ -26,7 +37,13 @@ export interface LeadSalvo {
   desbloqueadoEm: string;
   // null = sem cache válido: os dados são buscados depois que a página abre.
   dados: DadosLead | null;
+  situacao: SituacaoFunil;
+  anotacao: string | null;
+  ultimoContatoEm: string | null;
+  venda: VendaResumo | null;
 }
+
+type FiltroFunil = "todos" | SituacaoFunil;
 
 type Estado = { dados: DadosLead | null; carregando: boolean; erro: string | null };
 
@@ -34,13 +51,92 @@ type Estado = { dados: DadosLead | null; carregando: boolean; erro: string | nul
 // estourar a cota do Google de uma vez).
 const SIMULTANEOS = 3;
 
-export default function MeusLeadsClient({ leads }: { leads: LeadSalvo[] }) {
+export default function MeusLeadsClient({
+  leads,
+  funilAtivo,
+  erroFunil = null,
+}: {
+  leads: LeadSalvo[];
+  funilAtivo: boolean;
+  erroFunil?: string | null;
+}) {
   const [estados, setEstados] = useState<Record<string, Estado>>(() =>
     Object.fromEntries(
       leads.map((l) => [l.placeId, { dados: l.dados, carregando: !l.dados, erro: null }]),
     ),
   );
   const [filtro, setFiltro] = useState("");
+  const [funis, setFunis] = useState<Record<string, FunilEstado>>(() =>
+    Object.fromEntries(
+      leads.map((l) => [
+        l.placeId,
+        { situacao: l.situacao, anotacao: l.anotacao, ultimoContatoEm: l.ultimoContatoEm, venda: l.venda },
+      ]),
+    ),
+  );
+  const [filtroFunil, setFiltroFunil] = useState<FiltroFunil>("todos");
+  const [salvando, setSalvando] = useState<Record<string, boolean>>({});
+  const [errosFunil, setErrosFunil] = useState<Record<string, string | null>>({});
+  const [vendaAberta, setVendaAberta] = useState<string | null>(null);
+
+  // Troca a situação na hora (sem esperar o servidor) e desfaz se o banco
+  // recusar. A data do último contato vem do banco.
+  async function mudarSituacao(placeId: string, situacao: SituacaoFunil) {
+    const anterior = funis[placeId];
+    setFunis((f) => ({ ...f, [placeId]: { ...f[placeId], situacao } }));
+    setSalvando((s) => ({ ...s, [placeId]: true }));
+    setErrosFunil((e) => ({ ...e, [placeId]: null }));
+    try {
+      const res = await fetch("/api/leads/funil", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ placeId, situacao }),
+      });
+      const corpo = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(corpo.erro || "Não foi possível mudar a situação.");
+      setFunis((f) => ({ ...f, [placeId]: { ...f[placeId], ultimoContatoEm: corpo.ultimoContatoEm ?? null } }));
+    } catch (err) {
+      setFunis((f) => ({ ...f, [placeId]: anterior }));
+      const msg = err instanceof Error ? err.message : "Não foi possível mudar a situação.";
+      setErrosFunil((e) => ({ ...e, [placeId]: msg }));
+    } finally {
+      setSalvando((s) => ({ ...s, [placeId]: false }));
+    }
+  }
+
+  // Devolve a mensagem de erro, ou null se salvou.
+  async function salvarAnotacao(placeId: string, texto: string): Promise<string | null> {
+    try {
+      const res = await fetch("/api/leads/funil", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ placeId, anotacao: texto }),
+      });
+      const corpo = await res.json().catch(() => ({}));
+      if (!res.ok) return corpo.erro || "Não foi possível salvar a anotação.";
+      setFunis((f) => ({ ...f, [placeId]: { ...f[placeId], anotacao: corpo.anotacao ?? null } }));
+      return null;
+    } catch {
+      return "Não foi possível salvar a anotação.";
+    }
+  }
+
+  const fecharVenda = useCallback(() => setVendaAberta(null), []);
+
+  function vendaRegistrada(placeId: string, venda: VendaResumo) {
+    setFunis((f) => ({
+      ...f,
+      [placeId]: { ...f[placeId], situacao: "fechado", venda, ultimoContatoEm: new Date().toISOString() },
+    }));
+    setErrosFunil((e) => ({ ...e, [placeId]: null }));
+    setVendaAberta(null);
+  }
+
+  const contagem = useMemo(() => {
+    const c = Object.fromEntries(SITUACOES_FUNIL.map((s) => [s, 0])) as Record<SituacaoFunil, number>;
+    for (const l of leads) c[funis[l.placeId]?.situacao ?? "desbloqueado"]++;
+    return c;
+  }, [leads, funis]);
 
   const atualizar = useCallback(async (placeId: string) => {
     setEstados((e) => ({ ...e, [placeId]: { ...e[placeId], carregando: true, erro: null } }));
@@ -78,17 +174,49 @@ export default function MeusLeadsClient({ leads }: { leads: LeadSalvo[] }) {
     };
   }, [leads, atualizar]);
 
+  // O filtro por situação usa a situação atual (já com as trocas feitas
+  // nesta visita); o filtro de texto, o nome e o bairro.
   const visiveis = useMemo(() => {
     const texto = filtro.trim().toLowerCase();
-    if (!texto) return leads;
     return leads.filter((l) => {
+      if (filtroFunil !== "todos" && funis[l.placeId]?.situacao !== filtroFunil) return false;
+      if (!texto) return true;
       const d = estados[l.placeId]?.dados;
       return !!d && `${d.nome} ${d.bairro}`.toLowerCase().includes(texto);
     });
-  }, [leads, estados, filtro]);
+  }, [leads, estados, filtro, filtroFunil, funis]);
+
+  const leadVenda = vendaAberta ? leads.find((l) => l.placeId === vendaAberta) : null;
 
   return (
     <div className="mt-6">
+      {funilAtivo ? (
+        <div
+          role="group"
+          aria-label="Filtrar por situação"
+          className="-mx-1 mb-4 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none]"
+        >
+          <BotaoFiltro ativo={filtroFunil === "todos"} onClick={() => setFiltroFunil("todos")}>
+            Todos <span className="font-normal opacity-80">({leads.length})</span>
+          </BotaoFiltro>
+          {SITUACOES_FUNIL.map((s) => (
+            <BotaoFiltro
+              key={s}
+              ativo={filtroFunil === s}
+              onClick={() => setFiltroFunil(s)}
+              titulo={`${ROTULO_FUNIL[s]}: ${contagem[s]}`}
+            >
+              {contagemFunil(s, contagem[s])}
+            </BotaoFiltro>
+          ))}
+        </div>
+      ) : (
+        <p className={`${ALERTA_AVISO} mb-4`}>
+          {/^(42703|PGRST204)\b/.test(erroFunil ?? "") ? MSG_FALTA_ETAPA7 : MSG_ERRO_FUNIL}{" "}
+          <span className="break-words text-xs opacity-80">(código: {erroFunil ?? "?"})</span>
+        </p>
+      )}
+
       {leads.length > 4 && (
         <div className="relative mb-4 max-w-md">
           <label htmlFor="filtro-leads" className="sr-only">
@@ -112,10 +240,24 @@ export default function MeusLeadsClient({ leads }: { leads: LeadSalvo[] }) {
           return (
             <li key={lead.placeId}>
               {estado?.dados ? (
-                <CartaoLead
-                  dados={estado.dados}
-                  desbloqueadoEm={lead.desbloqueadoEm}
-                />
+                <CartaoLead dados={estado.dados} desbloqueadoEm={lead.desbloqueadoEm}>
+                  {funilAtivo && funis[lead.placeId] && (
+                    <>
+                      <FunilLead
+                        funil={funis[lead.placeId]}
+                        salvandoSituacao={!!salvando[lead.placeId]}
+                        onMudarSituacao={(s) => mudarSituacao(lead.placeId, s)}
+                        onMarcarFechado={() => setVendaAberta(lead.placeId)}
+                        onSalvarAnotacao={(t) => salvarAnotacao(lead.placeId, t)}
+                      />
+                      {errosFunil[lead.placeId] && (
+                        <p role="alert" className="mt-2 text-sm text-danger">
+                          {errosFunil[lead.placeId]}
+                        </p>
+                      )}
+                    </>
+                  )}
+                </CartaoLead>
               ) : estado?.erro ? (
                 <CartaoErro erro={estado.erro} onTentar={() => atualizar(lead.placeId)} />
               ) : (
@@ -128,10 +270,48 @@ export default function MeusLeadsClient({ leads }: { leads: LeadSalvo[] }) {
 
       {!visiveis.length && (
         <p className="mt-2 rounded-lg border border-dashed border-line bg-surface px-4 py-8 text-center text-sm text-ink-2">
-          Nenhum lead com “{filtro}”. Tente só uma parte do nome ou o bairro.
+          {filtro.trim()
+            ? `Nenhum lead com “${filtro}”${filtroFunil !== "todos" ? ` em “${ROTULO_FUNIL[filtroFunil]}”` : ""}. Tente só uma parte do nome ou o bairro.`
+            : `Nenhum lead em “${filtroFunil !== "todos" ? ROTULO_FUNIL[filtroFunil] : ""}” por enquanto.`}
         </p>
       )}
+
+      {leadVenda && (
+        <FormVenda
+          placeId={leadVenda.placeId}
+          nomeLead={estados[leadVenda.placeId]?.dados?.nome ?? "este lead"}
+          desbloqueadoEm={leadVenda.desbloqueadoEm}
+          onCancelar={fecharVenda}
+          onRegistrada={(v) => vendaRegistrada(leadVenda.placeId, v)}
+        />
+      )}
     </div>
+  );
+}
+
+function BotaoFiltro({
+  ativo,
+  onClick,
+  titulo,
+  children,
+}: {
+  ativo: boolean;
+  onClick: () => void;
+  titulo?: string;
+  children: ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      aria-pressed={ativo}
+      title={titulo}
+      onClick={onClick}
+      className={`inline-flex min-h-11 shrink-0 items-center gap-1 whitespace-nowrap rounded-full border px-4 text-sm font-semibold transition ${
+        ativo ? "border-primary bg-primary text-primary-ink" : "border-line bg-surface text-ink-2 hover:text-ink"
+      }`}
+    >
+      {children}
+    </button>
   );
 }
 
@@ -140,7 +320,15 @@ function iniciais(nome: string) {
   return ((partes[0]?.[0] ?? "") + (partes[1]?.[0] ?? "")).toUpperCase() || "?";
 }
 
-function CartaoLead({ dados, desbloqueadoEm }: { dados: DadosLead; desbloqueadoEm: string }) {
+function CartaoLead({
+  dados,
+  desbloqueadoEm,
+  children,
+}: {
+  dados: DadosLead;
+  desbloqueadoEm: string;
+  children?: ReactNode;
+}) {
   const eHospedagem = dados.situacao === "booking";
   const modeloMsg = eHospedagem ? MSG_PADRAO_HOSPEDAGEM : MSG_PADRAO_NEGOCIOS;
   const plataforma = dados.plataforma || (eHospedagem ? "Airbnb ou Booking" : "redes sociais");
@@ -208,6 +396,8 @@ function CartaoLead({ dados, desbloqueadoEm }: { dados: DadosLead; desbloqueadoE
           </a>
         )}
       </div>
+
+      {children}
 
       <p className="mt-auto pt-3 text-xs text-muted">Desbloqueado em {data}</p>
     </article>
