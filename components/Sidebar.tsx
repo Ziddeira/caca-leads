@@ -15,6 +15,7 @@ import {
   IconeTrofeu,
 } from "@/components/Icones";
 import Avatar from "@/components/Avatar";
+import { Sino } from "@/components/notificacoes/Notificacoes";
 
 // "ativoEm": outras páginas que também acendem o item (no celular, o
 // Score leva também ao Rank, pelas abas no topo das duas páginas).
@@ -41,7 +42,7 @@ const ITENS_LATERAL = [
 const ITEM_ADMIN = { href: "/painel/admin", label: "Administração", curto: "Admin", Icone: IconeEscudo };
 
 // No computador (md para cima): barra lateral fixa com a logo grande.
-// No celular: barra fina no topo (logo + Sair) e menu inferior fixo com
+// No celular: barra fina no topo (logo, sino, perfil e Sair) e menu inferior fixo com
 // os 5 atalhos, respeitando as áreas seguras do iPhone.
 export default function Sidebar({
   email,
@@ -149,6 +150,7 @@ export default function Sidebar({
             />
           </Link>
           <div className="flex items-center gap-1">
+            <Sino />
             {admin && (
               <Link
                 href={ITEM_ADMIN.href}
@@ -180,7 +182,8 @@ export default function Sidebar({
               className="flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-md px-3 text-sm font-semibold text-ink-2 transition hover:bg-canvas"
             >
               <IconeSair />
-              Sair
+              {/* Em telas bem estreitas fica só o ícone, para caber o sino. */}
+              <span className="max-[380px]:sr-only">Sair</span>
             </button>
           </div>
         </div>
