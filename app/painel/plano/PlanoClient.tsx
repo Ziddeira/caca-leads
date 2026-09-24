@@ -27,6 +27,7 @@ const CARTAO = `${CARTAO_BASE} p-5 sm:p-6`;
 interface Perfil {
   plano: string;
   creditosDesbloqueio: number;
+  creditosPremio: number;
   buscasRestantes: number;
   validoAte: string | null;
   temClienteAsaas: boolean;
@@ -170,6 +171,9 @@ export default function PlanoClient({
             <div>
               <p className="text-xs font-semibold uppercase tracking-wide text-muted">Desbloqueios</p>
               <p className="mt-1 text-2xl font-extrabold text-ink">{perfil.creditosDesbloqueio}</p>
+              {perfil.creditosPremio > 0 && (
+                <p className="mt-0.5 text-xs text-muted">inclui {perfil.creditosPremio} do prêmio do rank (não vencem)</p>
+              )}
             </div>
             <div>
               <p className="text-xs font-semibold uppercase tracking-wide text-muted">Buscas</p>

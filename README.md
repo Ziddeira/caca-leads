@@ -18,6 +18,9 @@ e, se for rodar localmente, copie `.env.example` para `.env.local`:
 - `ASAAS_ENV` — `sandbox` (testes) ou `producao`.
 - `ASAAS_WEBHOOK_TOKEN` — segredo que você inventa e cadastra igual no
   webhook do Asaas; a rota recusa (401) qualquer evento sem ele.
+- `CRON_SECRET` — segredo das rotinas agendadas (verificação semanal
+  das vendas e virada do mês). Texto aleatório de 32+ caracteres; a
+  Vercel envia sozinho nas execuções agendadas.
 
 Os valores do Supabase ficam em Supabase > Project Settings > API. A
 chave do Google é gerada no Google Cloud Console, com a "Places API
@@ -72,6 +75,40 @@ cada um no SQL Editor do Supabase:
    de lead que o próprio usuário desbloqueou, uma por lead, e o usuário
    não consegue gravar verificação nem pontos. Não mexe em planos nem
    créditos.
+
+8. Etapa 8, em **três partes, nesta ordem** (cada uma cabe fácil no
+   editor; copie pelo botão "Copy raw file" do GitHub para não vir
+   cortada): `supabase/etapa8-1-verificacao.sql`,
+   `supabase/etapa8-2-comprovante-admin.sql` e
+   `supabase/etapa8-3-rank-premio.sql` — verificação das vendas, pontos,
+   comprovante, rank e prêmio: novos status da venda (`aguardando_google`,
+   `nao_verificada`, `em_analise`), pontos calculados por gatilho a partir
+   do status (10 / 50 / 0), tabela `verificacoes_venda` (registro de cada
+   verificação, base do limite de 30 por usuário por mês), bucket privado
+   `comprovantes` (5 MB, imagem ou PDF), tabela `administradores`, rank
+   mensal (`rank_do_mes`), histórico (`rank_historico`) e prêmio do top 3
+   em `profiles.creditos_premio` (separado dos créditos do plano, não
+   vence; o desbloqueio gasta primeiro os do plano). Depois de rodar,
+   cadastre você como administrador (comando no fim da parte 3).
+
+### Rotinas agendadas (Vercel Cron)
+
+O `vercel.json` agenda duas rotas, que só aceitam chamadas com o
+`CRON_SECRET`:
+
+- `/api/cron/verificar-vendas` — toda segunda às 6h (Brasília). Verifica
+  em lote as vendas em aberto: cada venda no máximo 1 vez por semana, até
+  8 tentativas automáticas, e no máximo 30 verificações por usuário por
+  mês. O Google só é consultado quando o site abre e tem domínio próprio;
+  cada consulta vira uma linha em `chamadas_google` (tipo
+  `verificacao_venda`).
+- `/api/cron/fechar-mes` — dia 1º logo depois da meia-noite (Brasília).
+  Guarda o rank do mês que acabou e credita o prêmio (25, 15 e 10
+  desbloqueios). Não paga duas vezes, e fecha meses que tenham ficado
+  para trás.
+
+Para rodar na hora (teste), use o botão "Run" em Vercel > Settings >
+Cron Jobs.
 
 ### Links dos e-mails (Supabase Auth)
 

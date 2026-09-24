@@ -4,8 +4,10 @@
 // no celular abre o seletor do próprio sistema — dois toques), data do
 // último contato, anotação livre e, quando houver, a venda registrada.
 import { useId, useState } from "react";
+import Link from "next/link";
 import {
   ANOTACAO_MAX,
+  COR_STATUS_VENDA,
   ESTILO_FUNIL,
   ROTULO_FUNIL,
   ROTULO_STATUS_VENDA,
@@ -109,9 +111,13 @@ export default function FunilLead({
         <div className="mt-2 rounded-md bg-canvas px-3 py-2 text-sm">
           <p className="font-semibold text-ink">
             Venda em {dataDoDia(funil.venda.fechadoEm)} ·{" "}
-            <span className={funil.venda.status === "recusada" ? "text-danger" : "text-hot-ink"}>
-              {ROTULO_STATUS_VENDA[funil.venda.status]}
-            </span>
+            <span className={COR_STATUS_VENDA[funil.venda.status] ?? "text-hot-ink"}>
+              {ROTULO_STATUS_VENDA[funil.venda.status] ?? funil.venda.status}
+            </span>{" "}
+            ·{" "}
+            <Link href="/painel/score" className="font-semibold text-primary underline-offset-2 hover:underline">
+              ver no Score
+            </Link>
           </p>
           <a
             href={funil.venda.siteUrl}

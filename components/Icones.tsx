@@ -183,3 +183,38 @@ export function IconeVenda(props: Props) {
     </Base>
   );
 }
+
+export function IconeTrofeu(props: Props) {
+  return (
+    <Base {...props}>
+      <path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z" />
+      <path d="M17 5h3v2a4 4 0 0 1-3.5 4M7 5H4v2a4 4 0 0 0 3.5 4" />
+    </Base>
+  );
+}
+
+export function IconeRank(props: Props) {
+  return (
+    <Base {...props}>
+      <path d="M9 21V9h6v12M3 21v-7h6M15 21v-4h6v4M2 21h20" />
+    </Base>
+  );
+}
+
+export function IconeEscudo(props: Props) {
+  return (
+    <Base {...props}>
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+      <path d="m9 12 2 2 4-4" />
+    </Base>
+  );
+}
+
+export function IconeEnviar(props: Props) {
+  return (
+    <Base {...props}>
+      <path d="M12 16V4M7 9l5-5 5 5" />
+      <path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" />
+    </Base>
+  );
+}

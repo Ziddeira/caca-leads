@@ -101,3 +101,26 @@ export async function detalhesLugar(placeId: string): Promise<PlaceBruto> {
   }
   return dados as PlaceBruto;
 }
+
+// Só o site que o Google Maps mostra para a empresa. Usada pela
+// verificação semanal das vendas (campo único = consulta mais barata).
+export async function siteNoGoogle(placeId: string): Promise<string | null> {
+  const res = await fetch(
+    `https://places.googleapis.com/v1/places/${encodeURIComponent(placeId)}`,
+    {
+      headers: {
+        "X-Goog-Api-Key": chaveApi(),
+        "X-Goog-FieldMask": "websiteUri",
+      },
+      cache: "no-store",
+      signal: AbortSignal.timeout(15_000),
+    },
+  );
+
+  const dados = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    const msg = dados?.error?.message || `Erro ${res.status} na Places API.`;
+    throw new ErroGooglePlaces(msg);
+  }
+  return (dados as PlaceBruto).websiteUri || null;
+}

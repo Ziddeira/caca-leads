@@ -44,6 +44,10 @@ export default async function PainelLayout({
     redirect("/boas-vindas");
   }
 
+  // Link da tela de administração no menu (só para você). Sem o script da
+  // etapa 8, a função não existe e o link simplesmente não aparece.
+  const { data: ehAdmin } = await supabase.rpc("eh_admin");
+
   return (
     <div className="min-h-screen bg-canvas md:flex">
       <a
@@ -57,6 +61,7 @@ export default async function PainelLayout({
         apelido={perfil?.apelido ?? null}
         fotoUrl={perfil?.fotoUrl ?? null}
         avatarPronto={perfil?.avatarPronto ?? null}
+        admin={ehAdmin === true}
       />
       {/* No celular, o espaço de baixo evita que o menu inferior fixo
           cubra o fim da página (inclui a área segura do iPhone). */}

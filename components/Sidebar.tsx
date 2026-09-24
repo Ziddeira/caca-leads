@@ -6,40 +6,56 @@ import { createClient } from "@/lib/supabase/client";
 import {
   IconeBuscar,
   IconeComunidade,
+  IconeEscudo,
   IconeLeads,
   IconePerfil,
   IconePlano,
+  IconeRank,
   IconeSair,
+  IconeTrofeu,
 } from "@/components/Icones";
 import Avatar from "@/components/Avatar";
 
+// "ativoEm": outras páginas que também acendem o item (no celular, o
+// Score leva também ao Rank, pelas abas no topo das duas páginas).
 const ITENS = [
   { href: "/painel/buscar", label: "Buscar", curto: "Buscar", Icone: IconeBuscar },
-  { href: "/painel/meus-leads", label: "Meus leads", curto: "Meus leads", Icone: IconeLeads },
+  { href: "/painel/meus-leads", label: "Meus leads", curto: "Leads", Icone: IconeLeads },
+  { href: "/painel/score", label: "Score", curto: "Score", Icone: IconeTrofeu, ativoEm: ["/painel/rank"] },
   { href: "/painel/comunidade", label: "Comunidade", curto: "Comunidade", Icone: IconeComunidade },
   { href: "/painel/plano", label: "Meu plano", curto: "Plano", Icone: IconePlano },
 ];
 
-// "Perfil" fica só na barra lateral do computador: no celular, o atalho
-// é a foto no topo (o menu inferior continua com 4 itens).
+// No computador, Rank tem item próprio e "Perfil" fica só aqui: no
+// celular, o atalho do perfil é a foto no topo.
 const ITENS_LATERAL = [
-  ...ITENS,
+  ITENS[0],
+  ITENS[1],
+  { href: "/painel/score", label: "Score", curto: "Score", Icone: IconeTrofeu },
+  { href: "/painel/rank", label: "Rank do mês", curto: "Rank", Icone: IconeRank },
+  ITENS[3],
+  ITENS[4],
   { href: "/painel/perfil", label: "Perfil", curto: "Perfil", Icone: IconePerfil },
 ];
 
+const ITEM_ADMIN = { href: "/painel/admin", label: "Administração", curto: "Admin", Icone: IconeEscudo };
+
 // No computador (md para cima): barra lateral fixa com a logo grande.
 // No celular: barra fina no topo (logo + Sair) e menu inferior fixo com
-// os 4 atalhos, respeitando as áreas seguras do iPhone.
+// os 5 atalhos, respeitando as áreas seguras do iPhone.
 export default function Sidebar({
   email,
   apelido,
   fotoUrl,
   avatarPronto,
+  admin = false,
 }: {
   email: string | null;
   apelido: string | null;
   fotoUrl: string | null;
   avatarPronto: string | null;
+  // Só muda o que aparece no menu; a página e o banco conferem de novo.
+  admin?: boolean;
 }) {
   const pathname = usePathname();
   const router = useRouter();
@@ -52,6 +68,7 @@ export default function Sidebar({
   }
 
   const ativo = (href: string) => pathname === href || pathname.startsWith(href + "/");
+  const lateral = admin ? [...ITENS_LATERAL, ITEM_ADMIN] : ITENS_LATERAL;
 
   return (
     <>
@@ -69,7 +86,7 @@ export default function Sidebar({
         </Link>
 
         <nav aria-label="Menu principal" className="flex flex-1 flex-col gap-1">
-          {ITENS_LATERAL.map(({ href, label, Icone }) => {
+          {lateral.map(({ href, label, Icone }) => {
             const atual = ativo(href);
             return (
               <Link
@@ -132,6 +149,18 @@ export default function Sidebar({
             />
           </Link>
           <div className="flex items-center gap-1">
+            {admin && (
+              <Link
+                href={ITEM_ADMIN.href}
+                aria-label={ITEM_ADMIN.label}
+                aria-current={ativo(ITEM_ADMIN.href) ? "page" : undefined}
+                className={`flex min-h-11 min-w-11 items-center justify-center rounded-md transition hover:bg-canvas ${
+                  ativo(ITEM_ADMIN.href) ? "text-primary" : "text-ink-2"
+                }`}
+              >
+                <IconeEscudo />
+              </Link>
+            )}
             <Link
               href="/painel/perfil"
               aria-label="Meu perfil"
@@ -162,20 +191,20 @@ export default function Sidebar({
         aria-label="Menu principal"
         className="pb-seguro fixed inset-x-0 bottom-0 z-30 border-t border-line bg-surface/95 backdrop-blur md:hidden"
       >
-        <ul className="grid grid-cols-4">
-          {ITENS.map(({ href, curto, Icone }) => {
-            const atual = ativo(href);
+        <ul className="grid grid-cols-5">
+          {ITENS.map(({ href, curto, Icone, ativoEm }) => {
+            const atual = ativo(href) || (ativoEm ?? []).some(ativo);
             return (
               <li key={href}>
                 <Link
                   href={href}
                   aria-current={atual ? "page" : undefined}
-                  className={`flex min-h-16 flex-col items-center justify-center gap-1 px-1 text-xs font-semibold transition ${
+                  className={`flex min-h-16 flex-col items-center justify-center gap-1 px-0.5 text-[11px] font-semibold transition sm:text-xs ${
                     atual ? "text-primary" : "text-ink-2"
                   }`}
                 >
                   <span
-                    className={`flex h-8 w-14 items-center justify-center rounded-full transition ${
+                    className={`flex h-8 w-12 items-center justify-center rounded-full transition ${
                       atual ? "bg-primary-soft" : ""
                     }`}
                   >
