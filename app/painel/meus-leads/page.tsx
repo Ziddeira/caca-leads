@@ -49,7 +49,9 @@ export default async function MeusLeadsPage() {
   // antes e o funil fica desligado, com um aviso. O código do erro vai
   // junto no aviso, para saber se é mesmo coluna faltando (42703) ou
   // outra coisa (ex.: permissão, cache de esquema do Supabase).
-  const erroFunil = resposta.error ? resposta.error.code || "desconhecido" : null;
+  const erroFunil = resposta.error
+    ? `${resposta.error.code || "desconhecido"} — ${resposta.error.message}`
+    : null;
   if (resposta.error) {
     console.error("[meus-leads] Falha ao ler colunas da etapa 7:", resposta.error.code, resposta.error.message);
   }

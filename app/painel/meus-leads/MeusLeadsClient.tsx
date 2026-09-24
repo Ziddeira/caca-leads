@@ -212,8 +212,8 @@ export default function MeusLeadsClient({
         </div>
       ) : (
         <p className={`${ALERTA_AVISO} mb-4`}>
-          {erroFunil === "42703" || erroFunil === "PGRST204" ? MSG_FALTA_ETAPA7 : MSG_ERRO_FUNIL}{" "}
-          <span className="whitespace-nowrap text-xs opacity-80">(código: {erroFunil ?? "?"})</span>
+          {/^(42703|PGRST204)\b/.test(erroFunil ?? "") ? MSG_FALTA_ETAPA7 : MSG_ERRO_FUNIL}{" "}
+          <span className="break-words text-xs opacity-80">(código: {erroFunil ?? "?"})</span>
         </p>
       )}
 
