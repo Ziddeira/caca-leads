@@ -52,13 +52,47 @@ export function situacaoFunilValida(valor: unknown): valor is SituacaoFunil {
 
 export const ANOTACAO_MAX = 500;
 
-export type StatusVenda = "pendente_verificacao" | "verificada" | "recusada";
+// Situações da venda. Ver supabase/etapa8-score-rank.sql.
+export type StatusVenda =
+  | "pendente_verificacao"
+  | "aguardando_google"
+  | "nao_verificada"
+  | "em_analise"
+  | "verificada"
+  | "recusada";
 
 export const ROTULO_STATUS_VENDA: Record<StatusVenda, string> = {
   pendente_verificacao: "Pendente de verificação",
+  aguardando_google: "Aguardando o Google",
+  nao_verificada: "Não verificada",
+  em_analise: "Comprovante em análise",
   verificada: "Verificada",
-  recusada: "Não verificada",
+  recusada: "Recusada",
 };
+
+// Cor do texto da situação.
+export const COR_STATUS_VENDA: Record<StatusVenda, string> = {
+  pendente_verificacao: "text-hot-ink",
+  aguardando_google: "text-hot-ink",
+  nao_verificada: "text-danger",
+  em_analise: "text-rede",
+  verificada: "text-wa",
+  recusada: "text-danger",
+};
+
+// Etiqueta (fundo + texto + borda) da situação.
+export const ESTILO_STATUS_VENDA: Record<StatusVenda, string> = {
+  pendente_verificacao: "bg-hot-soft text-hot-ink border-hot/30",
+  aguardando_google: "bg-hot-soft text-hot-ink border-hot/30",
+  nao_verificada: "bg-danger-soft text-danger border-danger/25",
+  em_analise: "bg-rede-soft text-rede border-rede/25",
+  verificada: "bg-wa-soft text-wa border-wa/30",
+  recusada: "bg-danger-soft text-danger border-danger/25",
+};
+
+export function statusVendaValido(valor: unknown): valor is StatusVenda {
+  return typeof valor === "string" && valor in ROTULO_STATUS_VENDA;
+}
 
 // O valor recebido NÃO vem para a tela: fica só no banco, visível apenas
 // para o próprio usuário, e nunca é exibido publicamente.

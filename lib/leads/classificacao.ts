@@ -137,7 +137,7 @@ const NOMES_PLATAFORMA: Record<string, string> = {
   linktr: "Linktree",
 };
 
-function hostDe(url: string): string | null {
+export function hostDe(url: string): string | null {
   try {
     return new URL(url).hostname.toLowerCase().replace(/^www\./, "");
   } catch {

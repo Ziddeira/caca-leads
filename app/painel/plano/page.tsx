@@ -26,6 +26,13 @@ export default async function PlanoPage() {
       tem_cliente_asaas: boolean;
     }>();
 
+  // Desbloqueios ganhos no rank (etapa 8). Já estão somados no saldo de
+  // "meu_plano"; aqui é só para mostrar quantos são do prêmio.
+  const { data: premio } = await supabase
+    .from("profiles")
+    .select("creditos_premio")
+    .maybeSingle<{ creditos_premio: number }>();
+
   // A assinatura mais recente (viva ou a última cancelada).
   const { data: assinatura } = await supabase
     .from("assinaturas")
@@ -42,6 +49,7 @@ export default async function PlanoPage() {
         buscasRestantes: perfil?.buscas_restantes ?? 0,
         validoAte: perfil?.plano_valido_ate ?? null,
         temClienteAsaas: perfil?.tem_cliente_asaas ?? false,
+        creditosPremio: premio?.creditos_premio ?? 0,
       }}
       assinatura={
         assinatura
