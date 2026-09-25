@@ -21,6 +21,7 @@ export default function ErroInesperado({
   return (
     <TelaStatus
       codigo="500"
+      expressao="triste"
       titulo="Algo deu errado por aqui"
       texto="Tivemos um problema para abrir esta tela. Tente de novo em instantes; se continuar, use o botão “Preciso de ajuda” no painel."
     >

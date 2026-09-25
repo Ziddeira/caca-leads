@@ -1,6 +1,6 @@
 // Moldura das páginas 404 e de erro: logo no topo e código grande. A
-// Ártemis (chorando) aparece só no 404, quando "expressao" é passada; nas
-// outras telas vai o símbolo da marca.
+// Ártemis aparece quando "expressao" é passada (404 e 500, chorando);
+// sem ela, vai o símbolo da marca.
 import Link from "next/link";
 import type { ReactNode } from "react";
 import Logo from "@/components/marca/Logo";
