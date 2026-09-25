@@ -96,7 +96,7 @@ function CartaoConta({ conta: c, historico }: { conta: Conta; historico: Registr
         <div className="min-w-0">
           <h3 className="break-words font-bold text-ink">
             {c.apelido ?? "—"}
-            {c.is_admin && <span className="ml-2 rounded-full bg-primary-soft px-2 py-0.5 text-xs text-primary">admin</span>}
+            {c.is_admin && <span className="ml-2 border border-primary px-1.5 py-px font-display text-[11px] font-semibold uppercase tracking-[0.08em] text-primary">admin</span>}
           </h3>
           <p className="break-all text-sm text-ink-2">{c.email ?? "sem e-mail"}</p>
         </div>

@@ -9,12 +9,16 @@ import {
   montarMensagem,
 } from "@/lib/leads/mensagens";
 import EtiquetaSituacao from "@/components/leads/EtiquetaSituacao";
+import Score from "@/components/marca/Score";
+import LimitePlano from "@/components/marca/LimitePlano";
 import { ListaEsqueleto } from "@/components/leads/CartaoLeadEsqueleto";
 import {
+  ABA_ATIVA,
+  ABA_INATIVA,
   ALERTA_AVISO,
   ALERTA_ERRO,
   BOTAO,
-  BOTAO_SECUNDARIO,
+  BOTAO_NEUTRO,
   BOTAO_WHATSAPP,
   CAMPO,
   CARTAO,
@@ -100,6 +104,7 @@ export default function BuscaClient({ perfilInicial }: { perfilInicial: Perfil }
   const listaAreas = useMemo(() => dividirLista(areas), [areas]);
   const estimativaBuscas = termos.length * listaAreas.length;
   const podeHospedagem = perfil.plano === "pro";
+  const semBuscas = perfil.buscasRestantes <= 0;
 
   const contagens = useMemo(() => {
     const c: Record<Situacao, number> = { sem_site: 0, booking: 0, rede_social: 0, site_proprio: 0 };
@@ -216,25 +221,25 @@ export default function BuscaClient({ perfilInicial }: { perfilInicial: Perfil }
       />
 
       <div className="mt-5 flex flex-wrap gap-2 text-sm">
-        <span className="inline-flex items-center rounded-full bg-primary-soft px-3 py-1.5 font-semibold text-primary">
+        <span className="inline-flex items-center border border-primary/40 bg-primary-soft px-3 py-1.5 font-semibold text-primary">
           Plano {ROTULO_PLANO[perfil.plano] ?? perfil.plano}
         </span>
-        <span className="inline-flex items-center rounded-full border border-line bg-surface px-3 py-1.5 text-ink-2">
-          <strong className="mr-1 text-ink">{perfil.buscasRestantes}</strong> busca(s) restante(s)
+        <span className="inline-flex items-center border border-line bg-surface px-3 py-1.5 text-ink-2">
+          <strong className="mr-1 font-display text-ink">{perfil.buscasRestantes}</strong> busca(s) restante(s)
         </span>
-        <span className="inline-flex items-center rounded-full border border-line bg-surface px-3 py-1.5 text-ink-2">
-          <strong className="mr-1 text-ink">{perfil.creditosDesbloqueio}</strong> crédito(s) de desbloqueio
+        <span className="inline-flex items-center border border-line bg-surface px-3 py-1.5 text-ink-2">
+          <strong className="mr-1 font-display text-ink">{perfil.creditosDesbloqueio}</strong> crédito(s) de desbloqueio
         </span>
       </div>
 
       <div className={`${CARTAO} mt-4 p-4 sm:p-6`}>
-        <div role="group" aria-label="Tipo de busca" className="grid w-full grid-cols-2 gap-1 rounded-full bg-canvas p-1 sm:inline-grid sm:w-auto">
+        <div role="group" aria-label="Tipo de busca" className="grid w-full grid-cols-2 gap-1 border border-line bg-canvas p-1 sm:inline-grid sm:w-auto">
           <button
             type="button"
             onClick={() => alternarModo("negocios")}
             aria-pressed={modo === "negocios"}
-            className={`min-h-11 rounded-full px-5 text-sm font-semibold transition ${
-              modo === "negocios" ? "bg-surface text-ink shadow-sm" : "text-ink-2"
+            className={`min-h-11 px-5 font-display text-sm font-semibold uppercase tracking-[0.08em] transition ${
+              modo === "negocios" ? ABA_ATIVA : ABA_INATIVA
             }`}
           >
             Negócios
@@ -245,8 +250,8 @@ export default function BuscaClient({ perfilInicial }: { perfilInicial: Perfil }
             disabled={!podeHospedagem}
             aria-pressed={modo === "hospedagem"}
             title={!podeHospedagem ? "Disponível no plano Pro" : undefined}
-            className={`inline-flex min-h-11 items-center justify-center gap-1.5 rounded-full px-5 text-sm font-semibold transition ${
-              modo === "hospedagem" ? "bg-surface text-ink shadow-sm" : "text-ink-2"
+            className={`inline-flex min-h-11 items-center justify-center gap-1.5 px-5 font-display text-sm font-semibold uppercase tracking-[0.08em] transition ${
+              modo === "hospedagem" ? ABA_ATIVA : ABA_INATIVA
             } ${!podeHospedagem ? "cursor-not-allowed opacity-60" : ""}`}
           >
             Hospedagem
@@ -315,12 +320,22 @@ export default function BuscaClient({ perfilInicial }: { perfilInicial: Perfil }
         )}
       </div>
 
+      {/* Saldo zerado: aviso com a mascote (no lugar do estado vazio). */}
+      {semBuscas && !carregando && (
+        <div className="mt-6">
+          <LimitePlano
+            titulo="Suas buscas acabaram"
+            texto="Você usou todas as buscas do seu plano. Assine um plano ou compre um pacote extra para continuar caçando leads."
+          />
+        </div>
+      )}
+
       {carregando && !buscaFeita && <ListaEsqueleto quantidade={3} />}
 
-      {!buscaFeita && !carregando && (
+      {!buscaFeita && !carregando && !semBuscas && (
         <div className="mt-6">
           <EstadoVazio
-            icone={<IconeBuscar width={26} height={26} />}
+            mascote
             titulo="Sua lista de leads aparece aqui"
             texto={
               <>
@@ -339,7 +354,7 @@ export default function BuscaClient({ perfilInicial }: { perfilInicial: Perfil }
             onClick={() => setFiltrosAbertos((a) => !a)}
             aria-expanded={filtrosAbertos}
             aria-controls="filtros-busca"
-            className={`${BOTAO_SECUNDARIO} w-full lg:hidden`}
+            className={`${BOTAO_NEUTRO} w-full lg:hidden`}
           >
             <IconeFiltro width={18} height={18} />
             {filtrosAbertos ? "Esconder filtros" : "Categorias e filtros"}
@@ -347,7 +362,7 @@ export default function BuscaClient({ perfilInicial }: { perfilInicial: Perfil }
 
           <aside id="filtros-busca" className={`${filtrosAbertos ? "flex" : "hidden"} flex-col gap-3 lg:flex`}>
             <div className={`${CARTAO} p-4`}>
-              <h2 className="mb-2 text-sm font-bold text-ink">Categorias</h2>
+              <h2 className="mb-2 text-[13px] font-semibold uppercase tracking-[0.2em] text-ink">Categorias</h2>
               <div className="flex flex-col text-sm">
                 {(
                   [
@@ -376,7 +391,7 @@ export default function BuscaClient({ perfilInicial }: { perfilInicial: Perfil }
             </div>
 
             <div className={`${CARTAO} p-4`}>
-              <h2 className="mb-3 text-sm font-bold text-ink">Filtros</h2>
+              <h2 className="mb-3 text-[13px] font-semibold uppercase tracking-[0.2em] text-ink">Filtros</h2>
               <div className="grid grid-cols-2 gap-2">
                 <div>
                   <label htmlFor="min-nota" className="mb-1 block text-xs font-semibold text-ink-2">Nota mínima</label>
@@ -438,7 +453,7 @@ export default function BuscaClient({ perfilInicial }: { perfilInicial: Perfil }
           <section aria-label="Resultados" className="min-w-0">
             <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
               <p className="text-sm text-ink-2" aria-live="polite">
-                <strong className="text-ink">{leadsFiltrados.length}</strong> de {leads.length} leads
+                <strong className="font-display text-ink">{leadsFiltrados.length}</strong> de {leads.length} leads
               </p>
               <label htmlFor="ordenar" className="sr-only">Ordenar por</label>
               <select
@@ -494,23 +509,14 @@ function LeadCard({
   const eHospedagem = lead.modo === "hospedagem" || lead.situacao === "booking";
   const modeloMsg = eHospedagem ? MSG_PADRAO_HOSPEDAGEM : MSG_PADRAO_NEGOCIOS;
   const plataforma = lead.plataforma || (eHospedagem ? "Airbnb ou Booking" : "redes sociais");
-  const quente = lead.pontuacao >= 60;
 
   return (
     <article className={`${CARTAO} flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:p-5`}>
       <div className="flex min-w-0 flex-1 items-start gap-3 sm:items-center sm:gap-4">
-        <div
-          className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-sm font-extrabold ${
-            quente ? "bg-hot-soft text-hot-ink" : "bg-canvas text-ink"
-          }`}
-          title={`Pontuação de lead: ${lead.pontuacao} de 100`}
-        >
-          <span className="sr-only">Pontuação </span>
-          {lead.pontuacao}
-        </div>
+        <Score pontos={lead.pontuacao} title={`Pontuação de lead: ${lead.pontuacao} de 100`} />
 
         <div className="min-w-0 flex-1">
-          <h3 className="break-words text-base font-bold text-ink">{lead.nome}</h3>
+          <h3 className="break-words font-sans text-base font-extrabold text-ink">{lead.nome}</h3>
           <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1">
             <EtiquetaSituacao situacao={lead.situacao} plataforma={lead.plataforma} />
             {lead.tipo && <span className="text-xs text-muted">{lead.tipo}</span>}
@@ -519,7 +525,7 @@ function LeadCard({
             <span className="min-w-0 break-words">{lead.bairro || lead.area}</span>
             {lead.nota ? (
               <span className="inline-flex items-center gap-1">
-                <IconeEstrela className="text-hot" />
+                <IconeEstrela className="text-ink-2" />
                 {lead.nota.toFixed(1).replace(".", ",")}{" "}
                 <span className="text-muted">({lead.avaliacoes})</span>
               </span>
@@ -548,13 +554,13 @@ function LeadCard({
               <span className="text-sm text-ink-2">{lead.contato.telefone || "Sem telefone"}</span>
             )}
             {lead.contato.maps && (
-              <a target="_blank" rel="noopener" href={lead.contato.maps} className={`${BOTAO_SECUNDARIO} px-4!`}>
+              <a target="_blank" rel="noopener" href={lead.contato.maps} className={BOTAO_NEUTRO}>
                 <IconeMapa width={18} height={18} />
                 Maps
               </a>
             )}
             {lead.contato.site && (
-              <a target="_blank" rel="noopener" href={lead.contato.site} className={`${BOTAO_SECUNDARIO} px-4!`}>
+              <a target="_blank" rel="noopener" href={lead.contato.site} className={BOTAO_NEUTRO}>
                 <IconeLink width={18} height={18} />
                 Link
               </a>
@@ -565,9 +571,9 @@ function LeadCard({
             type="button"
             onClick={onDesbloquear}
             disabled={carregando}
-            className={`${BOTAO} px-4!`}
+            className={BOTAO_NEUTRO}
           >
-            <IconeCadeado width={18} height={18} />
+            <IconeCadeado width={13} height={13} />
             {carregando ? "Desbloqueando..." : "Desbloquear (1 crédito)"}
           </button>
         )}

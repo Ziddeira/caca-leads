@@ -131,7 +131,7 @@ export default async function RankPage({ searchParams }: { searchParams: Promise
                   href={`/painel/rank?mes=${m.slice(0, 7)}`}
                   aria-current={m === mes ? "page" : undefined}
                   className={`inline-flex min-h-11 items-center rounded-md border px-4 text-sm font-semibold capitalize ${
-                    m === mes ? "border-primary bg-primary-soft text-primary" : "border-line bg-surface text-ink-2 hover:bg-canvas"
+                    m === mes ? "border-primary bg-primary-soft text-primary" : "border-line bg-surface text-ink-2 hover:text-ink"
                   }`}
                 >
                   {nomeDoMes(m)}
@@ -145,14 +145,20 @@ export default async function RankPage({ searchParams }: { searchParams: Promise
   );
 }
 
-const MEDALHA = ["bg-[#F5C542] text-[#5A4300]", "bg-[#C9D1DC] text-[#2E3A4B]", "bg-[#E2A36B] text-[#5B3212]"];
+// Pódio nas cores da marca: 1º preenchido em amarelo, 2º com contorno
+// amarelo e 3º com contorno branco.
+const MEDALHA = [
+  "ap-cut-s bg-primary text-primary-ink",
+  "ap-cut-s text-primary shadow-[inset_0_0_0_2px_var(--ap-yellow)]",
+  "ap-cut-s text-ink shadow-[inset_0_0_0_2px_var(--ap-white)]",
+];
 
 function Linha({ linha, fotoUrl, historico }: { linha: LinhaRank; fotoUrl: string | null; historico: boolean }) {
   const medalha = MEDALHA[linha.posicao - 1];
   return (
     <li className={`flex items-center gap-3 px-4 py-3 sm:px-5 ${linha.eh_voce ? "bg-primary-soft" : ""}`}>
       <span
-        className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-extrabold ${
+        className={`flex h-9 w-9 shrink-0 items-center justify-center font-display text-base font-bold tabular-nums ${
           medalha ?? "text-ink-2"
         }`}
         aria-label={`${linha.posicao}º lugar`}
@@ -170,7 +176,7 @@ function Linha({ linha, fotoUrl, historico }: { linha: LinhaRank; fotoUrl: strin
         )}
       </span>
       <span className="text-right">
-        <span className="block text-lg font-extrabold text-ink">{linha.vendas}</span>
+        <span className="block font-display text-xl font-bold tabular-nums text-ink">{linha.vendas}</span>
         <span className="block text-xs text-muted">{linha.vendas === 1 ? "venda" : "vendas"}</span>
       </span>
     </li>

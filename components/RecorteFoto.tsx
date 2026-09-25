@@ -216,14 +216,14 @@ export default function RecorteFoto({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-ink/60 sm:items-center sm:p-6"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-black/75 sm:items-center sm:p-6"
       onClick={(ev) => ev.target === ev.currentTarget && onCancelar()}
     >
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby="titulo-recorte"
-        className="max-h-dvh w-full pb-[calc(1.25rem+env(safe-area-inset-bottom))] max-w-md overflow-y-auto overscroll-contain rounded-t-lg bg-surface p-5 shadow-cartao sm:rounded-lg sm:p-6 sm:pb-[calc(1.5rem+env(safe-area-inset-bottom))]"
+        className="max-h-dvh w-full pb-[calc(1.25rem+env(safe-area-inset-bottom))] max-w-md overflow-y-auto overscroll-contain border border-line bg-surface p-5 shadow-cartao sm:rounded-lg sm:p-6 sm:pb-[calc(1.5rem+env(safe-area-inset-bottom))]"
       >
         <h2 id="titulo-recorte" className="text-lg font-bold text-ink">
           Ajustar foto
@@ -242,7 +242,7 @@ export default function RecorteFoto({
           onPointerUp={aoSoltar}
           onPointerCancel={aoSoltar}
           onKeyDown={aoTeclar}
-          className="relative mx-auto mt-4 aspect-square w-full max-w-[min(360px,calc(100dvh-21rem))] cursor-grab touch-none overflow-hidden rounded-md bg-ink select-none active:cursor-grabbing"
+          className="relative mx-auto mt-4 aspect-square w-full max-w-[min(360px,calc(100dvh-21rem))] cursor-grab touch-none overflow-hidden bg-canvas select-none active:cursor-grabbing"
         >
           {lado > 0 && (
             // eslint-disable-next-line @next/next/no-img-element
@@ -262,7 +262,7 @@ export default function RecorteFoto({
           <div
             aria-hidden="true"
             className="pointer-events-none absolute inset-0 rounded-full ring-2 ring-white/90"
-            style={{ boxShadow: "0 0 0 9999px rgba(23, 32, 51, 0.6)" }}
+            style={{ boxShadow: "0 0 0 9999px rgba(10, 10, 10, 0.7)" }}
           />
         </div>
 

@@ -28,7 +28,7 @@ export default function BotaoAjuda() {
       <button
         type="button"
         onClick={() => setAberto(true)}
-        className="fixed right-4 bottom-[calc(4.75rem+env(safe-area-inset-bottom))] z-40 inline-flex min-h-11 items-center gap-2 rounded-full bg-ink px-4 py-2.5 text-sm font-semibold text-white shadow-lg transition hover:brightness-125 md:right-6 md:bottom-6"
+        className="fixed right-4 bottom-[calc(4.75rem+env(safe-area-inset-bottom))] z-40 inline-flex min-h-11 items-center gap-2 border border-line-strong bg-surface px-4 py-2.5 text-sm font-semibold text-ink shadow-[0_8px_24px_rgba(0,0,0,0.6)] transition hover:border-ink-2 md:right-6 md:bottom-6"
       >
         <IconeAjuda width={20} height={20} />
         <span>
@@ -120,14 +120,14 @@ function JanelaAjuda({ onFechar }: { onFechar: () => void }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-ink/60 sm:items-center sm:p-6"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-black/75 sm:items-center sm:p-6"
       onClick={(ev) => ev.target === ev.currentTarget && !enviando && onFechar()}
     >
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby={`${id}-titulo`}
-        className="max-h-dvh w-full max-w-md overflow-y-auto overscroll-contain rounded-t-lg bg-surface p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] shadow-cartao sm:rounded-lg sm:p-6 sm:pb-[calc(1.5rem+env(safe-area-inset-bottom))]"
+        className="max-h-dvh w-full max-w-md overflow-y-auto overscroll-contain border border-line bg-surface p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] shadow-cartao sm:rounded-lg sm:p-6 sm:pb-[calc(1.5rem+env(safe-area-inset-bottom))]"
       >
         <h2 id={`${id}-titulo`} className="text-lg font-bold text-ink">
           Preciso de ajuda
@@ -204,7 +204,7 @@ function JanelaAjuda({ onFechar }: { onFechar: () => void }) {
                   id={`${id}-anexo`}
                   type="file"
                   accept="image/jpeg,image/png,image/webp"
-                  className="block min-h-11 w-full text-sm text-ink-2 file:mr-3 file:min-h-11 file:rounded-md file:border file:border-line file:bg-surface file:px-4 file:font-semibold file:text-ink-2"
+                  className="block min-h-11 w-full text-sm text-ink-2 file:mr-3 file:min-h-11 file:border file:border-line-strong file:bg-transparent file:px-4 file:font-semibold file:text-campo"
                   onChange={(e) => escolherArquivo(e.target.files?.[0])}
                 />
                 {arquivo && <p className="mt-1 break-all text-xs text-muted">{arquivo.name}</p>}

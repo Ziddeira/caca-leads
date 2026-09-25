@@ -1,4 +1,4 @@
--- Caça-leads — Etapa 11, parte 1 de 3: permissão de administrador,
+-- Ártemis Prospect — Etapa 11, parte 1 de 3: permissão de administrador,
 -- registro de erros e auditoria
 -- Rode DEPOIS de todos os scripts anteriores (até a etapa 10), inteiro,
 -- de uma vez: Supabase > SQL Editor > New query > cole tudo > Run.

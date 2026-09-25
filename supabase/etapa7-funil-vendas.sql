@@ -1,4 +1,4 @@
--- Caça-leads — Etapa 7: funil de leads e registro de venda fechada
+-- Ártemis Prospect — Etapa 7: funil de leads e registro de venda fechada
 -- Rode isto DEPOIS da etapa 6, inteiro, de uma vez:
 -- Supabase > SQL Editor > New query > cole tudo > Run.
 -- Pode rodar de novo sem problema (é idempotente).

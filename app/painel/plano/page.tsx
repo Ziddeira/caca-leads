@@ -8,7 +8,7 @@ export default async function PlanoPage() {
   if (!supabase) {
     return (
       <div>
-        <h1 className="text-2xl font-extrabold tracking-tight text-ink">Meu plano</h1>
+        <h1 className="text-2xl font-bold text-ink">Meu plano</h1>
         <p className="mt-2 text-ink-2">Supabase não configurado neste ambiente.</p>
       </div>
     );

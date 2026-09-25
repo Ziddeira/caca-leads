@@ -1,4 +1,4 @@
--- Caça-leads — Etapa 11, parte 2 de 3: números do painel de Gestão
+-- Ártemis Prospect — Etapa 11, parte 2 de 3: números do painel de Gestão
 -- (visão geral, uso e custo, pagamentos, usuários)
 -- Rode DEPOIS da parte 1 (etapa11-1-admin-base.sql), inteiro, de uma vez:
 -- Supabase > SQL Editor > New query > cole tudo > Run.

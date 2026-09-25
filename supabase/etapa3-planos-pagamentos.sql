@@ -1,4 +1,4 @@
--- Caça-leads — Etapa 3: planos e pagamento com Asaas
+-- Ártemis Prospect — Etapa 3: planos e pagamento com Asaas
 -- Rode isto DEPOIS de supabase/profiles.sql e supabase/etapa2-busca-desbloqueio.sql,
 -- inteiro, de uma vez: Supabase > SQL Editor > New query > cole tudo > Run.
 --

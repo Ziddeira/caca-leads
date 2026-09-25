@@ -23,15 +23,15 @@ export default async function ComunidadePage() {
   return (
     <div>
       <section className={`${CARTAO} mx-auto max-w-3xl overflow-hidden`}>
-        <div className="bg-linear-to-b from-primary-soft/70 to-surface px-4 pt-8 sm:px-10">
+        <div className="ap-grid px-4 pt-8 sm:px-10">
           <IlustracaoObra className="mx-auto h-auto w-full max-w-md" />
         </div>
         <div className="px-5 pb-8 pt-2 text-center sm:px-10 sm:pb-10">
-          <span className="inline-flex items-center gap-2 rounded-full bg-hot-soft px-3 py-1 text-xs font-bold uppercase tracking-wide text-hot-ink">
-            <span className="h-2 w-2 rounded-full bg-hot" aria-hidden="true" />
+          <span className="inline-flex items-center gap-2 border border-primary px-3 py-1 font-display text-xs font-semibold uppercase tracking-[0.2em] text-primary">
+            <span className="h-2 w-2 bg-primary" aria-hidden="true" />
             Em construção
           </span>
-          <h1 className="mt-4 text-3xl font-extrabold text-ink sm:text-4xl">
+          <h1 className="mt-4 text-3xl font-bold text-ink sm:text-4xl">
             A Comunidade vem aí
           </h1>
           <p className="mx-auto mt-3 max-w-md text-base text-ink-2">

@@ -1,4 +1,4 @@
--- Caça-leads — Etapa 5: perfil do usuário (apelido, foto, telefone)
+-- Ártemis Prospect — Etapa 5: perfil do usuário (apelido, foto, telefone)
 -- Rode isto DEPOIS da etapa 4, inteiro, de uma vez:
 -- Supabase > SQL Editor > New query > cole tudo > Run.
 -- Pode rodar de novo sem problema (é idempotente).

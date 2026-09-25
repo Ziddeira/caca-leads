@@ -59,7 +59,7 @@ export async function POST(request: Request) {
       forma: corpo.forma,
       valor: plano.preco,
       primeiroVencimento: vencimento,
-      descricao: `Caça-leads — plano ${plano.nome} (mensal)`,
+      descricao: `Ártemis Prospect — plano ${plano.nome} (mensal)`,
       referencia: `assinatura:${ctx.user.id}`,
     });
     const link = await linkPrimeiraCobranca(assinatura.id).catch(() => null);

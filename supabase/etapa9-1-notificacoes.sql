@@ -1,4 +1,4 @@
--- Caça-leads — Etapa 9 (parte 1 de 2): central de notificações
+-- Ártemis Prospect — Etapa 9 (parte 1 de 2): central de notificações
 -- Rode isto DEPOIS de todos os scripts anteriores (até a etapa 8),
 -- inteiro, de uma vez: Supabase > SQL Editor > New query > cole tudo > Run.
 -- Depois rode a parte 2 (etapa9-2-rotina-notificacoes.sql).

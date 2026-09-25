@@ -1,4 +1,4 @@
--- Caça-leads — Etapa 11, parte 3 de 3: avisos do sino escritos pelo
+-- Ártemis Prospect — Etapa 11, parte 3 de 3: avisos do sino escritos pelo
 -- administrador
 -- Rode DEPOIS da parte 2 (etapa11-2-admin-paineis.sql), inteiro, de uma
 -- vez: Supabase > SQL Editor > New query > cole tudo > Run.
@@ -282,7 +282,7 @@ grant execute on function public.admin_apagar_aviso(bigint) to authenticated;
 notify pgrst, 'reload schema';
 
 -- 6. Marque a SUA conta como administradora ------------------------------------
--- Rode separado, trocando o e-mail pelo da sua conta no Caça-leads:
+-- Rode separado, trocando o e-mail pelo da sua conta no Ártemis Prospect:
 --
 --   update public.profiles set is_admin = true where email = 'seu-email@exemplo.com';
 --   select id, email, apelido, is_admin from public.profiles where is_admin;

@@ -41,7 +41,7 @@ export function montarEmailChamado(dados: DadosCopia, para: string): MensagemEma
     .map(([k, v]) => `${k}: ${String(v)}`);
   return {
     para,
-    assunto: `[Caça-leads] Chamado #${dados.id} — ${ASSUNTOS[dados.assunto]}`,
+    assunto: `[Ártemis Prospect] Chamado #${dados.id} — ${ASSUNTOS[dados.assunto]}`,
     texto: [
       dados.descricao,
       "",

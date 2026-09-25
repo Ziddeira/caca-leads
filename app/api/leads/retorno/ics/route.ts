@@ -17,7 +17,7 @@ export async function GET(request: Request) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return texto("Entre na sua conta do Caça-leads e tente de novo.", 401);
+  if (!user) return texto("Entre na sua conta do Ártemis Prospect e tente de novo.", 401);
 
   const placeId = new URL(request.url).searchParams.get("placeId")?.trim() ?? "";
   if (!placeId) return texto("Lead não informado.", 400);
@@ -53,7 +53,7 @@ export async function GET(request: Request) {
   if (!linha.retorno_em) return texto("Esse lead não tem retorno agendado.", 404);
 
   const dados = linha.dados && cacheValido(linha.dados_atualizados_em) ? linha.dados : null;
-  const nome = dados?.nome || "lead do Caça-leads";
+  const nome = dados?.nome || "lead do Ártemis Prospect";
   const ics = montarIcs({
     placeId,
     nome,

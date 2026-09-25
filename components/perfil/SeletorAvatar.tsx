@@ -9,7 +9,7 @@ import Avatar from "@/components/Avatar";
 import AvatarPronto from "@/components/AvatarPronto";
 import RecorteFoto from "@/components/RecorteFoto";
 import { IconeCamera } from "@/components/Icones";
-import { BOTAO, BOTAO_SECUNDARIO } from "@/components/ui";
+import { BOTAO_NEUTRO, BOTAO_SECUNDARIO } from "@/components/ui";
 import { Alerta, chamar, type Mensagem } from "@/components/perfil/comum";
 import { createClient } from "@/lib/supabase/client";
 import { AVATARES_PRONTOS, type AvatarProntoId } from "@/lib/perfil/avatares";
@@ -154,7 +154,7 @@ export default function SeletorAvatar({
             type="button"
             onClick={() => entrada.current?.click()}
             disabled={bloqueado}
-            className={`${BOTAO} w-full sm:w-auto`}
+            className={`${BOTAO_SECUNDARIO} w-full sm:w-auto`}
           >
             <IconeCamera />
             {ocupado === "enviar" ? "Enviando…" : fotoAtual ? "Trocar foto" : "Enviar minha foto"}
@@ -164,7 +164,7 @@ export default function SeletorAvatar({
               type="button"
               onClick={removerFoto}
               disabled={bloqueado}
-              className={`${BOTAO_SECUNDARIO} w-full sm:w-auto`}
+              className={`${BOTAO_NEUTRO} w-full sm:w-auto`}
             >
               {ocupado === "remover" ? "Removendo…" : "Remover foto"}
             </button>
@@ -193,7 +193,7 @@ export default function SeletorAvatar({
                   className={`flex aspect-square min-h-11 items-center justify-center rounded-full p-1 transition disabled:cursor-wait ${
                     escolhido
                       ? "ring-3 ring-primary ring-offset-2 ring-offset-surface"
-                      : "hover:scale-105 hover:ring-2 hover:ring-line"
+                      : "hover:scale-105 hover:ring-2 hover:ring-line-strong"
                   } ${ocupado === id ? "animate-pulse" : ""}`}
                 >
                   <AvatarPronto id={id} tamanho={56} className="h-full w-full" />

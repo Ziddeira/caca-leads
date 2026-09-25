@@ -1,4 +1,4 @@
--- Caça-leads — Etapa 6: boas-vindas no primeiro acesso e avatares prontos
+-- Ártemis Prospect — Etapa 6: boas-vindas no primeiro acesso e avatares prontos
 -- Rode isto DEPOIS da etapa 5, inteiro, de uma vez:
 -- Supabase > SQL Editor > New query > cole tudo > Run.
 -- Pode rodar de novo sem problema (é idempotente).

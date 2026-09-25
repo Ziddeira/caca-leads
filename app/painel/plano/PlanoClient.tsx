@@ -17,6 +17,8 @@ import {
   BOTAO,
   BOTAO_SECUNDARIO,
   CAMPO,
+  ABA_ATIVA,
+  ABA_INATIVA,
   CARTAO as CARTAO_BASE,
   ROTULO,
   TituloPagina,
@@ -157,8 +159,8 @@ export default function PlanoClient({
       <section className={`${CARTAO} mt-6`}>
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-muted">Plano atual</p>
-            <p className="mt-1 text-3xl font-extrabold tracking-tight text-ink">{nomePlano(perfil.plano)}</p>
+            <p className="font-display text-xs font-semibold uppercase tracking-[0.2em] text-muted">Plano atual</p>
+            <p className="mt-1 font-display text-3xl font-bold text-ink">{nomePlano(perfil.plano)}</p>
             <p className="mt-1 text-sm text-ink-2">
               {!planoPago
                 ? "Sem cobrança."
@@ -169,15 +171,15 @@ export default function PlanoClient({
           </div>
           <div className="flex gap-6">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-muted">Desbloqueios</p>
-              <p className="mt-1 text-2xl font-extrabold text-ink">{perfil.creditosDesbloqueio}</p>
+              <p className="font-display text-xs font-semibold uppercase tracking-[0.2em] text-muted">Desbloqueios</p>
+              <p className="mt-1 font-display text-2xl font-bold tabular-nums text-ink">{perfil.creditosDesbloqueio}</p>
               {perfil.creditosPremio > 0 && (
                 <p className="mt-0.5 text-xs text-muted">inclui {perfil.creditosPremio} do prêmio do rank (não vencem)</p>
               )}
             </div>
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-muted">Buscas</p>
-              <p className="mt-1 text-2xl font-extrabold text-ink">{perfil.buscasRestantes}</p>
+              <p className="font-display text-xs font-semibold uppercase tracking-[0.2em] text-muted">Buscas</p>
+              <p className="mt-1 font-display text-2xl font-bold tabular-nums text-ink">{perfil.buscasRestantes}</p>
             </div>
           </div>
         </div>
@@ -224,16 +226,16 @@ export default function PlanoClient({
       )}
 
       {/* Planos -------------------------------------------------------- */}
-      <h2 className="mt-10 text-2xl font-extrabold text-ink">Planos</h2>
+      <h2 className="mt-10 text-2xl font-bold text-ink">Planos</h2>
       <div className="mt-3 grid gap-4 md:grid-cols-3">
         {(Object.keys(PLANOS) as PlanoId[]).map((id) => {
           const p = PLANOS[id];
           const atual = perfil.plano === id;
           return (
-            <div key={id} className={`${CARTAO} flex flex-col ${atual ? "ring-2 ring-primary" : ""}`}>
-              <p className="text-lg font-extrabold text-ink">{p.nome}</p>
+            <div key={id} className={`${CARTAO} flex flex-col ${atual ? "border-primary shadow-[inset_0_0_0_1px_var(--ap-yellow)]" : ""}`}>
+              <p className="font-display text-lg font-bold uppercase tracking-[0.08em] text-ink">{p.nome}</p>
               <p className="mt-1 text-ink">
-                <span className="text-2xl font-extrabold">{formatarPreco(p.preco)}</span>
+                <span className="font-display text-3xl font-bold">{formatarPreco(p.preco)}</span>
                 {p.preco > 0 && <span className="text-sm text-ink-2">/mês</span>}
               </p>
               <ul className="mt-3 flex flex-1 flex-col gap-1 text-sm text-ink-2">
@@ -257,10 +259,12 @@ export default function PlanoClient({
                     </button>
                   )
                 ) : (
+                  // Um primário por tela: o do plano Pro (ou o "Gerar cobrança",
+                  // quando o pagamento está aberto).
                   <button
                     onClick={() => setCheckout({ tipo: "assinar", plano: id as PlanoPago })}
                     disabled={carregando}
-                    className={BOTAO}
+                    className={id === "pro" && !checkout ? BOTAO : BOTAO_SECUNDARIO}
                   >
                     {atual ? `Assinar ${p.nome} de novo` : `Assinar ${p.nome}`}
                   </button>
@@ -274,7 +278,7 @@ export default function PlanoClient({
       {/* Pacote extra -------------------------------------------------- */}
       <section className={`${CARTAO} mt-4 flex flex-wrap items-center justify-between gap-4`}>
         <div>
-          <p className="text-lg font-extrabold text-ink">Pacote extra</p>
+          <p className="font-display text-lg font-bold uppercase tracking-[0.08em] text-ink">Pacote extra</p>
           <p className="mt-1 text-sm text-ink-2">
             +{PACOTE_EXTRA.desbloqueios} desbloqueios e +{PACOTE_EXTRA.buscas} buscas por{" "}
             <strong className="text-ink">{formatarPreco(PACOTE_EXTRA.preco)}</strong>. Compra avulsa,
@@ -282,7 +286,7 @@ export default function PlanoClient({
             volta ao limite do plano (não acumula).
           </p>
         </div>
-        <button onClick={() => setCheckout({ tipo: "pacote" })} disabled={carregando} className={BOTAO}>
+        <button onClick={() => setCheckout({ tipo: "pacote" })} disabled={carregando} className={BOTAO_SECUNDARIO}>
           Comprar pacote extra
         </button>
       </section>
@@ -298,15 +302,15 @@ export default function PlanoClient({
 
           <fieldset className="mt-3">
             <legend className="mb-1 text-sm font-semibold text-ink-2">Forma de pagamento</legend>
-            <div className="grid w-full grid-cols-2 gap-1 rounded-full bg-canvas p-1 sm:inline-grid sm:w-auto">
+            <div className="grid w-full grid-cols-2 gap-1 border border-line bg-canvas p-1 sm:inline-grid sm:w-auto">
               {(["PIX", "CREDIT_CARD"] as const).map((f) => (
                 <button
                   key={f}
                   type="button"
                   onClick={() => setForma(f)}
                   aria-pressed={forma === f}
-                  className={`min-h-11 rounded-full px-4 text-sm font-semibold transition ${
-                    forma === f ? "bg-surface text-ink shadow" : "text-ink-2"
+                  className={`min-h-11 px-4 font-display text-sm font-semibold uppercase tracking-[0.08em] transition ${
+                    forma === f ? ABA_ATIVA : ABA_INATIVA
                   }`}
                 >
                   {f === "PIX" ? "Pix" : "Cartão de crédito"}
@@ -351,7 +355,7 @@ export default function PlanoClient({
           <p className="mt-3 text-xs text-muted">
             {forma === "PIX"
               ? "Você vai receber um link com o QR Code do Pix."
-              : "Os dados do cartão são digitados na página segura do Asaas — nunca passam pelo Caça-leads."}
+              : "Os dados do cartão são digitados na página segura do Asaas — nunca passam pelo Ártemis Prospect."}
             {checkout.tipo === "assinar" && " A cobrança se repete todo mês até você cancelar."}
           </p>
 
@@ -379,7 +383,7 @@ function Alerta({ children }: { children: React.ReactNode }) {
 
 function Selo({ children }: { children: React.ReactNode }) {
   return (
-    <span className="inline-block rounded-full bg-primary-soft px-3 py-1 text-sm font-semibold text-primary">
+    <span className="inline-block border border-primary px-2 py-[3px] font-display text-[11px] font-semibold uppercase tracking-[0.08em] text-primary">
       {children}
     </span>
   );

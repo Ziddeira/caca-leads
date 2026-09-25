@@ -75,7 +75,7 @@ function Cartao({ chamado: c }: { chamado: MeuChamado }) {
           </h2>
           <p className="text-xs text-muted">Aberto em {dataHora(c.criadoEm)}</p>
         </div>
-        <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${COR_SITUACAO[c.situacao]}`}>
+        <span className={`border px-2 py-[3px] font-display text-[11px] font-semibold uppercase leading-tight tracking-[0.08em] ${COR_SITUACAO[c.situacao]}`}>
           {SITUACOES[c.situacao]}
         </span>
       </div>

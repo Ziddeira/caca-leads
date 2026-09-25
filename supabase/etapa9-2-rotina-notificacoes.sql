@@ -1,4 +1,4 @@
--- Caça-leads — Etapa 9 (parte 2 de 2): a rotina que gera as notificações
+-- Ártemis Prospect — Etapa 9 (parte 2 de 2): a rotina que gera as notificações
 -- Rode isto DEPOIS da parte 1 (etapa9-1-notificacoes.sql), inteiro, de
 -- uma vez: Supabase > SQL Editor > New query > cole tudo > Run.
 --

@@ -155,7 +155,7 @@ function Cartao({ venda, onDecidido }: { venda: VendaAnalise; onDecidido: (statu
             <button type="button" disabled={enviando} onClick={() => setRecusando(false)} className={`${BOTAO_SECUNDARIO} flex-1 sm:flex-none`}>
               Voltar
             </button>
-            <button type="button" disabled={enviando} onClick={() => decidir(false)} className={`${BOTAO} flex-1 bg-danger! sm:flex-none`}>
+            <button type="button" disabled={enviando} onClick={() => decidir(false)} className={`${BOTAO} flex-1 bg-danger! hover:bg-danger! sm:flex-none`}>
               {enviando ? "Salvando…" : "Confirmar recusa"}
             </button>
           </>

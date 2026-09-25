@@ -1,4 +1,4 @@
--- Caça-leads — Etapa 2: busca no Google e desbloqueio de leads
+-- Ártemis Prospect — Etapa 2: busca no Google e desbloqueio de leads
 -- Rode isto DEPOIS do supabase/profiles.sql, inteiro, de uma vez:
 -- Supabase > SQL Editor > New query > cole tudo > Run.
 

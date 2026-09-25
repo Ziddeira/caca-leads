@@ -48,7 +48,7 @@ export default async function ErrosPage({ searchParams }: { searchParams: Promis
             key={f.id ?? "todos"}
             href={f.id ? `?origem=${f.id}` : "?"}
             aria-current={filtro === f.id ? "page" : undefined}
-            className={`inline-flex min-h-11 items-center rounded-full border px-4 text-sm font-semibold ${
+            className={`inline-flex min-h-11 items-center border px-4 text-sm font-semibold ${
               filtro === f.id ? "border-primary bg-primary-soft text-primary" : "border-line bg-surface text-ink-2 hover:text-ink"
             }`}
           >

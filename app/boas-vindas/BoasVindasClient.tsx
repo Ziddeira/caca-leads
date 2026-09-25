@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Logo from "@/components/marca/Logo";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import SeletorAvatar from "@/components/perfil/SeletorAvatar";
@@ -68,31 +69,30 @@ export default function BoasVindasClient({
 
   return (
     <div className="px-seguro flex min-h-screen flex-col items-center bg-canvas pt-[calc(2rem+env(safe-area-inset-top))] pb-[calc(2rem+env(safe-area-inset-bottom))] sm:justify-center">
-      <Link href="/" className="mb-6 block rounded-md" aria-label="Caça-leads">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/logo-principal.svg" alt="Caça-leads" width={808} height={212} className="h-10 w-auto" />
+      <Link href="/" className="mb-6 block" aria-label="Ártemis Prospect">
+        <Logo tamanho={24} />
       </Link>
 
       <main className={`${CARTAO} w-full max-w-lg p-5 sm:p-8`}>
         <div className="flex items-center justify-between gap-3">
-          <p className="text-sm font-semibold text-primary">Passo {passo} de 2</p>
+          <p className="font-display text-[13px] font-semibold uppercase tracking-[0.3em] text-primary">Passo {passo} de 2</p>
           <button
             type="button"
             onClick={() => finalizar("pular")}
             disabled={ocupado !== null}
-            className="inline-flex min-h-11 items-center rounded-md px-2 text-sm font-semibold text-ink-2 underline-offset-2 hover:text-ink hover:underline disabled:opacity-60"
+            className="inline-flex min-h-11 items-center px-2 text-sm font-semibold text-ink-2 underline-offset-2 hover:text-ink hover:underline disabled:opacity-60"
           >
             {ocupado === "pular" ? "Pulando…" : "Pular por agora"}
           </button>
         </div>
         <div className="mt-2 grid grid-cols-2 gap-2" aria-hidden="true">
-          <span className="h-1.5 rounded-full bg-primary" />
-          <span className={`h-1.5 rounded-full ${passo === 2 ? "bg-primary" : "bg-line"}`} />
+          <span className="h-1 bg-primary" />
+          <span className={`h-1 ${passo === 2 ? "bg-primary" : "bg-line"}`} />
         </div>
 
         {passo === 1 ? (
           <form onSubmit={salvarApelido} className="mt-6">
-            <h1 className="text-2xl font-extrabold text-ink sm:text-3xl">Boas-vindas ao Caça-leads!</h1>
+            <h1 className="text-2xl text-ink sm:text-3xl">Boas-vindas ao Ártemis Prospect!</h1>
             <p className="mt-2 text-ink-2">
               Como você quer aparecer por aqui? O apelido vai para o rank público dos
               caçadores de leads.
@@ -125,7 +125,7 @@ export default function BoasVindasClient({
           </form>
         ) : (
           <div className="mt-6">
-            <h1 className="text-2xl font-extrabold text-ink sm:text-3xl">Escolha seu avatar</h1>
+            <h1 className="text-2xl text-ink sm:text-3xl">Escolha seu avatar</h1>
             <p className="mt-2 mb-5 text-ink-2">
               Envie uma foto sua ou escolha um dos avatares prontos. Se não escolher
               nenhum, sorteamos um para você.

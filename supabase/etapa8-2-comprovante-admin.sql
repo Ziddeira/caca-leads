@@ -1,4 +1,4 @@
--- Caça-leads — Etapa 8, parte 2 de 3: comprovante, administrador e score
+-- Ártemis Prospect — Etapa 8, parte 2 de 3: comprovante, administrador e score
 -- Rode DEPOIS da parte 1 (etapa8-1-verificacao.sql), inteiro, de uma vez:
 -- Supabase > SQL Editor > New query > cole tudo > Run.
 -- Pode rodar de novo sem problema (é idempotente).

@@ -4,15 +4,15 @@ export default function CartaoLeadEsqueleto() {
   return (
     <div className="rounded-lg border border-line bg-surface p-4 shadow-cartao sm:p-5" aria-hidden="true">
       <div className="flex items-start gap-3">
-        <div className="esqueleto h-11 w-11 shrink-0 rounded-full" />
+        <div className="esqueleto h-12 w-12 shrink-0" />
         <div className="flex-1 space-y-2 pt-1">
           <div className="esqueleto h-4 w-3/5" />
           <div className="esqueleto h-3 w-2/5" />
         </div>
       </div>
       <div className="mt-4 flex gap-2">
-        <div className="esqueleto h-6 w-24 rounded-full" />
-        <div className="esqueleto h-6 w-16 rounded-full" />
+        <div className="esqueleto h-6 w-24" />
+        <div className="esqueleto h-6 w-16" />
       </div>
       <div className="mt-4 grid grid-cols-3 gap-2">
         <div className="esqueleto h-11" />

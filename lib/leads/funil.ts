@@ -38,12 +38,14 @@ export function contagemFunil(situacao: SituacaoFunil, n: number) {
   }
 }
 
+// Cores da marca: amarelo preenchido = o mais importante (fechado),
+// contorno amarelo = oportunidade, branco = informativo, cinza = neutro.
 export const ESTILO_FUNIL: Record<SituacaoFunil, string> = {
-  desbloqueado: "bg-proprio-soft text-proprio border-proprio/25",
-  contatado: "bg-rede-soft text-rede border-rede/25",
-  negociacao: "bg-hot-soft text-hot-ink border-hot/30",
-  fechado: "bg-wa-soft text-wa border-wa/30",
-  perdido: "bg-danger-soft text-danger border-danger/25",
+  desbloqueado: "bg-canvas text-ink-2 border-line-strong",
+  contatado: "bg-canvas text-ink border-ink/60",
+  negociacao: "bg-primary-soft text-primary border-primary/60",
+  fechado: "bg-primary text-primary-ink border-primary",
+  perdido: "bg-danger-soft text-danger border-danger/40",
 };
 
 export function situacaoFunilValida(valor: unknown): valor is SituacaoFunil {
@@ -75,19 +77,19 @@ export const COR_STATUS_VENDA: Record<StatusVenda, string> = {
   pendente_verificacao: "text-hot-ink",
   aguardando_google: "text-hot-ink",
   nao_verificada: "text-danger",
-  em_analise: "text-rede",
-  verificada: "text-wa",
+  em_analise: "text-ink",
+  verificada: "text-primary",
   recusada: "text-danger",
 };
 
 // Etiqueta (fundo + texto + borda) da situação.
 export const ESTILO_STATUS_VENDA: Record<StatusVenda, string> = {
-  pendente_verificacao: "bg-hot-soft text-hot-ink border-hot/30",
-  aguardando_google: "bg-hot-soft text-hot-ink border-hot/30",
-  nao_verificada: "bg-danger-soft text-danger border-danger/25",
-  em_analise: "bg-rede-soft text-rede border-rede/25",
-  verificada: "bg-wa-soft text-wa border-wa/30",
-  recusada: "bg-danger-soft text-danger border-danger/25",
+  pendente_verificacao: "bg-hot-soft text-hot-ink border-hot/40",
+  aguardando_google: "bg-hot-soft text-hot-ink border-hot/40",
+  nao_verificada: "bg-danger-soft text-danger border-danger/40",
+  em_analise: "bg-canvas text-ink border-ink/60",
+  verificada: "bg-primary text-primary-ink border-primary",
+  recusada: "bg-danger-soft text-danger border-danger/40",
 };
 
 export function statusVendaValido(valor: unknown): valor is StatusVenda {
