@@ -1,22 +1,41 @@
 import { NextResponse } from "next/server";
 import type { EmailOtpType } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
+import { importarFotoDoGoogle } from "@/lib/perfil/fotoGoogle";
 
-// Destino dos links que o Supabase manda por e-mail: confirmação de
-// cadastro, troca de e-mail e "esqueci minha senha".
+// Destino dos links que o Supabase manda por e-mail (confirmação de
+// cadastro, troca de e-mail e "esqueci minha senha") e da volta do login
+// com o Google (?via=google).
+// "origin" é o endereço em que a pessoa está (domínio oficial,
+// pré-visualização da Vercel ou localhost): ela continua nele.
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
   const tokenHash = searchParams.get("token_hash");
   const type = searchParams.get("type") as EmailOtpType | null;
   const next = destinoSeguro(searchParams.get("next"));
+  const viaGoogle = searchParams.get("via") === "google";
+
+  // A pessoa cancelou na tela do Google ou o Supabase recusou o login.
+  if (viaGoogle && (!code || searchParams.get("error"))) {
+    return NextResponse.redirect(`${origin}/login?erro=google`);
+  }
 
   const supabase = await createClient();
 
   if (supabase && code) {
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
+      // Primeira entrada pelo Google: a foto da conta vira a foto inicial.
+      // Depois disso, o layout do painel leva quem é novo às boas-vindas.
+      if (viaGoogle && data.user) {
+        await importarFotoDoGoogle(supabase, data.user);
+      }
       return NextResponse.redirect(`${origin}${next}`);
+    }
+    if (viaGoogle) {
+      console.error("[auth/callback] Falha no login com o Google:", error.message);
+      return NextResponse.redirect(`${origin}/login?erro=google`);
     }
   }
 

@@ -6,6 +6,7 @@ import { useState, type FormEvent } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { ALERTA_ERRO, ALERTA_SUCESSO, BOTAO, CAMPO, ROTULO } from "@/components/ui";
 import TelaAuth, { LINK_AUTH } from "@/components/TelaAuth";
+import BotaoGoogle from "@/components/BotaoGoogle";
 
 type Mode = "login" | "cadastro";
 
@@ -15,11 +16,17 @@ export default function AuthForm({ mode }: { mode: Mode }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(() =>
-    mode === "login" && searchParams.get("erro") === "confirmacao"
-      ? "Não foi possível validar o link do e-mail. Ele pode ter expirado ou ter sido aberto em outro navegador — peça um link novo."
-      : null,
-  );
+  const [error, setError] = useState<string | null>(() => {
+    if (mode !== "login") return null;
+    const erro = searchParams.get("erro");
+    if (erro === "confirmacao") {
+      return "Não foi possível validar o link do e-mail. Ele pode ter expirado ou ter sido aberto em outro navegador — peça um link novo.";
+    }
+    if (erro === "google") {
+      return "Não foi possível entrar com o Google. Tente de novo — e, se o problema continuar, entre com e-mail e senha.";
+    }
+    return null;
+  });
   const [info, setInfo] = useState<string | null>(null);
 
   async function handleSubmit(e: FormEvent) {
@@ -80,10 +87,12 @@ export default function AuthForm({ mode }: { mode: Mode }) {
       titulo={mode === "login" ? "Entrar na sua conta" : "Criar conta grátis"}
       descricao={
         mode === "login"
-          ? "Use o e-mail e a senha do seu cadastro."
+          ? "Use sua conta do Google ou o e-mail e a senha do cadastro."
           : "Leva menos de um minuto."
       }
     >
+      <BotaoGoogle />
+
       <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4">
         <div>
           <label htmlFor="email" className={ROTULO}>
