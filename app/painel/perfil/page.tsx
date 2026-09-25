@@ -37,6 +37,20 @@ export default async function PerfilPage({
     .maybeSingle();
   const mostrarVendas = erroComunidade ? null : !!comunidade?.mostrar_vendas_comunidade;
 
+  // Formas de entrar. O Google aparece nas identidades da conta. A senha
+  // vem da função "tem_senha" (etapa 17), que também pega quem entrou
+  // pelo Google e depois criou senha pelo "Esqueci minha senha"; sem o
+  // script, vale ter a identidade de e-mail (cadastro com senha).
+  const provedores = new Set([
+    ...(user.identities ?? []).map((i) => i.provider),
+    ...((user.app_metadata.providers as string[] | undefined) ?? []),
+  ]);
+  const { data: temSenha, error: erroSenha } = await supabase.rpc("tem_senha");
+  const acesso = {
+    senha: erroSenha ? provedores.has("email") : temSenha === true,
+    google: provedores.has("google"),
+  };
+
   return (
     <PerfilClient
       userId={user.id}
@@ -48,6 +62,7 @@ export default async function PerfilPage({
       perfil={perfil}
       pendente={pendente}
       mostrarVendas={mostrarVendas}
+      acesso={acesso}
     />
   );
 }

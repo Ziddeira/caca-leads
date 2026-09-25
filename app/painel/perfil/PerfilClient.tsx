@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import SeletorAvatar from "@/components/perfil/SeletorAvatar";
+import { IconeGoogle } from "@/components/BotaoGoogle";
+import { IconeCadeado } from "@/components/Icones";
 import { Alerta, chamar, type Mensagem } from "@/components/perfil/comum";
 import {
   ALERTA_AVISO,
@@ -38,6 +40,7 @@ export default function PerfilClient({
   perfil,
   pendente,
   mostrarVendas,
+  acesso,
 }: {
   userId: string;
   email: string;
@@ -47,6 +50,7 @@ export default function PerfilClient({
   pendente: "etapa5" | "etapa6" | null;
   // null = etapa 14 (Comunidade) ainda não rodada no banco.
   mostrarVendas: boolean | null;
+  acesso: FormasDeEntrar;
 }) {
   return (
     <div className="flex flex-col gap-6">
@@ -75,8 +79,10 @@ export default function PerfilClient({
           <CartaoComunidade apelido={perfil?.apelido ?? null} mostrarVendas={mostrarVendas} />
         </div>
         <div className="flex flex-col gap-6">
+          <CartaoAcesso acesso={acesso} />
           <CartaoEmail email={email} emailPendente={emailPendente} aviso={avisoEmail} />
-          <CartaoSenha />
+          {/* Quem entra só pelo Google não tem senha para trocar. */}
+          {acesso.senha && <CartaoSenha />}
           <CartaoTour />
         </div>
       </div>
@@ -294,6 +300,50 @@ function CartaoDados({ perfil, desativado }: { perfil: DadosPerfil | null; desat
           {salvando ? "Salvando…" : "Salvar"}
         </button>
       </form>
+    </section>
+  );
+}
+
+// Formas de entrar ---------------------------------------------------------
+interface FormasDeEntrar {
+  senha: boolean;
+  google: boolean;
+}
+
+function CartaoAcesso({ acesso }: { acesso: FormasDeEntrar }) {
+  const itens = [
+    acesso.senha && { chave: "senha", icone: <IconeCadeado className="shrink-0 text-ink-2" />, texto: "E-mail e senha" },
+    acesso.google && { chave: "google", icone: <IconeGoogle tamanho={20} />, texto: "Conta do Google" },
+  ].filter((i) => !!i);
+
+  return (
+    <section aria-labelledby="titulo-acesso" className={CARTAO}>
+      <h2 id="titulo-acesso" className={TITULO_CARTAO}>
+        Como você entra
+      </h2>
+      <ul className="mt-3 flex flex-col gap-2">
+        {itens.map((item) => (
+          <li
+            key={item.chave}
+            className="flex min-h-11 items-center gap-3 border border-line-input bg-canvas px-3 py-2 text-campo"
+          >
+            {item.icone}
+            <span className="font-semibold">{item.texto}</span>
+          </li>
+        ))}
+      </ul>
+      {acesso.google && acesso.senha && (
+        <p className={AJUDA}>
+          As duas formas abrem a mesma conta, com o mesmo plano, créditos e histórico.
+        </p>
+      )}
+      {acesso.google && !acesso.senha && (
+        <p className={AJUDA}>
+          Sua conta não tem senha: você entra pelo botão &quot;Entrar com o Google&quot;. Se
+          quiser entrar também com e-mail e senha, use &quot;Esqueci minha senha&quot; na tela
+          de login para criar uma.
+        </p>
+      )}
     </section>
   );
 }
