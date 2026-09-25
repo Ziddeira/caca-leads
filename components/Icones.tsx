@@ -331,3 +331,47 @@ export function IconeLixeira(props: Props) {
     </Base>
   );
 }
+
+export function IconeMensagens(props: Props) {
+  return (
+    <Base {...props}>
+      <path d="M4 4h16v12H9l-5 4z" />
+      <path d="M8 9h8M8 12h5" />
+    </Base>
+  );
+}
+
+export function IconeMandar(props: Props) {
+  return (
+    <Base {...props}>
+      <path d="M3 11 21 3l-8 18-2-8z" />
+      <path d="m11 13 10-10" />
+    </Base>
+  );
+}
+
+export function IconeBloquear(props: Props) {
+  return (
+    <Base {...props}>
+      <circle cx="12" cy="12" r="9" />
+      <path d="m5.6 5.6 12.8 12.8" />
+    </Base>
+  );
+}
+
+export function IconeVisto(props: Props) {
+  return (
+    <Base {...props}>
+      <path d="m4 12 4 4 8-8" />
+    </Base>
+  );
+}
+
+export function IconeVistoDuplo(props: Props) {
+  return (
+    <Base {...props}>
+      <path d="m2 12 4 4 8-8" />
+      <path d="m11 15 1 1 9-9" />
+    </Base>
+  );
+}

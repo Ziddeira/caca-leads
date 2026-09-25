@@ -8,6 +8,7 @@ import {
   IconeComunidade,
   IconeEscudo,
   IconeLeads,
+  IconeMensagens,
   IconePerfil,
   IconePlano,
   IconeRank,
@@ -17,6 +18,7 @@ import {
 import Avatar from "@/components/Avatar";
 import Logo from "@/components/marca/Logo";
 import { Sino } from "@/components/notificacoes/Notificacoes";
+import { ContadorMensagens } from "@/components/mensagens/Resumo";
 
 // "ativoEm": outras páginas que também acendem o item (no celular, o
 // Score leva também ao Rank, pelas abas no topo das duas páginas).
@@ -29,6 +31,8 @@ type Item = {
   Icone: typeof IconeBuscar;
   ativoEm?: string[];
   tour?: string;
+  // Mostra o número de mensagens não lidas + pedidos recebidos.
+  contador?: boolean;
 };
 
 const ITENS: Item[] = [
@@ -36,6 +40,7 @@ const ITENS: Item[] = [
   { href: "/painel/meus-leads", label: "Meus leads", curto: "Leads", Icone: IconeLeads, tour: "meus-leads" },
   { href: "/painel/score", label: "Score", curto: "Score", Icone: IconeTrofeu, ativoEm: ["/painel/rank"], tour: "score" },
   { href: "/painel/comunidade", label: "Comunidade", curto: "Comunidade", Icone: IconeComunidade },
+  { href: "/painel/mensagens", label: "Mensagens", curto: "Mensagens", Icone: IconeMensagens, contador: true },
   { href: "/painel/plano", label: "Meu plano", curto: "Plano", Icone: IconePlano, tour: "plano" },
 ];
 
@@ -48,6 +53,7 @@ const ITENS_LATERAL: Item[] = [
   { href: "/painel/rank", label: "Rank do mês", curto: "Rank", Icone: IconeRank },
   ITENS[3],
   ITENS[4],
+  ITENS[5],
   { href: "/painel/perfil", label: "Perfil", curto: "Perfil", Icone: IconePerfil },
 ];
 
@@ -55,7 +61,7 @@ const ITEM_ADMIN: Item = { href: "/painel/admin", label: "Gestão", curto: "Gest
 
 // No computador (md para cima): barra lateral fixa com a logo grande.
 // No celular: barra fina no topo (logo, sino, perfil e Sair) e menu inferior fixo com
-// os 5 atalhos, respeitando as áreas seguras do iPhone.
+// os 6 atalhos, respeitando as áreas seguras do iPhone.
 export default function Sidebar({
   email,
   apelido,
@@ -92,7 +98,7 @@ export default function Sidebar({
         </Link>
 
         <nav aria-label="Menu principal" className="flex flex-1 flex-col gap-1">
-          {lateral.map(({ href, label, Icone, tour }) => {
+          {lateral.map(({ href, label, Icone, tour, contador }) => {
             const atual = ativo(href);
             return (
               <Link
@@ -108,6 +114,7 @@ export default function Sidebar({
               >
                 <Icone width={19} height={19} />
                 {label}
+                {contador && <ContadorMensagens className="ml-auto" />}
               </Link>
             );
           })}
@@ -195,8 +202,8 @@ export default function Sidebar({
         aria-label="Menu principal"
         className="pb-seguro fixed inset-x-0 bottom-0 z-30 border-t border-line-2 bg-sidebar/95 backdrop-blur md:hidden"
       >
-        <ul className="grid grid-cols-5">
-          {ITENS.map(({ href, curto, Icone, ativoEm, tour }) => {
+        <ul className="grid grid-cols-6">
+          {ITENS.map(({ href, curto, Icone, ativoEm, tour, contador }) => {
             const atual = ativo(href) || (ativoEm ?? []).some(ativo);
             return (
               <li key={href}>
@@ -204,12 +211,13 @@ export default function Sidebar({
                   href={href}
                   data-tour={tour}
                   aria-current={atual ? "page" : undefined}
-                  className={`flex min-h-16 flex-col items-center justify-center gap-1 border-t-[3px] px-0.5 text-[11px] font-semibold transition sm:text-xs ${
+                  className={`flex min-h-16 flex-col items-center justify-center gap-1 border-t-[3px] px-0.5 text-[10px] font-semibold tracking-tight transition min-[400px]:text-[11px] sm:text-xs ${
                     atual ? "border-primary bg-primary-soft text-primary" : "border-transparent text-ink-2"
                   }`}
                 >
-                  <span className="flex h-8 w-12 items-center justify-center">
+                  <span className="relative flex h-8 w-12 items-center justify-center">
                     <Icone />
+                    {contador && <ContadorMensagens className="absolute -top-0.5 right-0" />}
                   </span>
                   {curto}
                 </Link>

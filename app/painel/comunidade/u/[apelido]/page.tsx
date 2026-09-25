@@ -5,9 +5,11 @@ import Avatar from "@/components/Avatar";
 import { CARTAO } from "@/components/ui";
 import { ComunidadeProvider } from "@/components/comunidade/Contexto";
 import Feed from "@/components/comunidade/Feed";
+import BotaoConversar from "@/components/mensagens/BotaoConversar";
 import { lerEstado } from "@/lib/comunidade/paginas";
 import { MSG_FALTA_ETAPA14, faltaEtapa14 } from "@/lib/comunidade/regras";
 import { urlAvatar, type PerfilComunidade, type Post } from "@/lib/comunidade/tipos";
+import type { RelacaoChat } from "@/lib/mensagens/tipos";
 
 export const dynamic = "force-dynamic";
 
@@ -26,10 +28,13 @@ export default async function PerfilComunidadePage({ params }: { params: Promise
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const [{ estado, erro }, perfil, feed] = await Promise.all([
+  const [{ estado, erro }, perfil, feed, chat] = await Promise.all([
     lerEstado(supabase),
     supabase.rpc("comunidade_perfil", { p_apelido: apelido }),
     supabase.rpc("comunidade_feed", { p_apelido: apelido, p_limite: POR_PAGINA }),
+    // Botão de mensagens. Sem a etapa 16 (ou no próprio perfil), volta
+    // vazio e o botão não aparece.
+    supabase.rpc("chat_relacao", { p_apelido: apelido }),
   ]);
   const falha = erro ?? perfil.error ?? feed.error;
   if (falha) {
@@ -39,6 +44,7 @@ export default async function PerfilComunidadePage({ params }: { params: Promise
   const p = perfil.data as PerfilComunidade | null;
   if (!p) notFound();
   const posts = (feed.data ?? []) as Post[];
+  const relacao = chat.error ? null : (chat.data as RelacaoChat | null);
   const desde = new Date(p.membro_desde).toLocaleDateString("pt-BR", {
     timeZone: "America/Sao_Paulo",
     month: "long",
@@ -72,6 +78,11 @@ export default async function PerfilComunidadePage({ params }: { params: Promise
             )}
           </dl>
           {p.suspenso && <p className="mt-2 text-xs font-semibold text-danger">Conta suspensa da comunidade.</p>}
+          {!p.sou_eu && relacao && (
+            <div className="mt-4">
+              <BotaoConversar apelido={p.apelido} relacao={relacao} />
+            </div>
+          )}
           {p.sou_eu && !p.mostra_vendas && (
             <p className="mt-3 text-xs text-muted">
               Quer mostrar suas vendas verificadas aqui?{" "}
