@@ -41,7 +41,7 @@ export default async function PainelLayout({
   // Apelido e foto para o menu. Se o script da etapa 5 ainda não foi
   // rodado, o menu só mostra o e-mail, como antes.
   const { perfil } = await lerPerfil(supabase, user.id);
-  // Tema salvo no perfil (etapa 17): vale em qualquer aparelho.
+  // Tema salvo no perfil (etapa 18): vale em qualquer aparelho.
   const tema = await lerTema(supabase, user.id);
 
   // Primeiro acesso: antes do painel, a tela de boas-vindas (apelido e

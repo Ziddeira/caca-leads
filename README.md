@@ -186,7 +186,12 @@ cada um no SQL Editor do Supabase:
     Cria o bucket **privado** `mensagens` e liga o Realtime nas tabelas
     `chat_conversas` e `chat_mensagens`. As imagens das denúncias abrem
     na Gestão com a `SUPABASE_SERVICE_ROLE_KEY`.
-17. `supabase/etapa17-tema.sql` — tema claro, escuro ou "seguir o
+17. `supabase/etapa17-login-google.sql` — cria só a função `tem_senha`,
+    que o Perfil usa para saber se a conta tem senha (e esconder a troca
+    de senha de quem entra só pelo Google). O login com o Google funciona
+    sem este script; sem ele, o Perfil decide pelo tipo de login. Veja
+    "Login com o Google" abaixo.
+18. `supabase/etapa18-tema.sql` — tema claro, escuro ou "seguir o
     sistema". Cria a coluna `profiles.tema` e a função `definir_tema`,
     para a escolha valer em qualquer aparelho. Sem este script, o botão
     de tema funciona do mesmo jeito, mas a escolha fica só no aparelho
@@ -240,6 +245,30 @@ Em Supabase > Authentication > URL Configuration > Redirect URLs, deixe
 liberado `https://<seu-domínio>/auth/callback**` (com os dois asteriscos,
 para aceitar o `?next=...` usado na troca de e-mail e no "esqueci minha
 senha"). Adicione também a URL de pré-visualização da Vercel, se usar.
+
+### Login com o Google
+
+1. Supabase > Authentication > Sign In / Providers > Google: ligado, com
+   o Client ID e o Client Secret do Google Cloud. No Google Cloud, a
+   "Authorized redirect URI" é a do Supabase
+   (`https://<projeto>.supabase.co/auth/v1/callback`), não a do site.
+2. Supabase > Authentication > URL Configuration:
+   - **Site URL**: `https://artemisprospect.com.br`.
+   - **Redirect URLs** (uma por linha):
+     `https://artemisprospect.com.br/**`,
+     `https://www.artemisprospect.com.br/**` (se o www também abrir o
+     site), `https://*-<sua-conta>.vercel.app/**` (pré-visualizações da
+     Vercel) e `http://localhost:3000/**`.
+   O site pede ao Supabase para voltar ao endereço em que a pessoa
+   está. Se esse endereço não estiver na lista, o Supabase manda para a
+   Site URL — é por isso que, sem a linha da Vercel, o login feito numa
+   pré-visualização terminaria no site oficial.
+3. Quem entra pela primeira vez pelo Google ganha o perfil com o plano
+   grátis (o mesmo gatilho do cadastro por e-mail), cai nas boas-vindas
+   e, se a conta do Google tiver foto, ela já vem como foto inicial.
+4. Quem já tem conta com o mesmo e-mail continua com a mesma conta: o
+   Supabase liga o Google ao usuário que já existe ("automatic identity
+   linking", que vem ligado). Não crie um segundo usuário manualmente.
 
 ## Webhook do Asaas
 

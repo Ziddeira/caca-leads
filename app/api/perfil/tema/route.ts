@@ -29,11 +29,11 @@ export async function POST(request: Request) {
 
   const { error } = await supabase.rpc("definir_tema", { p_tema: tema });
   if (error) {
-    // Sem o script da etapa 17 a função não existe. O tema já mudou na
+    // Sem o script da etapa 18 a função não existe. O tema já mudou na
     // tela e fica guardado neste aparelho; só não vai para o perfil.
     if (faltaEtapa5(error.code)) {
       return NextResponse.json(
-        { erro: "O tema ainda não foi ativado no banco. Rode o script supabase/etapa17-tema.sql no Supabase." },
+        { erro: "O tema ainda não foi ativado no banco. Rode o script supabase/etapa18-tema.sql no Supabase." },
         { status: 503 },
       );
     }

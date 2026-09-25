@@ -5,7 +5,7 @@
 // - no atributo data-tema-escolha do <html> (o que a tela mostra agora);
 // - num cookie, lido por um script no <head> antes da primeira pintura,
 //   para não piscar a cor errada ao carregar a página;
-// - no perfil (coluna profiles.tema, etapa 17), para valer em qualquer
+// - no perfil (coluna profiles.tema, etapa 18), para valer em qualquer
 //   aparelho em que a pessoa entrar.
 // data-tema (sem "-escolha") é o tema de fato aplicado: "sistema" vira
 // "claro" ou "escuro" conforme o aparelho.

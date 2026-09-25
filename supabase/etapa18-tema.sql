@@ -1,4 +1,4 @@
--- Ártemis Prospect — Etapa 17: tema claro, escuro ou "seguir o sistema"
+-- Ártemis Prospect — Etapa 18: tema claro, escuro ou "seguir o sistema"
 -- Rode isto DEPOIS da etapa 5, inteiro, de uma vez:
 -- Supabase > SQL Editor > New query > cole tudo > Run.
 -- Pode rodar de novo sem problema (é idempotente).
