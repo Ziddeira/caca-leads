@@ -331,3 +331,48 @@ export function IconeLixeira(props: Props) {
     </Base>
   );
 }
+
+// Envelope: diferente do balão da Comunidade.
+export function IconeMensagens(props: Props) {
+  return (
+    <Base {...props}>
+      <path d="M3 5h18v14H3z" />
+      <path d="m3 6 9 7 9-7" />
+    </Base>
+  );
+}
+
+export function IconeMandar(props: Props) {
+  return (
+    <Base {...props}>
+      <path d="M3 11 21 3l-8 18-2-8z" />
+      <path d="m11 13 10-10" />
+    </Base>
+  );
+}
+
+export function IconeBloquear(props: Props) {
+  return (
+    <Base {...props}>
+      <circle cx="12" cy="12" r="9" />
+      <path d="m5.6 5.6 12.8 12.8" />
+    </Base>
+  );
+}
+
+export function IconeVisto(props: Props) {
+  return (
+    <Base {...props}>
+      <path d="m4 12 4 4 8-8" />
+    </Base>
+  );
+}
+
+export function IconeVistoDuplo(props: Props) {
+  return (
+    <Base {...props}>
+      <path d="m2 12 4 4 8-8" />
+      <path d="m11 15 1 1 9-9" />
+    </Base>
+  );
+}

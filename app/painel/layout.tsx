@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import Sidebar from "@/components/Sidebar";
 import { NotificacoesProvider, Sino } from "@/components/notificacoes/Notificacoes";
 import BotaoAjuda from "@/components/suporte/BotaoAjuda";
+import { MensagensProvider } from "@/components/mensagens/Resumo";
 import TourArtemis from "@/components/tour/TourArtemis";
 import { createClient } from "@/lib/supabase/server";
 import { lerPerfil } from "@/lib/perfil/dados";
@@ -58,8 +59,15 @@ export default async function PainelLayout({
     .select("id", { count: "exact", head: true })
     .is("lida_em", null);
 
+  // Número do item "Mensagens" (não lidas + pedidos recebidos). Sem o
+  // script da etapa 16, a função não existe e o número não aparece.
+  const { data: resumoMensagens, error: erroMensagens } = await supabase.rpc("chat_resumo");
+
   return (
     <NotificacoesProvider naoLidasInicial={erroNotificacoes ? null : (naoLidas ?? 0)}>
+    <MensagensProvider
+      inicial={erroMensagens || !resumoMensagens ? null : (resumoMensagens as { nao_lidas: number; pedidos: number })}
+    >
       <div className="min-h-screen bg-canvas md:flex">
         <a
           href="#conteudo"
@@ -95,6 +103,7 @@ export default async function PainelLayout({
             boas-vindas; depois, só pelo "Rever o tour" do Perfil. */}
         <TourArtemis concluido={perfil?.tourConcluido ?? true} />
       </div>
+    </MensagensProvider>
     </NotificacoesProvider>
   );
 }

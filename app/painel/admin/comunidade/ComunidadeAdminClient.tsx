@@ -115,7 +115,7 @@ export default function ComunidadeAdminClient({
       <section className="mt-8">
         <h2 className="text-lg font-bold text-ink">Suspensões ativas</h2>
         <p className="mt-0.5 mb-3 text-sm text-ink-2">
-          Quem está suspenso lê o feed, mas não publica, comenta, curte nem denuncia.
+          Quem está suspenso lê o feed e as próprias conversas, mas não publica, comenta, curte, denuncia posts nem envia mensagens.
         </p>
         {suspensoes.length === 0 ? (
           <p className="text-sm text-ink-2">Ninguém suspenso agora.</p>

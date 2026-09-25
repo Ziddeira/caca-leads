@@ -23,6 +23,9 @@ import {
 export default function BotaoAjuda() {
   const [aberto, setAberto] = useState(false);
   const fechar = useCallback(() => setAberto(false), []);
+  const pathname = usePathname();
+  // Dentro de uma conversa, o botão cobriria a caixa de mensagem.
+  if (/^\/painel\/mensagens\/\d+/.test(pathname)) return null;
   return (
     <>
       <button

@@ -14,6 +14,7 @@ const ABAS = [
   { href: "/painel/admin/vendas", rotulo: "Vendas a aprovar" },
   { href: "/painel/admin/suporte", rotulo: "Suporte" },
   { href: "/painel/admin/comunidade", rotulo: "Comunidade" },
+  { href: "/painel/admin/mensagens", rotulo: "Mensagens" },
 ];
 
 // Sub-abas da Gestão. No celular, a faixa rola para o lado.
