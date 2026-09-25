@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import Sidebar from "@/components/Sidebar";
 import { NotificacoesProvider, Sino } from "@/components/notificacoes/Notificacoes";
@@ -7,6 +8,13 @@ import TourArtemis from "@/components/tour/TourArtemis";
 import { createClient } from "@/lib/supabase/server";
 import { lerPerfil, lerTema } from "@/lib/perfil/dados";
 import { TemaDoPerfil } from "@/components/tema/Tema";
+import { SEM_INDEXACAO } from "@/lib/site";
+
+// O painel exige login: fica fora do Google (e bloqueado no robots.txt).
+export const metadata: Metadata = {
+  title: "Painel",
+  robots: SEM_INDEXACAO,
+};
 
 export default async function PainelLayout({
   children,
