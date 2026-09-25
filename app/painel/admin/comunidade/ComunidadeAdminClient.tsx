@@ -183,7 +183,7 @@ function CartaoDenuncia({ grupo: g, pendente }: { grupo: GrupoDenuncia; pendente
   return (
     <article className={`${CARTAO} p-4 sm:p-5`}>
       <header className="flex flex-wrap items-center gap-2 text-sm">
-        <span className="border border-primary px-2 py-0.5 font-display text-xs font-semibold uppercase tracking-[0.1em] text-primary">
+        <span className="border border-destaque px-2 py-0.5 font-display text-xs font-semibold uppercase tracking-[0.1em] text-destaque">
           {g.alvo_tipo === "post" ? (c?.tipo === "repost" ? "Republicação" : "Post") : "Comentário"} #{g.alvo_id}
         </span>
         <strong className="text-ink">
@@ -248,7 +248,7 @@ function CartaoDenuncia({ grupo: g, pendente }: { grupo: GrupoDenuncia; pendente
       {c && g.post_id && !removido && (
         <Link
           href={`/painel/comunidade/post/${g.post_id}`}
-          className="mt-2 inline-flex min-h-11 items-center text-sm font-semibold text-primary hover:underline"
+          className="mt-2 inline-flex min-h-11 items-center text-sm font-semibold text-destaque hover:underline"
         >
           Ver na comunidade
         </Link>

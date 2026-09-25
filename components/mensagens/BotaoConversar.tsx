@@ -40,7 +40,7 @@ function Botao({ apelido, relacao: r }: { apelido: string; relacao: RelacaoChat 
     return (
       <p className="text-sm text-ink-2">
         Você bloqueou {apelido} nas mensagens.{" "}
-        <Link href="/painel/mensagens/bloqueados" className="font-semibold text-primary hover:underline">
+        <Link href="/painel/mensagens/bloqueados" className="font-semibold text-destaque hover:underline">
           Ver bloqueados
         </Link>
       </p>

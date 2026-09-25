@@ -1,6 +1,7 @@
 // A Ártemis, mascote da marca (brand/MANUAL.md, seção 7). Ela sempre
-// fica sobre fundo claro: no tema escuro vai dentro de um círculo ou de
-// um card branco. Nunca recolorir nem distorcer; a proporção original
+// fica sobre fundo claro: vai dentro de um círculo ou de um card claro
+// (cor em app/globals.css, --color-mascote), nos dois temas. Nunca
+// recolorir nem distorcer; a proporção original
 // (741 × 1024) é mantida pelo object-contain.
 import Image from "next/image";
 
@@ -33,7 +34,7 @@ export default function Mascote({
   const moldura = forma === "circulo" ? "rounded-full" : "ap-cut";
   return (
     <div
-      className={`flex shrink-0 items-center justify-center overflow-hidden bg-white ${moldura} ${className}`}
+      className={`flex shrink-0 items-center justify-center overflow-hidden border border-mascote-borda bg-mascote ${moldura} ${className}`}
       style={
         forma === "circulo"
           ? { width: tamanho, height: tamanho }

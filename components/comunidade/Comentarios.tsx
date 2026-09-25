@@ -114,7 +114,7 @@ export default function Comentarios({
               type="button"
               onClick={() => carregar(lista[lista.length - 1]?.id)}
               disabled={carregando}
-              className="mt-2 min-h-11 text-sm font-semibold text-primary hover:underline disabled:opacity-60"
+              className="mt-2 min-h-11 text-sm font-semibold text-destaque hover:underline disabled:opacity-60"
             >
               {carregando ? "Carregando…" : "Ver mais comentários"}
             </button>

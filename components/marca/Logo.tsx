@@ -1,10 +1,13 @@
 // Logo do Ártemis Prospect (brand/MANUAL.md, seção 2). O símbolo é SVG
 // e o nome é texto em Chakra Petch, então a logo fica nítida em qualquer
 // tamanho. "tamanho" é o corpo de ÁRTEMIS em px (o --s do manual): na
-// sidebar 22, no hero 64 ou mais. Todas as medidas saem dele.
+// sidebar 32, no hero 64 ou mais. Todas as medidas saem dele.
 type Variante = "horizontal" | "vertical" | "simbolo" | "nome";
-// "escuro": sobre o preto (principal). "claro": sobre branco.
-type Fundo = "escuro" | "claro";
+// "tema" (padrão): segue o tema do site, pelas variáveis --logo-* de
+// app/globals.css (no escuro, a versão principal; no claro, a versão
+// sobre branco). "escuro" e "claro" fixam a versão, para fundos que não
+// mudam com o tema.
+type Fundo = "tema" | "escuro" | "claro";
 
 const CORES: Record<
   Fundo,
@@ -12,11 +15,19 @@ const CORES: Record<
 > = {
   escuro: { a: "#FFD60A", losango: "#FFFFFF", cantos: "#3D3D3D", nome: "#FFFFFF", sub: "#FFD60A", traco: "#FFD60A" },
   claro: { a: "#0A0A0A", losango: "#0A0A0A", cantos: "#D4D4D4", nome: "#0A0A0A", sub: "#0A0A0A", traco: "#FFD60A" },
+  tema: {
+    a: "var(--logo-a)",
+    losango: "var(--logo-losango)",
+    cantos: "var(--logo-cantos)",
+    nome: "var(--logo-nome)",
+    sub: "var(--logo-sub)",
+    traco: "var(--logo-traco)",
+  },
 };
 
 export function Simbolo({
   tamanho,
-  fundo = "escuro",
+  fundo = "tema",
   className = "",
 }: {
   tamanho: number;
@@ -36,12 +47,12 @@ export function Simbolo({
     >
       <path
         d="M4 14V4h10M50 4h10v10M4 50v10h10M60 50v10H50"
-        stroke={c.cantos}
+        style={{ stroke: c.cantos }}
         strokeWidth="2.5"
         strokeLinecap="square"
       />
-      <polygon points="32,10 54,54 43,54 32,31 21,54 10,54" fill={c.a} />
-      <polygon points="32,40 36,45 32,50 28,45" fill={c.losango} />
+      <polygon points="32,10 54,54 43,54 32,31 21,54 10,54" style={{ fill: c.a }} />
+      <polygon points="32,40 36,45 32,50 28,45" style={{ fill: c.losango }} />
     </svg>
   );
 }
@@ -92,7 +103,7 @@ function Assinatura({ s, fundo, centro }: { s: number; fundo: Fundo; centro?: bo
 export default function Logo({
   variante = "horizontal",
   tamanho = 22,
-  fundo = "escuro",
+  fundo = "tema",
   className = "",
 }: {
   variante?: Variante;

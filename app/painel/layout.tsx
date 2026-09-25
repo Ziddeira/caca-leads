@@ -5,7 +5,8 @@ import BotaoAjuda from "@/components/suporte/BotaoAjuda";
 import { MensagensProvider } from "@/components/mensagens/Resumo";
 import TourArtemis from "@/components/tour/TourArtemis";
 import { createClient } from "@/lib/supabase/server";
-import { lerPerfil } from "@/lib/perfil/dados";
+import { lerPerfil, lerTema } from "@/lib/perfil/dados";
+import { TemaDoPerfil } from "@/components/tema/Tema";
 
 export default async function PainelLayout({
   children,
@@ -40,6 +41,8 @@ export default async function PainelLayout({
   // Apelido e foto para o menu. Se o script da etapa 5 ainda não foi
   // rodado, o menu só mostra o e-mail, como antes.
   const { perfil } = await lerPerfil(supabase, user.id);
+  // Tema salvo no perfil (etapa 18): vale em qualquer aparelho.
+  const tema = await lerTema(supabase, user.id);
 
   // Primeiro acesso: antes do painel, a tela de boas-vindas (apelido e
   // avatar). Aparece uma vez só; quem já tinha conta está marcado como
@@ -68,6 +71,7 @@ export default async function PainelLayout({
     <MensagensProvider
       inicial={erroMensagens || !resumoMensagens ? null : (resumoMensagens as { nao_lidas: number; pedidos: number })}
     >
+      <TemaDoPerfil tema={tema} />
       <div className="min-h-screen bg-canvas md:flex">
         <a
           href="#conteudo"

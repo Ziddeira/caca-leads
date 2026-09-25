@@ -248,7 +248,7 @@ export default function MeusLeadsClient({
               {atrasados > 0 && (
                 <span
                   className={`ml-0.5 px-1.5 text-xs ${
-                    filtroFunil === "retorno" ? "bg-primary-ink text-primary" : "bg-danger-soft text-danger"
+                    filtroFunil === "retorno" ? "bg-primary-ink text-destaque" : "bg-danger-soft text-danger"
                   }`}
                 >
                   {atrasados} atrasado{atrasados === 1 ? "" : "s"}
@@ -389,7 +389,7 @@ function BotaoFiltro({
       title={titulo}
       onClick={onClick}
       className={`inline-flex min-h-11 shrink-0 items-center gap-1 whitespace-nowrap border px-4 text-sm font-semibold transition ${
-        ativo ? "border-primary bg-primary-soft text-primary" : "border-line bg-surface text-ink-2 hover:text-ink"
+        ativo ? "border-destaque bg-primary-soft text-destaque" : "border-line bg-surface text-ink-2 hover:text-ink"
       }`}
     >
       {children}

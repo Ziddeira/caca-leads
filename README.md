@@ -191,6 +191,11 @@ cada um no SQL Editor do Supabase:
     de senha de quem entra só pelo Google). O login com o Google funciona
     sem este script; sem ele, o Perfil decide pelo tipo de login. Veja
     "Login com o Google" abaixo.
+18. `supabase/etapa18-tema.sql` — tema claro, escuro ou "seguir o
+    sistema". Cria a coluna `profiles.tema` e a função `definir_tema`,
+    para a escolha valer em qualquer aparelho. Sem este script, o botão
+    de tema funciona do mesmo jeito, mas a escolha fica só no aparelho
+    (cookie). As cores dos dois temas ficam em `app/globals.css`.
 
 ### Rotinas agendadas (Vercel Cron)
 

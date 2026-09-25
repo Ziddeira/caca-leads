@@ -129,7 +129,7 @@ function PreviaLink({ url, previa }: { url: string; previa: Conteudo["link_previ
       rel="noopener noreferrer nofollow ugc"
       className="mt-3 block border border-line bg-canvas px-4 py-3 transition hover:border-line-strong"
     >
-      <span className="block truncate font-display text-[11px] font-semibold uppercase tracking-[0.12em] text-primary">
+      <span className="block truncate font-display text-[11px] font-semibold uppercase tracking-[0.12em] text-destaque">
         {previa?.site ?? host}
       </span>
       <span className="mt-0.5 block break-words font-semibold text-ink">{previa?.titulo ?? url}</span>
@@ -173,7 +173,7 @@ export function MenuAcoes({
   }, [aberto]);
 
   if (!podeApagar && !podeDenunciar) return null;
-  const item = "flex min-h-11 w-full items-center gap-2 px-4 text-left text-sm font-semibold transition hover:bg-white/[0.06]";
+  const item = "flex min-h-11 w-full items-center gap-2 px-4 text-left text-sm font-semibold transition hover:bg-realce-2";
 
   return (
     <div ref={caixa} className="relative shrink-0">
@@ -192,7 +192,7 @@ export function MenuAcoes({
         <div
           id={id}
           role="menu"
-          className="absolute right-0 top-full z-20 mt-1 w-48 border border-line-strong bg-surface py-1 shadow-[0_12px_32px_rgba(0,0,0,0.6)]"
+          className="absolute right-0 top-full z-20 mt-1 w-48 border border-line-strong bg-surface py-1 shadow-[0_12px_32px_var(--color-sombra)]"
         >
           {podeDenunciar && (
             <button
@@ -275,7 +275,7 @@ export function JanelaDenuncia({
                 <label
                   key={m}
                   className={`flex min-h-11 cursor-pointer items-center gap-3 border px-3 text-sm transition ${
-                    motivo === m ? "border-primary bg-primary-soft text-ink" : "border-line text-ink-2 hover:text-ink"
+                    motivo === m ? "border-destaque bg-primary-soft text-ink" : "border-line text-ink-2 hover:text-ink"
                   }`}
                 >
                   <input
@@ -284,7 +284,7 @@ export function JanelaDenuncia({
                     value={m}
                     checked={motivo === m}
                     onChange={() => setMotivo(m)}
-                    className="accent-[var(--ap-yellow)]"
+                    className="accent-destaque"
                   />
                   {MOTIVOS_DENUNCIA[m]}
                 </label>

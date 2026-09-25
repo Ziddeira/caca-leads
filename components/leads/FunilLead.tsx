@@ -92,7 +92,7 @@ export default function FunilLead({
                 if (nova === "fechado") onMarcarFechado();
                 else onMudarSituacao(nova);
               }}
-              className={`min-h-11 cursor-pointer rounded-md border px-3 py-2 text-sm font-semibold outline-none transition focus:border-primary disabled:cursor-wait disabled:opacity-70 ${ESTILO_FUNIL[funil.situacao]}`}
+              className={`min-h-11 cursor-pointer rounded-md border px-3 py-2 text-sm font-semibold outline-none transition focus:border-destaque disabled:cursor-wait disabled:opacity-70 ${ESTILO_FUNIL[funil.situacao]}`}
             >
               {SITUACOES_FUNIL.map((s) => (
                 <option key={s} value={s}>
@@ -115,7 +115,7 @@ export default function FunilLead({
               {ROTULO_STATUS_VENDA[funil.venda.status] ?? funil.venda.status}
             </span>{" "}
             ·{" "}
-            <Link href="/painel/score" className="font-semibold text-primary underline-offset-2 hover:underline">
+            <Link href="/painel/score" className="font-semibold text-destaque underline-offset-2 hover:underline">
               ver no Score
             </Link>
           </p>
@@ -123,7 +123,7 @@ export default function FunilLead({
             href={funil.venda.siteUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-0.5 inline-flex min-h-11 max-w-full items-center gap-1.5 break-all text-primary underline-offset-2 hover:underline"
+            className="mt-0.5 inline-flex min-h-11 max-w-full items-center gap-1.5 break-all text-destaque underline-offset-2 hover:underline"
           >
             <IconeLink width={16} height={16} className="shrink-0" />
             {funil.venda.siteUrl.replace(/^https?:\/\//i, "")}
@@ -185,7 +185,7 @@ export default function FunilLead({
         <button
           type="button"
           onClick={abrirNota}
-          className="mt-2 inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-primary underline-offset-2 hover:underline"
+          className="mt-2 inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-destaque underline-offset-2 hover:underline"
         >
           <IconeAnotacao width={16} height={16} />
           Adicionar anotação

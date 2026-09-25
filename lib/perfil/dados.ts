@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { FOTO_BUCKET } from "./regras";
+import { temaValido, type Tema } from "@/lib/tema";
 
 export interface DadosPerfil {
   apelido: string | null;
@@ -106,3 +107,11 @@ export const MSG_FALTA_ETAPA5 =
 
 export const MSG_FALTA_ETAPA6 =
   "Os avatares prontos ainda não foram ativados no banco. Rode o script supabase/etapa6-boas-vindas.sql no Supabase.";
+
+// Tema salvo no perfil (etapa 18). Nulo quando a pessoa nunca escolheu
+// ou quando o script ainda não foi rodado: aí vale o do aparelho.
+export async function lerTema(supabase: SupabaseClient, userId: string): Promise<Tema | null> {
+  const { data, error } = await supabase.from("profiles").select("tema").eq("id", userId).maybeSingle();
+  if (error || !data) return null;
+  return temaValido(data.tema) ? data.tema : null;
+}

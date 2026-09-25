@@ -49,7 +49,7 @@ export default async function ErrosPage({ searchParams }: { searchParams: Promis
             href={f.id ? `?origem=${f.id}` : "?"}
             aria-current={filtro === f.id ? "page" : undefined}
             className={`inline-flex min-h-11 items-center border px-4 text-sm font-semibold ${
-              filtro === f.id ? "border-primary bg-primary-soft text-primary" : "border-line bg-surface text-ink-2 hover:text-ink"
+              filtro === f.id ? "border-destaque bg-primary-soft text-destaque" : "border-line bg-surface text-ink-2 hover:text-ink"
             }`}
           >
             {f.nome}
@@ -78,7 +78,7 @@ export default async function ErrosPage({ searchParams }: { searchParams: Promis
                     <span className="block break-words text-ink">{e.mensagem}</span>
                     {e.detalhe && (
                       <details className="mt-1">
-                        <summary className="cursor-pointer text-xs text-primary">Detalhes</summary>
+                        <summary className="cursor-pointer text-xs text-destaque">Detalhes</summary>
                         <pre className="mt-1 max-w-xl overflow-x-auto whitespace-pre-wrap break-all rounded bg-canvas p-2 text-xs text-ink-2">
                           {JSON.stringify(e.detalhe, null, 2)}
                         </pre>

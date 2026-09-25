@@ -3,7 +3,7 @@
 // elemento que deve prender o olhar.
 import type { ReactNode } from "react";
 
-const CANTO = "pointer-events-none absolute h-6 w-6 border-primary";
+const CANTO = "pointer-events-none absolute h-6 w-6 border-destaque";
 
 export default function Mira({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (

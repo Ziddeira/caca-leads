@@ -70,12 +70,12 @@ export default function BoasVindasClient({
   return (
     <div className="px-seguro flex min-h-screen flex-col items-center bg-canvas pt-[calc(2rem+env(safe-area-inset-top))] pb-[calc(2rem+env(safe-area-inset-bottom))] sm:justify-center">
       <Link href="/" className="mb-6 block" aria-label="Ártemis Prospect">
-        <Logo tamanho={24} />
+        <Logo tamanho={32} />
       </Link>
 
       <main className={`${CARTAO} w-full max-w-lg p-5 sm:p-8`}>
         <div className="flex items-center justify-between gap-3">
-          <p className="font-display text-[13px] font-semibold uppercase tracking-[0.3em] text-primary">Passo {passo} de 2</p>
+          <p className="font-display text-[13px] font-semibold uppercase tracking-[0.3em] text-destaque">Passo {passo} de 2</p>
           <button
             type="button"
             onClick={() => finalizar("pular")}
@@ -86,8 +86,8 @@ export default function BoasVindasClient({
           </button>
         </div>
         <div className="mt-2 grid grid-cols-2 gap-2" aria-hidden="true">
-          <span className="h-1 bg-primary" />
-          <span className={`h-1 ${passo === 2 ? "bg-primary" : "bg-line"}`} />
+          <span className="h-1 bg-destaque" />
+          <span className={`h-1 ${passo === 2 ? "bg-destaque" : "bg-line"}`} />
         </div>
 
         {passo === 1 ? (

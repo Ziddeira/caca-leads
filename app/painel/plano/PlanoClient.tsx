@@ -232,7 +232,7 @@ export default function PlanoClient({
           const p = PLANOS[id];
           const atual = perfil.plano === id;
           return (
-            <div key={id} className={`${CARTAO} flex flex-col ${atual ? "border-primary shadow-[inset_0_0_0_1px_var(--ap-yellow)]" : ""}`}>
+            <div key={id} className={`${CARTAO} flex flex-col ${atual ? "border-destaque shadow-[inset_0_0_0_1px_var(--color-destaque)]" : ""}`}>
               <p className="font-display text-lg font-bold uppercase tracking-[0.08em] text-ink">{p.nome}</p>
               <p className="mt-1 text-ink">
                 <span className="font-display text-3xl font-bold">{formatarPreco(p.preco)}</span>
@@ -383,7 +383,7 @@ function Alerta({ children }: { children: React.ReactNode }) {
 
 function Selo({ children }: { children: React.ReactNode }) {
   return (
-    <span className="inline-block border border-primary px-2 py-[3px] font-display text-[11px] font-semibold uppercase tracking-[0.08em] text-primary">
+    <span className="inline-block border border-destaque px-2 py-[3px] font-display text-[11px] font-semibold uppercase tracking-[0.08em] text-destaque">
       {children}
     </span>
   );

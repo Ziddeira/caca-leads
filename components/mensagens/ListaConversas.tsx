@@ -76,7 +76,7 @@ export default function ListaConversas({
         <p className="mb-4 border border-line bg-surface px-3 py-2.5 text-sm text-ink-2">
           Plano Grátis: <strong className="text-ink">{Math.min(estado.ativas, estado.limite_ativas)}</strong> de{" "}
           {estado.limite_ativas} conversas abertas. Você responde pedidos, mas só o{" "}
-          <Link href="/painel/plano" className="font-semibold text-primary hover:underline">
+          <Link href="/painel/plano" className="font-semibold text-destaque hover:underline">
             Solo e o Pro
           </Link>{" "}
           iniciam conversas e não têm limite.
@@ -124,7 +124,7 @@ export default function ListaConversas({
                 estado.acesso_total ? (
                   <>
                     Abra o perfil de alguém na{" "}
-                    <Link href="/painel/comunidade" className="font-semibold text-primary hover:underline">
+                    <Link href="/painel/comunidade" className="font-semibold text-destaque hover:underline">
                       Comunidade
                     </Link>{" "}
                     e toque em “Pedir conversa”. A conversa começa quando a pessoa aceitar.
@@ -170,7 +170,7 @@ function Secao({ titulo, total, children }: { titulo: string; total?: number; ch
     <section>
       <h2 className="mb-2 font-display text-[13px] font-semibold uppercase tracking-[0.2em] text-ink-2">
         {titulo}
-        {total !== undefined && <span className="ml-2 text-primary">{total}</span>}
+        {total !== undefined && <span className="ml-2 text-destaque">{total}</span>}
       </h2>
       <ul className={`${CARTAO} divide-y divide-line-2`}>{children}</ul>
     </section>
@@ -200,7 +200,7 @@ function ItemConversa({ conversa: c }: { conversa: Conversa }) {
     <li>
       <Link
         href={`/painel/mensagens/${c.id}`}
-        className={`flex min-h-16 items-center gap-3 px-3 py-3 transition hover:bg-white/[0.04] sm:px-4 ${
+        className={`flex min-h-16 items-center gap-3 px-3 py-3 transition hover:bg-realce sm:px-4 ${
           naoLida ? "bg-primary-soft" : ""
         }`}
       >
@@ -210,7 +210,7 @@ function ItemConversa({ conversa: c }: { conversa: Conversa }) {
             <span className={`truncate ${naoLida ? "font-bold text-ink" : "font-semibold text-ink"}`}>
               {c.outro.apelido ?? "Conta removida"}
             </span>
-            <span className={`shrink-0 text-xs ${naoLida ? "font-semibold text-primary" : "text-muted"}`}>
+            <span className={`shrink-0 text-xs ${naoLida ? "font-semibold text-destaque" : "text-muted"}`}>
               {tempoRelativo(u?.criado_em ?? c.atualizado_em)}
             </span>
           </span>
@@ -218,7 +218,7 @@ function ItemConversa({ conversa: c }: { conversa: Conversa }) {
             {u?.minha &&
               (u.lida ? (
                 <>
-                  <IconeVistoDuplo width={16} height={16} className="shrink-0 text-primary" />
+                  <IconeVistoDuplo width={16} height={16} className="shrink-0 text-destaque" />
                   <span className="sr-only">Lida.</span>
                 </>
               ) : (
@@ -276,7 +276,7 @@ function PedidoRecebido({ conversa: c, onMudou }: { conversa: Conversa; onMudou:
       {c.outro.apelido && (
         <Link
           href={`/painel/comunidade/u/${encodeURIComponent(c.outro.apelido)}`}
-          className="mt-1 inline-flex min-h-11 items-center text-sm font-semibold text-primary hover:underline"
+          className="mt-1 inline-flex min-h-11 items-center text-sm font-semibold text-destaque hover:underline"
         >
           Ver perfil antes de responder
         </Link>
@@ -294,7 +294,7 @@ function PedidoRecebido({ conversa: c, onMudou }: { conversa: Conversa; onMudou:
           type="button"
           onClick={() => responder("aceitar")}
           disabled={enviando}
-          className={`${BOTAO_NEUTRO} border-primary! text-primary!`}
+          className={`${BOTAO_NEUTRO} border-destaque! text-destaque!`}
         >
           Aceitar
         </button>

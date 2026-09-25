@@ -176,7 +176,7 @@ export default function CartaoPost({
             onClick={curtir}
             aria-pressed={euCurti}
             aria-label={`${euCurti ? "Descurtir" : "Curtir"} (${curtidas})`}
-            className={`${acao} ${euCurti ? "text-primary" : ""}`}
+            className={`${acao} ${euCurti ? "text-destaque" : ""}`}
           >
             <IconeCurtir fill={euCurti ? "currentColor" : "none"} />
             {curtidas > 0 && curtidas}
@@ -195,7 +195,7 @@ export default function CartaoPost({
             type="button"
             onClick={abrirRepublicar}
             aria-label={`Republicar (${reposts})`}
-            className={`${acao} ${euRepostei ? "text-primary" : ""}`}
+            className={`${acao} ${euRepostei ? "text-destaque" : ""}`}
           >
             <IconeRepublicar />
             {reposts > 0 && reposts}

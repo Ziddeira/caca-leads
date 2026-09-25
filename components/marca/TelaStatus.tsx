@@ -22,14 +22,14 @@ export default function TelaStatus({
   return (
     <div className="ap-grid px-seguro flex min-h-screen flex-col items-center justify-center pt-[calc(2.5rem+env(safe-area-inset-top))] pb-[calc(2.5rem+env(safe-area-inset-bottom))] text-center">
       <Link href="/" aria-label="Ártemis Prospect — voltar para o início" className="mb-10 block">
-        <Logo tamanho={24} />
+        <Logo tamanho={32} />
       </Link>
       {expressao ? (
         <Mascote tamanho={148} expressao={expressao} />
       ) : (
         <Logo variante="simbolo" tamanho={112} />
       )}
-      <p className="mt-6 font-display text-6xl font-bold italic leading-none text-primary sm:text-7xl">
+      <p className="mt-6 font-display text-6xl font-bold italic leading-none text-destaque sm:text-7xl">
         {codigo}
       </p>
       <h1 className="mt-4 text-2xl text-ink sm:text-3xl">{titulo}</h1>

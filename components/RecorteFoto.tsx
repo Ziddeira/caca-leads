@@ -216,7 +216,7 @@ export default function RecorteFoto({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-black/75 sm:items-center sm:p-6"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-veu sm:items-center sm:p-6"
       onClick={(ev) => ev.target === ev.currentTarget && onCancelar()}
     >
       <div
@@ -281,7 +281,7 @@ export default function RecorteFoto({
             step={0.01}
             value={estado.zoom}
             onChange={(ev) => zoomEm(Number(ev.target.value))}
-            className="h-11 w-full cursor-pointer accent-primary"
+            className="h-11 w-full cursor-pointer accent-destaque"
           />
           <span aria-hidden="true" className="text-lg font-bold text-muted">
             +

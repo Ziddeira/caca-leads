@@ -120,7 +120,7 @@ function JanelaRegras({ onFechar }: { onFechar: (ok: boolean) => void }) {
       <ol className="mt-4 space-y-3">
         {REGRAS_COMUNIDADE.map((r, i) => (
           <li key={r.titulo} className="flex gap-3">
-            <span className="flex h-7 w-7 shrink-0 items-center justify-center bg-primary-soft font-display text-sm font-bold text-primary">
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center bg-primary-soft font-display text-sm font-bold text-destaque">
               {i + 1}
             </span>
             <p className="text-sm text-ink-2">

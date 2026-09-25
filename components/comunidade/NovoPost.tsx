@@ -181,7 +181,7 @@ export default function NovoPost({ onPublicado }: { onPublicado: (post: Post) =>
                 onClick={() => tirar(a.chave)}
                 disabled={!!enviando}
                 aria-label="Tirar imagem"
-                className="absolute right-0 top-0 flex h-9 w-9 items-center justify-center bg-black/70 text-ink"
+                className="absolute right-0 top-0 flex h-9 w-9 items-center justify-center bg-black/70 text-white"
               >
                 <IconeFechar width={16} height={16} />
               </button>
@@ -218,7 +218,7 @@ export default function NovoPost({ onPublicado }: { onPublicado: (post: Post) =>
               onClick={() => setCategoria((atual) => (atual === c ? null : c))}
               className={`min-h-11 border px-3 font-display text-xs font-semibold uppercase tracking-[0.08em] transition ${
                 categoria === c
-                  ? "border-primary bg-primary-soft text-primary"
+                  ? "border-destaque bg-primary-soft text-destaque"
                   : "border-line-strong text-ink-2 hover:text-ink"
               }`}
             >
@@ -254,7 +254,7 @@ export default function NovoPost({ onPublicado }: { onPublicado: (post: Post) =>
             <IconeImagem />
             Imagem
             {gratis && (
-              <span className="border border-primary px-1.5 py-0.5 font-display text-[10px] uppercase tracking-[0.1em] text-primary">
+              <span className="border border-destaque px-1.5 py-0.5 font-display text-[10px] uppercase tracking-[0.1em] text-destaque">
                 Solo/Pro
               </span>
             )}
@@ -265,7 +265,7 @@ export default function NovoPost({ onPublicado }: { onPublicado: (post: Post) =>
             aria-pressed={comLink}
             disabled={!!enviando}
             className={`flex min-h-11 items-center gap-2 px-2 text-sm font-semibold transition hover:text-ink ${
-              comLink ? "text-primary" : "text-ink-2"
+              comLink ? "text-destaque" : "text-ink-2"
             }`}
           >
             <IconeLink />
@@ -281,7 +281,7 @@ export default function NovoPost({ onPublicado }: { onPublicado: (post: Post) =>
         <p className="mt-3 text-xs text-muted">
           Plano Grátis: {postsHoje >= estado.limite_posts ? "você já publicou hoje" : "1 post por dia"}, sem
           imagens. Curtir e comentar são à vontade.{" "}
-          <Link href="/painel/plano" className="font-semibold text-primary underline-offset-2 hover:underline">
+          <Link href="/painel/plano" className="font-semibold text-destaque underline-offset-2 hover:underline">
             Ver planos
           </Link>
         </p>

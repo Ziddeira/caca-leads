@@ -66,7 +66,7 @@ const ROTULO_PLANO: Record<string, string> = {
   pro: "Pro",
 };
 
-const CHECKBOX = "h-5 w-5 shrink-0 cursor-pointer accent-primary";
+const CHECKBOX = "h-5 w-5 shrink-0 cursor-pointer accent-destaque";
 
 const ORDENS = {
   pontuacao: (a: LeadResultado, b: LeadResultado) => b.pontuacao - a.pontuacao,
@@ -297,7 +297,7 @@ export default function BuscaClient({
       {/* data-tour: partes destacadas pelo tour da Ártemis
           (components/tour/TourArtemis.tsx). */}
       <div data-tour="saldo" className="mt-5 flex flex-wrap gap-2 text-sm">
-        <span className="inline-flex items-center border border-primary/40 bg-primary-soft px-3 py-1.5 font-semibold text-primary">
+        <span className="inline-flex items-center border border-destaque/40 bg-primary-soft px-3 py-1.5 font-semibold text-destaque">
           Plano {ROTULO_PLANO[perfil.plano] ?? perfil.plano}
         </span>
         <span className="inline-flex items-center border border-line bg-surface px-3 py-1.5 text-ink-2">
@@ -420,7 +420,7 @@ export default function BuscaClient({
                 <span suppressHydrationWarning>{quandoFoi(expirada.feitaEm)}</span>, ficou salva por{" "}
                 {VALIDADE_CACHE_DIAS} dias, o prazo máximo que o Google permite guardar esses dados. Os termos
                 já estão preenchidos acima: é só buscar de novo (gasta do seu saldo). Os leads que você
-                desbloqueou continuam em <Link href="/painel/meus-leads" className="font-semibold text-primary underline">Meus leads</Link>.
+                desbloqueou continuam em <Link href="/painel/meus-leads" className="font-semibold text-destaque underline">Meus leads</Link>.
               </>
             }
           >

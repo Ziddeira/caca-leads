@@ -396,7 +396,7 @@ function Balao({ mensagem: m, mostrarSituacao }: { mensagem: Item; mostrarSituac
     <div className={`flex ${m.minha ? "justify-end" : "justify-start"}`}>
       <div
         className={`max-w-[85%] border px-3 py-2 sm:max-w-[70%] ${
-          m.minha ? "border-primary/30 bg-primary-soft" : "border-line bg-surface"
+          m.minha ? "border-destaque/30 bg-primary-soft" : "border-line bg-surface"
         } ${m.enviando ? "opacity-70" : ""}`}
       >
         {m.imagem && <ImagemMensagem path={m.imagem} urlLocal={m.urlLocal} />}
@@ -410,7 +410,7 @@ function Balao({ mensagem: m, mostrarSituacao }: { mensagem: Item; mostrarSituac
               <span>· enviando…</span>
             ) : m.lida_em ? (
               <>
-                <IconeVistoDuplo width={15} height={15} className="text-primary" />
+                <IconeVistoDuplo width={15} height={15} className="text-destaque" />
                 <span className={mostrarSituacao ? "" : "sr-only"}>Lida</span>
               </>
             ) : (
@@ -772,7 +772,7 @@ function MenuConversa({
     };
   }, [aberto]);
 
-  const item = "flex min-h-11 w-full items-center gap-2 px-4 text-left text-sm font-semibold transition hover:bg-white/[0.06]";
+  const item = "flex min-h-11 w-full items-center gap-2 px-4 text-left text-sm font-semibold transition hover:bg-realce-2";
   const escolher = (fn: () => void) => () => {
     setAberto(false);
     fn();
@@ -803,7 +803,7 @@ function MenuConversa({
         <div
           id={id}
           role="menu"
-          className="absolute right-0 top-full z-30 mt-1 w-56 border border-line-strong bg-surface py-1 shadow-[0_12px_32px_rgba(0,0,0,0.6)]"
+          className="absolute right-0 top-full z-30 mt-1 w-56 border border-line-strong bg-surface py-1 shadow-[0_12px_32px_var(--color-sombra)]"
         >
           {textoEncerrar && (
             <button type="button" role="menuitem" onClick={escolher(onEncerrar)} className={`${item} text-ink-2 hover:text-ink`}>
@@ -880,7 +880,7 @@ function JanelaDenuncia({
               <label
                 key={m}
                 className={`flex min-h-11 cursor-pointer items-center gap-3 border px-3 text-sm transition ${
-                  motivo === m ? "border-primary bg-primary-soft text-ink" : "border-line text-ink-2 hover:text-ink"
+                  motivo === m ? "border-destaque bg-primary-soft text-ink" : "border-line text-ink-2 hover:text-ink"
                 }`}
               >
                 <input
@@ -889,7 +889,7 @@ function JanelaDenuncia({
                   value={m}
                   checked={motivo === m}
                   onChange={() => setMotivo(m)}
-                  className="accent-[var(--ap-yellow)]"
+                  className="accent-destaque"
                 />
                 {MOTIVOS_DENUNCIA[m]}
               </label>
@@ -915,7 +915,7 @@ function JanelaDenuncia({
               type="checkbox"
               checked={bloquear}
               onChange={(e) => setBloquear(e.target.checked)}
-              className="h-5 w-5 accent-[var(--ap-yellow)]"
+              className="h-5 w-5 accent-destaque"
             />
             Bloquear {apelido} também
           </label>

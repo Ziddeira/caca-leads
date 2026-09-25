@@ -183,7 +183,7 @@ function CartaoAviso({ aviso: a, hoje }: { aviso: Aviso; hoje: string }) {
         <h3 className="min-w-0 break-words font-bold text-ink">{a.titulo}</h3>
         <span
           className={`border px-2 py-[3px] font-display text-[11px] font-semibold uppercase leading-tight tracking-[0.08em] ${
-            situacao === "No ar" ? "border-primary bg-primary text-primary-ink" : situacao === "Agendado" ? "border-primary text-primary" : "border-line-strong text-ink-2"
+            situacao === "No ar" ? "border-primary bg-primary text-primary-ink" : situacao === "Agendado" ? "border-destaque text-destaque" : "border-line-strong text-ink-2"
           }`}
         >
           {situacao}

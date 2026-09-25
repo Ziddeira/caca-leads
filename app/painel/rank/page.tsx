@@ -105,7 +105,7 @@ export default async function RankPage({ searchParams }: { searchParams: Promise
       {!eu && !estouNoTop && (
         <p className="mt-4 text-sm text-ink-2">
           {mes ? "Você não teve venda verificada neste mês." : "Você ainda não tem venda verificada neste mês."}{" "}
-          <Link href="/painel/score" className="font-semibold text-primary underline-offset-2 hover:underline">
+          <Link href="/painel/score" className="font-semibold text-destaque underline-offset-2 hover:underline">
             Ver minhas vendas
           </Link>
         </p>
@@ -131,7 +131,7 @@ export default async function RankPage({ searchParams }: { searchParams: Promise
                   href={`/painel/rank?mes=${m.slice(0, 7)}`}
                   aria-current={m === mes ? "page" : undefined}
                   className={`inline-flex min-h-11 items-center rounded-md border px-4 text-sm font-semibold capitalize ${
-                    m === mes ? "border-primary bg-primary-soft text-primary" : "border-line bg-surface text-ink-2 hover:text-ink"
+                    m === mes ? "border-destaque bg-primary-soft text-destaque" : "border-line bg-surface text-ink-2 hover:text-ink"
                   }`}
                 >
                   {nomeDoMes(m)}
@@ -149,8 +149,8 @@ export default async function RankPage({ searchParams }: { searchParams: Promise
 // amarelo e 3º com contorno branco.
 const MEDALHA = [
   "ap-cut-s bg-primary text-primary-ink",
-  "ap-cut-s text-primary shadow-[inset_0_0_0_2px_var(--ap-yellow)]",
-  "ap-cut-s text-ink shadow-[inset_0_0_0_2px_var(--ap-white)]",
+  "ap-cut-s text-destaque shadow-[inset_0_0_0_2px_var(--color-destaque)]",
+  "ap-cut-s text-ink shadow-[inset_0_0_0_2px_var(--color-ink)]",
 ];
 
 function Linha({ linha, fotoUrl, historico }: { linha: LinhaRank; fotoUrl: string | null; historico: boolean }) {
@@ -169,7 +169,7 @@ function Linha({ linha, fotoUrl, historico }: { linha: LinhaRank; fotoUrl: strin
       <span className="min-w-0 flex-1">
         <span className="block truncate font-semibold text-ink">
           {linha.apelido ?? "Caçador"}
-          {linha.eh_voce && <span className="ml-1.5 text-xs font-bold text-primary">(você)</span>}
+          {linha.eh_voce && <span className="ml-1.5 text-xs font-bold text-destaque">(você)</span>}
         </span>
         {historico && linha.premio_creditos > 0 && (
           <span className="block text-xs text-muted">Ganhou {linha.premio_creditos} desbloqueios</span>

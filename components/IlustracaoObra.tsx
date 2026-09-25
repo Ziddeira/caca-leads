@@ -4,7 +4,8 @@
 // cinzas de apoio; a pele e o marrom do rolo ficam como estavam). É decorativa (aria-hidden): o
 // texto da página explica tudo.
 const ROUPA = "#525252";
-const FUNDO = "#1A1A1A";
+// Fundo e chão seguem o tema (app/globals.css).
+const FUNDO = "var(--color-line-2)";
 const AMARELO = "#FFD60A";
 const AMARELO_ESCURO = "#FFB800";
 const TINTA = "#0A0A0A";
@@ -12,7 +13,7 @@ const CALCA = "#737373";
 const METAL = "#A3A3A3";
 const PELE = "#E8B48F";
 const PELE_2 = "#B97F5A";
-const LINHA = "#262626";
+const LINHA = "var(--color-line)";
 
 function Cone({ x, escala = 1 }: { x: number; escala?: number }) {
   return (
@@ -84,12 +85,12 @@ export default function IlustracaoObra({ className }: { className?: string }) {
       </defs>
 
       {/* fundo */}
-      <circle cx="240" cy="160" r="128" fill={FUNDO} />
+      <circle cx="240" cy="160" r="128" style={{ fill: FUNDO }} />
       <circle cx="96" cy="70" r="5" fill={AMARELO} opacity=".6" />
       <circle cx="398" cy="96" r="7" fill={ROUPA} opacity=".18" />
       <circle cx="372" cy="46" r="4" fill={AMARELO} opacity=".8" />
       <path d="M86 118 l4 -10 l4 10 l-10 -5 h12 z" fill={ROUPA} opacity=".25" />
-      <ellipse cx="240" cy="263" rx="214" ry="11" fill={LINHA} />
+      <ellipse cx="240" cy="263" rx="214" ry="11" style={{ fill: LINHA }} />
 
       {/* placa com os balões da comunidade */}
       <rect x="199" y="160" width="9" height="102" rx="3" fill={METAL} />

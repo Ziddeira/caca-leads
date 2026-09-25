@@ -149,9 +149,9 @@ const ROTULO_TIPO: Record<Tipo, string> = {
 const COR_TIPO: Record<Tipo, string> = {
   // Etiquetas da marca: preenchido = urgente, contorno amarelo =
   // oportunidade, branco = informativo, cinza = neutro.
-  renovacao: "border-primary text-primary",
+  renovacao: "border-destaque text-destaque",
   saldo: "border-primary bg-primary text-primary-ink",
-  novidade: "border-primary text-primary",
+  novidade: "border-destaque text-destaque",
   incentivo: "border-ink text-ink",
   retorno: "border-ink text-ink",
   suporte: "border-line-strong text-ink-2",
@@ -229,8 +229,8 @@ export function Sino({ className = "" }: { className?: string }) {
         aria-label={rotulo}
         aria-expanded={aberto}
         aria-controls={idPainel}
-        className={`relative flex min-h-11 min-w-11 items-center justify-center rounded-md transition hover:bg-white/[0.04] ${
-          aberto ? "bg-primary-soft text-primary" : "text-ink-2 hover:text-ink"
+        className={`relative flex min-h-11 min-w-11 items-center justify-center rounded-md transition hover:bg-realce ${
+          aberto ? "bg-primary-soft text-destaque" : "text-ink-2 hover:text-ink"
         }`}
       >
         <IconeSino width={22} height={22} />
@@ -248,7 +248,7 @@ export function Sino({ className = "" }: { className?: string }) {
         <section
           id={idPainel}
           aria-labelledby={`${idPainel}-titulo`}
-          className="fixed inset-x-3 top-[calc(env(safe-area-inset-top)+4.5rem)] z-40 flex max-h-[calc(100dvh-env(safe-area-inset-top)-env(safe-area-inset-bottom)-10rem)] flex-col overflow-hidden rounded-lg border border-line bg-surface shadow-[0_12px_32px_rgba(0,0,0,0.6)] md:absolute md:inset-x-auto md:right-0 md:top-full md:mt-2 md:max-h-[70vh] md:w-[26rem]"
+          className="fixed inset-x-3 top-[calc(env(safe-area-inset-top)+4.5rem)] z-40 flex max-h-[calc(100dvh-env(safe-area-inset-top)-env(safe-area-inset-bottom)-10rem)] flex-col overflow-hidden rounded-lg border border-line bg-surface shadow-[0_12px_32px_var(--color-sombra)] md:absolute md:inset-x-auto md:right-0 md:top-full md:mt-2 md:max-h-[70vh] md:w-[26rem]"
         >
           <header className="flex items-center justify-between gap-2 border-b border-line-2 px-4 py-2">
             <h2
@@ -264,7 +264,7 @@ export function Sino({ className = "" }: { className?: string }) {
                 <button
                   type="button"
                   onClick={() => apagar(null)}
-                  className="min-h-11 rounded-md px-3 text-sm font-semibold text-ink-2 transition hover:bg-white/[0.04] hover:text-ink"
+                  className="min-h-11 rounded-md px-3 text-sm font-semibold text-ink-2 transition hover:bg-realce hover:text-ink"
                 >
                   Apagar todas
                 </button>
@@ -273,7 +273,7 @@ export function Sino({ className = "" }: { className?: string }) {
                 type="button"
                 onClick={() => fechar()}
                 aria-label="Fechar notificações"
-                className="flex min-h-11 min-w-11 items-center justify-center rounded-md text-ink-2 transition hover:bg-white/[0.04] md:hidden"
+                className="flex min-h-11 min-w-11 items-center justify-center rounded-md text-ink-2 transition hover:bg-realce md:hidden"
               >
                 <IconeFechar />
               </button>
@@ -302,8 +302,8 @@ export function Sino({ className = "" }: { className?: string }) {
                         </span>
                         <span className="text-muted">{quando(n.criado_em)}</span>
                         {nova && (
-                          <span className="flex items-center gap-1 font-semibold text-primary">
-                            <span aria-hidden="true" className="h-2 w-2 bg-primary" />
+                          <span className="flex items-center gap-1 font-semibold text-destaque">
+                            <span aria-hidden="true" className="h-2 w-2 bg-destaque" />
                             Nova
                           </span>
                         )}
@@ -318,7 +318,7 @@ export function Sino({ className = "" }: { className?: string }) {
                         <Link
                           href={n.link}
                           onClick={() => fechar(false)}
-                          className="block min-w-0 flex-1 px-4 py-3 transition hover:bg-white/[0.04]"
+                          className="block min-w-0 flex-1 px-4 py-3 transition hover:bg-realce"
                         >
                           {conteudo}
                         </Link>
@@ -329,7 +329,7 @@ export function Sino({ className = "" }: { className?: string }) {
                         type="button"
                         onClick={() => apagar([n.id])}
                         aria-label={`Apagar notificação: ${n.titulo}`}
-                        className="mr-1 mt-1 flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-md text-muted transition hover:bg-white/[0.04] hover:text-ink"
+                        className="mr-1 mt-1 flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-md text-muted transition hover:bg-realce hover:text-ink"
                       >
                         <IconeFechar width={18} height={18} />
                       </button>
