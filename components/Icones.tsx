@@ -332,11 +332,12 @@ export function IconeLixeira(props: Props) {
   );
 }
 
+// Envelope: diferente do balão da Comunidade.
 export function IconeMensagens(props: Props) {
   return (
     <Base {...props}>
-      <path d="M4 4h16v12H9l-5 4z" />
-      <path d="M8 9h8M8 12h5" />
+      <path d="M3 5h18v14H3z" />
+      <path d="m3 6 9 7 9-7" />
     </Base>
   );
 }

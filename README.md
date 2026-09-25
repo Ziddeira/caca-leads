@@ -170,6 +170,22 @@ cada um no SQL Editor do Supabase:
     o Google. Ele só é trocado por uma busca nova ou pelo botão "Limpar
     pesquisa". Pela política de cache do Google, a lista é apagada 30 dias
     depois da busca e a tela avisa que ela expirou.
+16. Etapa 16, em **três partes, nesta ordem**:
+    `supabase/etapa16-1-mensagens-base.sql`,
+    `supabase/etapa16-2-mensagens-funcoes.sql` e
+    `supabase/etapa16-3-mensagens-moderacao.sql` — Mensagens (chat
+    privado). A conversa só começa depois que a outra pessoa aceita o
+    pedido (feito pelo perfil dela na Comunidade); quem aceitou pode
+    desfazer. Texto até 1000 caracteres e imagem até 5 MB (só JPG, PNG e
+    WEBP; o servidor confere o conteúdo do arquivo), com "enviada" e
+    "lida" e atualização em tempo real (Supabase Realtime). Bloquear,
+    denunciar (as últimas 30 mensagens vão para Gestão > Mensagens),
+    10 pedidos por dia e 20 mensagens por minuto. Grátis responde e
+    mantém até 3 conversas abertas; Solo e Pro sem limite. Cada pessoa só
+    lê as próprias conversas pelo RLS, sem exceção para administrador.
+    Cria o bucket **privado** `mensagens` e liga o Realtime nas tabelas
+    `chat_conversas` e `chat_mensagens`. As imagens das denúncias abrem
+    na Gestão com a `SUPABASE_SERVICE_ROLE_KEY`.
 
 ### Rotinas agendadas (Vercel Cron)
 
