@@ -114,7 +114,7 @@ export default async function MeusLeadsPage() {
       ) : (
         <div className="mt-8">
           <EstadoVazio
-            mascote
+            logo
             titulo="Nenhum lead desbloqueado ainda"
             texto="Busque por nicho e bairro e desbloqueie quem vale a conversa. O WhatsApp e o link do Maps ficam salvos aqui."
           >

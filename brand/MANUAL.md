@@ -287,8 +287,7 @@ A Ártemis em estilo chibi: cabelo amarelo ondulado com risca no meio, vestido p
 
 **Onde ela aparece:**
 
-- Landing page: perto do título principal ou na seção "Como funciona".
-- App: estado vazio de "Buscar" ("Sua lista de leads aparece aqui"), estado vazio de "Meus leads", primeira busca, sucesso ao encontrar leads, erro e limite do plano atingido.
+- Site e app: **só** na página 404 (chorando) e no tour guiado do primeiro acesso (cabeça, com as expressões de `public/artemis/`). Nas demais telas (landing, estados vazios, erro e limite do plano) vai o símbolo da marca.
 - Redes e lives: avatar, figurinhas, overlay e thumbnails.
 
 **Regras:**

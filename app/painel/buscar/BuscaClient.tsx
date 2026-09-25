@@ -325,7 +325,7 @@ export default function BuscaClient({ perfilInicial }: { perfilInicial: Perfil }
         )}
       </div>
 
-      {/* Saldo zerado: aviso com a mascote (no lugar do estado vazio). */}
+      {/* Saldo zerado: aviso de limite (no lugar do estado vazio). */}
       {semBuscas && !carregando && (
         <div data-tour="resultado" className="mt-6">
           <LimitePlano

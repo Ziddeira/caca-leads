@@ -3,7 +3,6 @@
 // Valores do manual da marca: brand/MANUAL.md, seção 6.
 import type { ReactNode } from "react";
 import Logo from "@/components/marca/Logo";
-import Mascote from "@/components/marca/Mascote";
 
 // Área de toque mínima de 44px (min-h-11) em tudo que é clicável.
 // Primário: amarelo, texto preto, canto cortado. Um por tela.
@@ -66,15 +65,12 @@ export function EstadoVazio({
   icone,
   titulo,
   texto,
-  mascote = false,
   logo = false,
   children,
 }: {
   icone?: ReactNode;
   titulo: string;
   texto: ReactNode;
-  // Mostra a Ártemis (num círculo branco) no lugar do ícone.
-  mascote?: boolean;
   // Mostra o símbolo da logo no lugar do ícone.
   logo?: boolean;
   children?: ReactNode;
@@ -83,8 +79,6 @@ export function EstadoVazio({
     <div className="flex flex-col items-center border border-dashed border-line bg-surface px-6 py-12 text-center">
       {logo ? (
         <Logo variante="simbolo" tamanho={72} className="mb-5" />
-      ) : mascote ? (
-        <Mascote tamanho={132} className="mb-5" />
       ) : (
         icone && (
           <div className="mb-4 flex h-14 w-14 items-center justify-center border border-line-strong text-ink">

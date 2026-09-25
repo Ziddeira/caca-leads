@@ -6,7 +6,6 @@ import type { Situacao } from "@/lib/leads/classificacao";
 import EtiquetaSituacao from "@/components/leads/EtiquetaSituacao";
 import { BOTAO_GRANDE, BOTAO_NEUTRO, BOTAO_SECUNDARIO, BOTAO_WHATSAPP, CARTAO, ROTULO_SECAO } from "@/components/ui";
 import Logo from "@/components/marca/Logo";
-import Mascote from "@/components/marca/Mascote";
 import Mira from "@/components/marca/Mira";
 import Score from "@/components/marca/Score";
 import {
@@ -92,8 +91,9 @@ export default async function Home() {
                 ))}
               </ol>
             </div>
-            <Mascote tamanho={240} className="mx-auto max-lg:order-first max-sm:hidden" />
-            <Mascote tamanho={160} className="mx-auto max-lg:order-first sm:hidden" />
+            {/* A Ártemis fica só no 404 e no tour; aqui vai o símbolo da marca. */}
+            <Logo variante="simbolo" tamanho={200} className="mx-auto max-lg:order-first max-sm:hidden" />
+            <Logo variante="simbolo" tamanho={132} className="mx-auto max-lg:order-first sm:hidden" />
           </div>
         </section>
       </main>
