@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { buscarTexto, ErroGooglePlaces } from "@/lib/leads/google";
 import { registrarErro } from "@/lib/erros/registrar";
+import { semContato } from "@/lib/leads/ultimaBusca";
 import {
   celularBrasileiro,
   classificar,
@@ -171,11 +172,33 @@ export async function POST(request: Request) {
 
   const leads = [...porId.values()].sort((a, b) => b.pontuacao - a.pontuacao);
 
+  // Guarda esta busca (já cobrada) como a última do usuário, no lugar da
+  // anterior, para a página Buscar recarregar o resultado sem gastar
+  // busca nem chamar o Google. Vai sem os contatos. Se falhar (ex.: SQL da
+  // etapa 15 não rodado), o resultado aparece normalmente, só não fica
+  // salvo.
+  const { data: salvoBruto, error: erroSalvar } = await supabase.rpc("salvar_ultima_busca", {
+    p_termos: termos,
+    p_areas: areas,
+    p_modo: modo,
+    p_leads: semContato(leads),
+    p_aviso: aviso,
+  });
+  if (erroSalvar) console.error("[leads/buscar] salvar_ultima_busca", erroSalvar.message);
+  const salvo = (Array.isArray(salvoBruto) ? salvoBruto[0] : salvoBruto) as
+    | { feita_em: string; expira_em: string }
+    | null;
+
   return NextResponse.json({
     leads,
     buscasRestantes,
     chamadasGoogle,
     aviso,
+    termos,
+    areas,
+    modo,
+    feitaEm: salvo?.feita_em ?? new Date().toISOString(),
+    expiraEm: salvo?.expira_em ?? null,
   });
 }
 

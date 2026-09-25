@@ -163,6 +163,13 @@ cada um no SQL Editor do Supabase:
     vai para a auditoria. A prévia do link é gravada pelo servidor com a
     `SUPABASE_SERVICE_ROLE_KEY` (sem ela, o post sai sem prévia), e o link
     público do post (`/comunidade/post/<id>`) também usa essa chave.
+15. `supabase/etapa15-ultima-busca.sql` — a última busca de cada usuário
+    fica salva (tabela `ultima_busca`, uma linha por usuário, com termos,
+    regiões, data e a lista de leads sem os contatos). A página Buscar
+    recarrega esse resultado só lendo o banco: não gasta busca nem chama
+    o Google. Ele só é trocado por uma busca nova ou pelo botão "Limpar
+    pesquisa". Pela política de cache do Google, a lista é apagada 30 dias
+    depois da busca e a tela avisa que ela expirou.
 
 ### Rotinas agendadas (Vercel Cron)
 

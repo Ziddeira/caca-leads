@@ -42,6 +42,9 @@ export interface LeadResultado {
   area: string;
   modo: Modo;
   contato: ContatoLead | null;
+  // Já desbloqueado antes, mas sem o contato à mão (cache vencido):
+  // desbloquear de novo não cobra.
+  desbloqueado?: boolean;
 }
 
 export interface ContatoLead {
