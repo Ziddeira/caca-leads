@@ -138,6 +138,9 @@ export default function BuscaClient({ perfilInicial }: { perfilInicial: Perfil }
     ordenarPor,
   ]);
 
+  // O tour destaca o botão Desbloquear do primeiro lead ainda fechado.
+  const primeiroBloqueado = leadsFiltrados.find((l) => !l.contato)?.id;
+
   function alternarModo(novoModo: Modo) {
     if (novoModo === "hospedagem" && !podeHospedagem) return;
     setModo(novoModo);
@@ -220,19 +223,21 @@ export default function BuscaClient({ perfilInicial }: { perfilInicial: Perfil }
         descricao="Busca no Google Maps e separa quem não tem site, quem depende de Airbnb/Booking e quem só usa app ou rede social."
       />
 
-      <div className="mt-5 flex flex-wrap gap-2 text-sm">
+      {/* data-tour: partes destacadas pelo tour da Ártemis
+          (components/tour/TourArtemis.tsx). */}
+      <div data-tour="saldo" className="mt-5 flex flex-wrap gap-2 text-sm">
         <span className="inline-flex items-center border border-primary/40 bg-primary-soft px-3 py-1.5 font-semibold text-primary">
           Plano {ROTULO_PLANO[perfil.plano] ?? perfil.plano}
         </span>
         <span className="inline-flex items-center border border-line bg-surface px-3 py-1.5 text-ink-2">
           <strong className="mr-1 font-display text-ink">{perfil.buscasRestantes}</strong> busca(s) restante(s)
         </span>
-        <span className="inline-flex items-center border border-line bg-surface px-3 py-1.5 text-ink-2">
+        <span data-tour="creditos" className="inline-flex items-center border border-line bg-surface px-3 py-1.5 text-ink-2">
           <strong className="mr-1 font-display text-ink">{perfil.creditosDesbloqueio}</strong> crédito(s) de desbloqueio
         </span>
       </div>
 
-      <div className={`${CARTAO} mt-4 p-4 sm:p-6`}>
+      <div data-tour="busca" className={`${CARTAO} mt-4 p-4 sm:p-6`}>
         <div role="group" aria-label="Tipo de busca" className="grid w-full grid-cols-2 gap-1 border border-line bg-canvas p-1 sm:inline-grid sm:w-auto">
           <button
             type="button"
@@ -320,9 +325,9 @@ export default function BuscaClient({ perfilInicial }: { perfilInicial: Perfil }
         )}
       </div>
 
-      {/* Saldo zerado: aviso com a mascote (no lugar do estado vazio). */}
+      {/* Saldo zerado: aviso de limite (no lugar do estado vazio). */}
       {semBuscas && !carregando && (
-        <div className="mt-6">
+        <div data-tour="resultado" className="mt-6">
           <LimitePlano
             titulo="Suas buscas acabaram"
             texto="Você usou todas as buscas do seu plano. Assine um plano ou compre um pacote extra para continuar caçando leads."
@@ -333,7 +338,7 @@ export default function BuscaClient({ perfilInicial }: { perfilInicial: Perfil }
       {carregando && !buscaFeita && <ListaEsqueleto quantidade={3} />}
 
       {!buscaFeita && !carregando && !semBuscas && (
-        <div className="mt-6">
+        <div data-tour="resultado" className="mt-6">
           <EstadoVazio
             logo
             titulo="Sua lista de leads aparece aqui"
@@ -450,7 +455,7 @@ export default function BuscaClient({ perfilInicial }: { perfilInicial: Perfil }
             </div>
           </aside>
 
-          <section aria-label="Resultados" className="min-w-0">
+          <section data-tour="resultado" aria-label="Resultados" className="min-w-0">
             <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
               <p className="text-sm text-ink-2" aria-live="polite">
                 <strong className="font-display text-ink">{leadsFiltrados.length}</strong> de {leads.length} leads
@@ -474,6 +479,7 @@ export default function BuscaClient({ perfilInicial }: { perfilInicial: Perfil }
                 <LeadCard
                   key={lead.id}
                   lead={lead}
+                  tour={lead.id === primeiroBloqueado}
                   carregando={!!desbloqueando[lead.id]}
                   onDesbloquear={() => desbloquear(lead)}
                 />
@@ -499,10 +505,12 @@ export default function BuscaClient({ perfilInicial }: { perfilInicial: Perfil }
 
 function LeadCard({
   lead,
+  tour,
   carregando,
   onDesbloquear,
 }: {
   lead: LeadResultado;
+  tour: boolean;
   carregando: boolean;
   onDesbloquear: () => void;
 }) {
@@ -571,6 +579,7 @@ function LeadCard({
             type="button"
             onClick={onDesbloquear}
             disabled={carregando}
+            data-tour={tour ? "desbloquear" : undefined}
             className={BOTAO_NEUTRO}
           >
             <IconeCadeado width={13} height={13} />

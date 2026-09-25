@@ -1,4 +1,4 @@
-// Aviso de limite do plano atingido, com a Ártemis (brand/MANUAL.md, 7).
+// Aviso de limite do plano atingido, com a Ártemis triste (brand/MANUAL.md, 7).
 // Só mostra o que o saldo já diz; quem decide o que pode ou não é o
 // servidor, como sempre. O botão é secundário porque a tela já tem o
 // primário (Buscar leads).
@@ -13,7 +13,7 @@ export default function LimitePlano({ titulo, texto }: { titulo: string; texto: 
       role="status"
       className="flex flex-col items-center gap-5 border border-primary/40 bg-surface px-6 py-8 text-center sm:flex-row sm:text-left"
     >
-      <Mascote tamanho={112} />
+      <Mascote tamanho={112} expressao="triste" />
       <div className="min-w-0 flex-1">
         <p className="font-display text-[13px] font-semibold uppercase tracking-[0.3em] text-primary">
           Limite do plano

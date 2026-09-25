@@ -1,5 +1,6 @@
-// Moldura das páginas 404 e de erro: logo no topo, código grande e a
-// Ártemis orientando (brand/MANUAL.md, 7: ela aparece também no erro).
+// Moldura das páginas 404 e de erro: logo no topo e código grande. A
+// Ártemis aparece quando "expressao" é passada (404 e 500, chorando);
+// sem ela, vai o símbolo da marca.
 import Link from "next/link";
 import type { ReactNode } from "react";
 import Logo from "@/components/marca/Logo";
@@ -9,7 +10,7 @@ export default function TelaStatus({
   codigo,
   titulo,
   texto,
-  expressao = "padrao",
+  expressao,
   children,
 }: {
   codigo: string;
@@ -23,7 +24,11 @@ export default function TelaStatus({
       <Link href="/" aria-label="Ártemis Prospect — voltar para o início" className="mb-10 block">
         <Logo tamanho={24} />
       </Link>
-      <Mascote tamanho={148} expressao={expressao} />
+      {expressao ? (
+        <Mascote tamanho={148} expressao={expressao} />
+      ) : (
+        <Logo variante="simbolo" tamanho={112} />
+      )}
       <p className="mt-6 font-display text-6xl font-bold italic leading-none text-primary sm:text-7xl">
         {codigo}
       </p>

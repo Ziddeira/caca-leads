@@ -10,6 +10,8 @@ export interface DadosPerfil {
   telefoneVerificadoEm: string | null;
   // false = ainda não passou pela tela de boas-vindas.
   configuracaoConcluida: boolean;
+  // false = ainda não viu (nem pulou) o tour guiado da Ártemis.
+  tourConcluido: boolean;
 }
 
 // Link público da foto (o bucket "avatares" é de leitura pública).
@@ -20,20 +22,41 @@ export function urlDaFoto(supabase: SupabaseClient, path: string | null) {
 
 const COLUNAS_ETAPA5 = "apelido, foto_path, telefone, telefone_verificado_em";
 const COLUNAS_ETAPA6 = `${COLUNAS_ETAPA5}, avatar_pronto, configuracao_inicial_em`;
+const COLUNAS_ETAPA13 = `${COLUNAS_ETAPA6}, tour_concluido_em`;
 
 // Lê o perfil do usuário logado.
 // "pendente" diz qual script SQL falta rodar: "etapa5" (sem apelido,
 // foto e telefone) ou "etapa6" (sem avatares prontos e boas-vindas).
 // Sem a etapa 6, o resto do perfil funciona e a tela de boas-vindas
-// simplesmente não aparece.
+// simplesmente não aparece. Sem a etapa 13, o mesmo vale para o tour.
 export async function lerPerfil(
   supabase: SupabaseClient,
   userId: string,
 ): Promise<{ perfil: DadosPerfil | null; pendente: "etapa5" | "etapa6" | null }> {
-  const completo = await supabase.from("profiles").select(COLUNAS_ETAPA6).eq("id", userId).maybeSingle();
+  const completo = await supabase.from("profiles").select(COLUNAS_ETAPA13).eq("id", userId).maybeSingle();
 
-  // 42703: coluna não existe.
+  // 42703: coluna não existe. Sem a etapa 13, só o tour não aparece
+  // sozinho (ele ainda pode ser visto pelo Perfil).
   if (completo.error?.code === "42703") {
+    const semTour = await supabase.from("profiles").select(COLUNAS_ETAPA6).eq("id", userId).maybeSingle();
+    if (semTour.error?.code !== "42703") {
+      if (semTour.error || !semTour.data) return { perfil: null, pendente: null };
+      const d = semTour.data;
+      return {
+        perfil: {
+          apelido: d.apelido,
+          fotoPath: d.foto_path,
+          fotoUrl: urlDaFoto(supabase, d.foto_path),
+          avatarPronto: d.avatar_pronto,
+          telefone: d.telefone,
+          telefoneVerificadoEm: d.telefone_verificado_em,
+          configuracaoConcluida: d.configuracao_inicial_em !== null,
+          tourConcluido: true,
+        },
+        pendente: null,
+      };
+    }
+
     const basico = await supabase.from("profiles").select(COLUNAS_ETAPA5).eq("id", userId).maybeSingle();
     if (basico.error || !basico.data) {
       return { perfil: null, pendente: basico.error?.code === "42703" ? "etapa5" : null };
@@ -48,6 +71,7 @@ export async function lerPerfil(
         telefone: d.telefone,
         telefoneVerificadoEm: d.telefone_verificado_em,
         configuracaoConcluida: true,
+        tourConcluido: true,
       },
       pendente: "etapa6",
     };
@@ -65,6 +89,7 @@ export async function lerPerfil(
       telefone: d.telefone,
       telefoneVerificadoEm: d.telefone_verificado_em,
       configuracaoConcluida: d.configuracao_inicial_em !== null,
+      tourConcluido: d.tour_concluido_em !== null,
     },
     pendente: null,
   };

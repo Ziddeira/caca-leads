@@ -144,6 +144,11 @@ cada um no SQL Editor do Supabase:
     `suporte`). A cópia por e-mail está preparada em
     `lib/suporte/email.ts`, mas desligada até existir um serviço de
     e-mail.
+13. `supabase/etapa13-tour.sql` — tour guiado pela Ártemis logo depois
+    das boas-vindas: coluna `tour_concluido_em` em `profiles` e função
+    `concluir_tour` (concluir ou pular marcam como visto). Quem já tinha
+    passado pelas boas-vindas fica marcado e não vê o tour sozinho; no
+    Perfil há o botão "Rever o tour".
 
 ### Rotinas agendadas (Vercel Cron)
 

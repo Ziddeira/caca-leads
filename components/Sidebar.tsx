@@ -20,27 +20,38 @@ import { Sino } from "@/components/notificacoes/Notificacoes";
 
 // "ativoEm": outras páginas que também acendem o item (no celular, o
 // Score leva também ao Rank, pelas abas no topo das duas páginas).
-const ITENS = [
+// "tour": nome que o tour da Ártemis usa para destacar o item
+// (components/tour/TourArtemis.tsx).
+type Item = {
+  href: string;
+  label: string;
+  curto: string;
+  Icone: typeof IconeBuscar;
+  ativoEm?: string[];
+  tour?: string;
+};
+
+const ITENS: Item[] = [
   { href: "/painel/buscar", label: "Buscar", curto: "Buscar", Icone: IconeBuscar },
-  { href: "/painel/meus-leads", label: "Meus leads", curto: "Leads", Icone: IconeLeads },
-  { href: "/painel/score", label: "Score", curto: "Score", Icone: IconeTrofeu, ativoEm: ["/painel/rank"] },
+  { href: "/painel/meus-leads", label: "Meus leads", curto: "Leads", Icone: IconeLeads, tour: "meus-leads" },
+  { href: "/painel/score", label: "Score", curto: "Score", Icone: IconeTrofeu, ativoEm: ["/painel/rank"], tour: "score" },
   { href: "/painel/comunidade", label: "Comunidade", curto: "Comunidade", Icone: IconeComunidade },
-  { href: "/painel/plano", label: "Meu plano", curto: "Plano", Icone: IconePlano },
+  { href: "/painel/plano", label: "Meu plano", curto: "Plano", Icone: IconePlano, tour: "plano" },
 ];
 
 // No computador, Rank tem item próprio e "Perfil" fica só aqui: no
 // celular, o atalho do perfil é a foto no topo.
-const ITENS_LATERAL = [
+const ITENS_LATERAL: Item[] = [
   ITENS[0],
   ITENS[1],
-  { href: "/painel/score", label: "Score", curto: "Score", Icone: IconeTrofeu },
+  { href: "/painel/score", label: "Score", curto: "Score", Icone: IconeTrofeu, tour: "score" },
   { href: "/painel/rank", label: "Rank do mês", curto: "Rank", Icone: IconeRank },
   ITENS[3],
   ITENS[4],
   { href: "/painel/perfil", label: "Perfil", curto: "Perfil", Icone: IconePerfil },
 ];
 
-const ITEM_ADMIN = { href: "/painel/admin", label: "Gestão", curto: "Gestão", Icone: IconeEscudo };
+const ITEM_ADMIN: Item = { href: "/painel/admin", label: "Gestão", curto: "Gestão", Icone: IconeEscudo };
 
 // No computador (md para cima): barra lateral fixa com a logo grande.
 // No celular: barra fina no topo (logo, sino, perfil e Sair) e menu inferior fixo com
@@ -81,12 +92,13 @@ export default function Sidebar({
         </Link>
 
         <nav aria-label="Menu principal" className="flex flex-1 flex-col gap-1">
-          {lateral.map(({ href, label, Icone }) => {
+          {lateral.map(({ href, label, Icone, tour }) => {
             const atual = ativo(href);
             return (
               <Link
                 key={href}
                 href={href}
+                data-tour={tour}
                 aria-current={atual ? "page" : undefined}
                 className={`flex min-h-11 items-center gap-3 border-l-[3px] px-[14px] py-3 text-[15px] font-semibold transition ${
                   atual
@@ -184,12 +196,13 @@ export default function Sidebar({
         className="pb-seguro fixed inset-x-0 bottom-0 z-30 border-t border-line-2 bg-sidebar/95 backdrop-blur md:hidden"
       >
         <ul className="grid grid-cols-5">
-          {ITENS.map(({ href, curto, Icone, ativoEm }) => {
+          {ITENS.map(({ href, curto, Icone, ativoEm, tour }) => {
             const atual = ativo(href) || (ativoEm ?? []).some(ativo);
             return (
               <li key={href}>
                 <Link
                   href={href}
+                  data-tour={tour}
                   aria-current={atual ? "page" : undefined}
                   className={`flex min-h-16 flex-col items-center justify-center gap-1 border-t-[3px] px-0.5 text-[11px] font-semibold transition sm:text-xs ${
                     atual ? "border-primary bg-primary-soft text-primary" : "border-transparent text-ink-2"
