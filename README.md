@@ -149,6 +149,20 @@ cada um no SQL Editor do Supabase:
     `concluir_tour` (concluir ou pular marcam como visto). Quem já tinha
     passado pelas boas-vindas fica marcado e não vê o tour sozinho; no
     Perfil há o botão "Rever o tour".
+14. Etapa 14, em **três partes, nesta ordem**:
+    `supabase/etapa14-1-comunidade-base.sql`,
+    `supabase/etapa14-2-comunidade-funcoes.sql` e
+    `supabase/etapa14-3-comunidade-moderacao.sql` — feed da Comunidade:
+    posts (até 500 caracteres, até 4 imagens, link com prévia, categoria),
+    curtidas, comentários de um nível (até 300), republicação, denúncias,
+    suspensões e aceite das regras. Cria o bucket público `comunidade`
+    (5 MB, só imagem; só Solo/Pro enviam). O Grátis lê, curte, comenta e
+    publica 1 post por dia sem imagem; Solo e Pro têm até 20 posts e 50
+    comentários por dia, com 60 s entre posts. Tudo passa por funções do
+    banco com RLS; a moderação fica em Gestão > Comunidade e cada decisão
+    vai para a auditoria. A prévia do link é gravada pelo servidor com a
+    `SUPABASE_SERVICE_ROLE_KEY` (sem ela, o post sai sem prévia), e o link
+    público do post (`/comunidade/post/<id>`) também usa essa chave.
 
 ### Rotinas agendadas (Vercel Cron)
 

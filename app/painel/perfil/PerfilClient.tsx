@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import SeletorAvatar from "@/components/perfil/SeletorAvatar";
@@ -36,6 +37,7 @@ export default function PerfilClient({
   avisoEmail,
   perfil,
   pendente,
+  mostrarVendas,
 }: {
   userId: string;
   email: string;
@@ -43,6 +45,8 @@ export default function PerfilClient({
   avisoEmail: "confirmado" | "parcial" | null;
   perfil: DadosPerfil | null;
   pendente: "etapa5" | "etapa6" | null;
+  // null = etapa 14 (Comunidade) ainda não rodada no banco.
+  mostrarVendas: boolean | null;
 }) {
   return (
     <div className="flex flex-col gap-6">
@@ -68,6 +72,7 @@ export default function PerfilClient({
         <div className="flex flex-col gap-6">
           <CartaoFoto userId={userId} perfil={perfil} email={email} pendente={pendente} />
           <CartaoDados perfil={perfil} desativado={pendente === "etapa5"} />
+          <CartaoComunidade apelido={perfil?.apelido ?? null} mostrarVendas={mostrarVendas} />
         </div>
         <div className="flex flex-col gap-6">
           <CartaoEmail email={email} emailPendente={emailPendente} aviso={avisoEmail} />
@@ -76,6 +81,70 @@ export default function PerfilClient({
         </div>
       </div>
     </div>
+  );
+}
+
+// Comunidade -------------------------------------------------------------
+// Escolhe se o número de vendas verificadas aparece no perfil público da
+// Comunidade. Começa desligado.
+function CartaoComunidade({ apelido, mostrarVendas }: { apelido: string | null; mostrarVendas: boolean | null }) {
+  const [ligado, setLigado] = useState(!!mostrarVendas);
+  const [salvando, setSalvando] = useState(false);
+  const [mensagem, setMensagem] = useState<Mensagem>(null);
+
+  async function trocar(valor: boolean) {
+    setMensagem(null);
+    setLigado(valor);
+    setSalvando(true);
+    const erro = await chamar("/api/perfil/comunidade", "POST", { mostrarVendas: valor });
+    setSalvando(false);
+    if (erro) {
+      setLigado(!valor);
+      setMensagem({ tipo: "erro", texto: erro });
+      return;
+    }
+    setMensagem({ tipo: "ok", texto: valor ? "Suas vendas verificadas aparecem no seu perfil." : "Suas vendas não aparecem mais no seu perfil." });
+  }
+
+  return (
+    <section id="comunidade" aria-labelledby="titulo-comunidade" className={CARTAO}>
+      <h2 id="titulo-comunidade" className={TITULO_CARTAO}>
+        Comunidade
+      </h2>
+      <p className="mt-1 mb-4 text-sm text-ink-2">
+        Seu perfil na comunidade mostra apelido, foto e posts. Nunca mostra e-mail nem telefone.
+      </p>
+      {mostrarVendas === null ? (
+        <p className={ALERTA_AVISO}>
+          A Comunidade ainda não foi ativada no banco. Rode as 3 partes supabase/etapa14-1, etapa14-2 e
+          etapa14-3 no Supabase.
+        </p>
+      ) : (
+        <label className="flex min-h-11 cursor-pointer items-start gap-3">
+          <input
+            type="checkbox"
+            checked={ligado}
+            disabled={salvando}
+            onChange={(e) => trocar(e.target.checked)}
+            className="mt-1 h-5 w-5 shrink-0 accent-[var(--ap-yellow)]"
+          />
+          <span className="text-sm text-campo">
+            Mostrar o número das minhas vendas verificadas no meu perfil da comunidade
+          </span>
+        </label>
+      )}
+      <div className="mt-3">
+        <Alerta mensagem={mensagem} />
+      </div>
+      {apelido && mostrarVendas !== null && (
+        <Link
+          href={`/painel/comunidade/u/${encodeURIComponent(apelido)}`}
+          className="mt-3 inline-flex min-h-11 items-center text-sm font-semibold text-primary hover:underline"
+        >
+          Ver meu perfil na comunidade
+        </Link>
+      )}
+    </section>
   );
 }
 
