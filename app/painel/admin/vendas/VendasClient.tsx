@@ -92,11 +92,11 @@ function Cartao({ venda, onDecidido }: { venda: VendaAnalise; onDecidido: (statu
       </p>
 
       <div className="mt-2 flex flex-wrap gap-x-4">
-        <a href={venda.siteUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center gap-1.5 break-all text-sm text-primary hover:underline">
+        <a href={venda.siteUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center gap-1.5 break-all text-sm text-destaque hover:underline">
           <IconeLink width={16} height={16} className="shrink-0" />
           {venda.siteUrl.replace(/^https?:\/\//i, "")}
         </a>
-        <a href={venda.maps} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center gap-1.5 text-sm text-primary hover:underline">
+        <a href={venda.maps} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center gap-1.5 text-sm text-destaque hover:underline">
           <IconeMapa width={16} height={16} />
           Abrir no Google Maps
         </a>

@@ -11,33 +11,33 @@ export const BOTAO =
 // Primário no tamanho cheio do manual (16px, padding 17px 28px): hero e
 // chamadas principais.
 export const BOTAO_GRANDE = `${BOTAO} min-h-[54px] px-7! py-[17px]! text-base!`;
-// Secundário: só contorno branco de 1px, sem fundo.
+// Secundário: só contorno de 1px na cor do texto, sem fundo.
 export const BOTAO_SECUNDARIO =
-  "inline-flex min-h-11 items-center justify-center gap-2 border border-ink bg-transparent px-5 py-3 text-center font-display text-sm font-bold uppercase leading-tight tracking-[0.08em] text-ink transition hover:bg-white/[0.06] disabled:cursor-wait disabled:opacity-70";
-// Neutro (Desbloquear, Maps, filtros e ações de apoio): contorno #3D3D3D,
-// texto #D4D4D4.
+  "inline-flex min-h-11 items-center justify-center gap-2 border border-ink bg-transparent px-5 py-3 text-center font-display text-sm font-bold uppercase leading-tight tracking-[0.08em] text-ink transition hover:bg-realce-2 disabled:cursor-wait disabled:opacity-70";
+// Neutro (Desbloquear, Maps, filtros e ações de apoio): contorno forte,
+// texto de campo (cores de cada tema em app/globals.css).
 export const BOTAO_NEUTRO =
   "inline-flex min-h-11 items-center justify-center gap-2 border border-line-strong bg-transparent px-3 py-[9px] text-center font-display text-[13px] font-semibold uppercase leading-tight tracking-[0.06em] text-campo transition hover:border-ink-2 hover:text-ink disabled:cursor-wait disabled:opacity-70";
 // Ação pequena (WhatsApp): amarelo, canto cortado de 7px.
 export const BOTAO_WHATSAPP =
   "ap-cut-s inline-flex min-h-11 items-center justify-center gap-2 bg-primary px-[14px] py-[10px] text-center font-display text-[13px] font-bold uppercase leading-tight tracking-[0.06em] text-primary-ink transition hover:bg-primary-hover";
-// Input: fundo preto, borda #2E2E2E, texto #D4D4D4; foco com borda amarela.
+// Input: fundo da página, borda de campo, texto de campo; foco com borda de destaque.
 export const CAMPO =
-  "min-h-11 w-full border border-line-input bg-canvas px-3 py-2 text-base text-campo outline-none transition placeholder:text-ink-3 focus:border-primary";
+  "min-h-11 w-full border border-line-input bg-canvas px-3 py-2 text-base text-campo outline-none transition placeholder:text-ink-3 focus:border-destaque";
 export const ROTULO = "mb-1.5 block text-sm font-semibold text-campo";
 // Rótulo de seção: Chakra Petch 600, caixa alta, espaçado, amarelo.
 export const ROTULO_SECAO =
-  "font-display text-[13px] font-semibold uppercase tracking-[0.3em] text-primary";
+  "font-display text-[13px] font-semibold uppercase tracking-[0.3em] text-destaque";
 // Abas (Negócios/Hospedagem, Score/Rank, Gestão): a ativa em amarelo,
 // com traço embaixo, como o item ativo da sidebar.
-export const ABA_ATIVA = "bg-primary-soft text-primary shadow-[inset_0_-3px_0_var(--ap-yellow)]";
-export const ABA_INATIVA = "text-ink-2 hover:bg-white/[0.04] hover:text-ink";
-// Card: fundo #121212, borda 1px #262626, sem raio.
+export const ABA_ATIVA = "bg-primary-soft text-destaque shadow-[inset_0_-3px_0_var(--color-destaque)]";
+export const ABA_INATIVA = "text-ink-2 hover:bg-realce hover:text-ink";
+// Card: fundo de superfície, borda 1px, sem raio.
 export const CARTAO = "border border-line bg-surface";
 export const ALERTA_ERRO =
   "border border-danger/40 bg-danger-soft px-3 py-2.5 text-sm text-danger";
 export const ALERTA_AVISO =
-  "border border-primary/40 bg-primary-soft px-3 py-2.5 text-sm text-primary";
+  "border border-destaque/40 bg-primary-soft px-3 py-2.5 text-sm text-destaque";
 export const ALERTA_SUCESSO =
   "border border-ink/30 bg-wa-soft px-3 py-2.5 text-sm text-ink";
 

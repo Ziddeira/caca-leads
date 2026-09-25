@@ -161,6 +161,25 @@ Cerca de 70% preto, 20% branco e 10% amarelo. O amarelo não vira fundo de seç�
 }
 ```
 
+### 3.6 Temas claro e escuro do site
+
+O site tem tema escuro (padrão), tema claro e a opção "seguir o sistema". As cores de cada tema ficam só em `app/globals.css`; os componentes usam os tokens (`bg-canvas`, `text-ink`, `bg-primary`, `text-destaque`...), nunca cor solta.
+
+| Token | Escuro | Claro | Uso |
+|---|---|---|---|
+| `canvas` | `#141414` | `#F5F5F3` | Fundo da página (cinza bem escuro, não preto puro) |
+| `sidebar` | `#171717` | `#FAFAF9` | Barra lateral e barras do celular |
+| `surface` | `#1B1B1B` | `#FFFFFF` | Cards e painéis |
+| `ink` | `#ECECEC` | `#141414` | Texto principal |
+| `ink-2` | `#ADADAD` | `#525252` | Texto secundário |
+| `primary` | `#EBC633` | `#FFD60A` | Fundo amarelo (botões, etiqueta cheia); texto em cima sempre `#0A0A0A` |
+| `destaque` | `#FFD60A` | `#7A5C00` | "Texto amarelo": links, ícones e bordas ativas |
+
+- No escuro, o amarelo das áreas grandes é um pouco menos saturado (`#EBC633`) e o amarelo cheio (`#FFD60A`) fica nos detalhes.
+- No claro, amarelo nunca vira texto: o texto de destaque é o dourado escuro `#7A5C00`, e a logo usa a versão "sobre branco" (seção 2.4).
+- Todos os pares de texto e fundo passam no contraste AA (4,5:1).
+- A mascote continua dentro do círculo branco nos dois temas; no claro ele ganha um contorno fino.
+
 ---
 
 ## 4. Tipografia

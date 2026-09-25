@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import SeletorAvatar from "@/components/perfil/SeletorAvatar";
+import SeletorTema from "@/components/tema/SeletorTema";
 import { Alerta, chamar, type Mensagem } from "@/components/perfil/comum";
 import {
   ALERTA_AVISO,
@@ -76,6 +77,7 @@ export default function PerfilClient({
         </div>
         <div className="flex flex-col gap-6">
           <CartaoEmail email={email} emailPendente={emailPendente} aviso={avisoEmail} />
+          <CartaoAparencia />
           <CartaoSenha />
           <CartaoTour />
         </div>
@@ -126,7 +128,7 @@ function CartaoComunidade({ apelido, mostrarVendas }: { apelido: string | null; 
             checked={ligado}
             disabled={salvando}
             onChange={(e) => trocar(e.target.checked)}
-            className="mt-1 h-5 w-5 shrink-0 accent-[var(--ap-yellow)]"
+            className="mt-1 h-5 w-5 shrink-0 accent-destaque"
           />
           <span className="text-sm text-campo">
             Mostrar o número das minhas vendas verificadas no meu perfil da comunidade
@@ -139,7 +141,7 @@ function CartaoComunidade({ apelido, mostrarVendas }: { apelido: string | null; 
       {apelido && mostrarVendas !== null && (
         <Link
           href={`/painel/comunidade/u/${encodeURIComponent(apelido)}`}
-          className="mt-3 inline-flex min-h-11 items-center text-sm font-semibold text-primary hover:underline"
+          className="mt-3 inline-flex min-h-11 items-center text-sm font-semibold text-destaque hover:underline"
         >
           Ver meu perfil na comunidade
         </Link>
@@ -151,6 +153,23 @@ function CartaoComunidade({ apelido, mostrarVendas }: { apelido: string | null; 
 // Tour guiado da Ártemis ----------------------------------------------
 // Abre a tela de Buscar com ?tour=1; o tour (components/tour/TourArtemis.tsx)
 // começa sozinho lá.
+// Tema claro, escuro ou do sistema. Fica salvo no perfil e vale em
+// qualquer aparelho (no celular, também pelo ícone no topo).
+function CartaoAparencia() {
+  return (
+    <section aria-labelledby="titulo-aparencia" className={CARTAO}>
+      <h2 id="titulo-aparencia" className={TITULO_CARTAO}>
+        Aparência
+      </h2>
+      <p className="mt-1 mb-4 text-sm text-ink-2">
+        Escolha o tema do site. &quot;Sistema&quot; segue o modo claro ou escuro do seu celular ou
+        computador. A escolha vale em qualquer aparelho em que você entrar.
+      </p>
+      <SeletorTema salvar className="max-w-sm" />
+    </section>
+  );
+}
+
 function CartaoTour() {
   const router = useRouter();
   return (

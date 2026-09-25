@@ -56,7 +56,7 @@ export default async function MensagensAdminPage({ searchParams }: { searchParam
               href={s === "pendente" ? "?" : `?situacao=${s}`}
               aria-current={situacao === s ? "page" : undefined}
               className={`inline-flex min-h-11 items-center border px-4 text-sm font-semibold ${
-                situacao === s ? "border-primary bg-primary-soft text-primary" : "border-line bg-surface text-ink-2 hover:text-ink"
+                situacao === s ? "border-destaque bg-primary-soft text-destaque" : "border-line bg-surface text-ink-2 hover:text-ink"
               }`}
             >
               {SITUACOES[s]}

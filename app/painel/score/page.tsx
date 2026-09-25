@@ -145,7 +145,7 @@ function Numero({ rotulo, valor, destaque = false }: { rotulo: string; valor: nu
   return (
     <div className={`${CARTAO} px-3 py-4 sm:px-5`}>
       <p className="font-display text-xs font-semibold uppercase tracking-[0.2em] text-muted">{rotulo}</p>
-      <p className={`mt-1 font-display text-2xl font-bold tabular-nums sm:text-3xl ${destaque ? "text-primary" : "text-ink"}`}>{valor}</p>
+      <p className={`mt-1 font-display text-2xl font-bold tabular-nums sm:text-3xl ${destaque ? "text-destaque" : "text-ink"}`}>{valor}</p>
     </div>
   );
 }

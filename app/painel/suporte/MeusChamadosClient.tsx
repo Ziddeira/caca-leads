@@ -89,8 +89,8 @@ function Cartao({ chamado: c }: { chamado: MeuChamado }) {
       )}
 
       {c.resposta ? (
-        <div className="mt-3 rounded-md border border-primary/20 bg-primary-soft px-3 py-2.5">
-          <p className="text-xs font-semibold text-primary">
+        <div className="mt-3 rounded-md border border-destaque/20 bg-primary-soft px-3 py-2.5">
+          <p className="text-xs font-semibold text-destaque">
             Resposta do suporte{c.respondidoEm && ` · ${dataHora(c.respondidoEm)}`}
           </p>
           <p className="mt-1 whitespace-pre-line break-words text-sm text-ink">{c.resposta}</p>

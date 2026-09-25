@@ -96,7 +96,7 @@ function CartaoConta({ conta: c, historico }: { conta: Conta; historico: Registr
         <div className="min-w-0">
           <h3 className="break-words font-bold text-ink">
             {c.apelido ?? "—"}
-            {c.is_admin && <span className="ml-2 border border-primary px-1.5 py-px font-display text-[11px] font-semibold uppercase tracking-[0.08em] text-primary">admin</span>}
+            {c.is_admin && <span className="ml-2 border border-destaque px-1.5 py-px font-display text-[11px] font-semibold uppercase tracking-[0.08em] text-destaque">admin</span>}
           </h3>
           <p className="break-all text-sm text-ink-2">{c.email ?? "sem e-mail"}</p>
         </div>
@@ -120,7 +120,7 @@ function CartaoConta({ conta: c, historico }: { conta: Conta; historico: Registr
 
       {historico.length > 0 && (
         <details className="mt-3">
-          <summary className="min-h-11 cursor-pointer py-2 text-sm font-semibold text-primary">
+          <summary className="min-h-11 cursor-pointer py-2 text-sm font-semibold text-destaque">
             Histórico de ajustes ({historico.length})
           </summary>
           <ul className="space-y-2 text-sm">

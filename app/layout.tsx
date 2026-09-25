@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Chakra_Petch, Manrope } from "next/font/google";
 import "./globals.css";
+import { ScriptTema, TemaDoAparelho } from "@/components/tema/Tema";
 
 // Fontes da marca (brand/MANUAL.md, seção 4): Chakra Petch nos títulos,
 // botões, rótulos e números; Manrope no texto e na interface.
@@ -53,20 +54,37 @@ export const metadata: Metadata = {
 };
 
 // "viewportFit: cover" libera o uso de env(safe-area-inset-*) no iPhone.
+// A cor da barra do navegador começa com o fundo do tema escuro
+// (padrão) e é trocada pelo components/tema/Tema.tsx quando o tema muda.
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#0a0a0a",
-  colorScheme: "dark",
+  themeColor: "#141414",
+  colorScheme: "dark light",
 };
 
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="pt-BR" className={`${chakra.variable} ${manrope.variable} h-full`}>
-      <body className="min-h-full font-sans antialiased">{children}</body>
+    // data-tema começa no escuro (padrão); o script do <head> troca pela
+    // escolha guardada antes da primeira pintura, então a página não
+    // pisca branco nem pisca o tema errado.
+    <html
+      lang="pt-BR"
+      data-tema="escuro"
+      data-tema-escolha="escuro"
+      suppressHydrationWarning
+      className={`${chakra.variable} ${manrope.variable} h-full`}
+    >
+      <head>
+        <ScriptTema />
+      </head>
+      <body className="min-h-full font-sans antialiased">
+        <TemaDoAparelho />
+        {children}
+      </body>
     </html>
   );
 }

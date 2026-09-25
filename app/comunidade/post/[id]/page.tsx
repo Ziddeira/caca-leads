@@ -65,7 +65,7 @@ export default async function PostPublicoPage({ params }: { params: Promise<{ id
       <header className="pt-seguro px-seguro border-b border-line-2 sm:px-6">
         <div className="mx-auto flex h-16 max-w-2xl items-center justify-between gap-4">
           <Link href="/" aria-label="Ártemis Prospect — início">
-            <Logo tamanho={18} />
+            <Logo tamanho={24} />
           </Link>
           {!logado && (
             <Link
@@ -79,7 +79,7 @@ export default async function PostPublicoPage({ params }: { params: Promise<{ id
       </header>
 
       <main className="px-seguro mx-auto max-w-2xl pb-[calc(3rem+env(safe-area-inset-bottom))] pt-6 sm:px-6">
-        <p className="mb-4 font-display text-[13px] font-semibold uppercase tracking-[0.3em] text-primary">
+        <p className="mb-4 font-display text-[13px] font-semibold uppercase tracking-[0.3em] text-destaque">
           Comunidade Ártemis
         </p>
         <ComunidadeProvider estado={null} userId={null} somenteLeitura>

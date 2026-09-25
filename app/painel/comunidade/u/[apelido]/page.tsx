@@ -73,7 +73,7 @@ export default async function PerfilComunidadePage({ params }: { params: Promise
             {p.mostra_vendas && p.vendas_verificadas !== null && (
               <div>
                 <dt className="text-xs font-semibold uppercase tracking-[0.1em] text-muted">Vendas verificadas</dt>
-                <dd className="font-display text-2xl font-bold tabular-nums text-primary">{p.vendas_verificadas}</dd>
+                <dd className="font-display text-2xl font-bold tabular-nums text-destaque">{p.vendas_verificadas}</dd>
               </div>
             )}
           </dl>
@@ -86,7 +86,7 @@ export default async function PerfilComunidadePage({ params }: { params: Promise
           {p.sou_eu && !p.mostra_vendas && (
             <p className="mt-3 text-xs text-muted">
               Quer mostrar suas vendas verificadas aqui?{" "}
-              <Link href="/painel/perfil#comunidade" className="font-semibold text-primary hover:underline">
+              <Link href="/painel/perfil#comunidade" className="font-semibold text-destaque hover:underline">
                 Ative no Perfil
               </Link>
               .

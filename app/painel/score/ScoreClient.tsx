@@ -96,7 +96,7 @@ function CartaoVenda({ venda, onMudar }: { venda: VendaScore; onMudar: (m: Parti
         href={venda.siteUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className="mt-1 inline-flex min-h-11 max-w-full items-center gap-1.5 break-all text-sm text-primary underline-offset-2 hover:underline"
+        className="mt-1 inline-flex min-h-11 max-w-full items-center gap-1.5 break-all text-sm text-destaque underline-offset-2 hover:underline"
       >
         <IconeLink width={16} height={16} className="shrink-0" />
         {semProtocolo(venda.siteUrl)}

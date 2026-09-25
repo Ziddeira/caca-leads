@@ -1,11 +1,24 @@
 @import "tailwindcss";
 
-/* Paleta do Ártemis Prospect (brand/MANUAL.md, seção 3). Os valores
-   exatos do manual ficam em --ap-*; os nomes antigos (canvas, surface,
-   ink, primary...) apontam para eles, para as telas usarem as classes
-   do Tailwind de sempre (bg-surface, text-ink, bg-primary...).
-   Proporção: ~70% preto, 20% branco, 10% amarelo. O amarelo marca ação
-   e estado ativo; nunca vira fundo de seção inteira. */
+/* Paleta do Ártemis Prospect (brand/MANUAL.md, seção 3) e os dois temas.
+   TODAS as cores do site saem daqui: as telas só usam as classes do
+   Tailwind geradas pelos tokens abaixo (bg-surface, text-ink,
+   bg-primary, text-destaque...). Nada de cor solta nos componentes.
+
+   --ap-*: cores exatas do manual. Não mudam com o tema; servem de
+   referência e para peças que ficam sempre sobre o preto (ex.: a tela
+   de erro grave, que não carrega este arquivo).
+
+   Tema escuro (padrão): cinza bem escuro no lugar do preto puro, texto
+   em branco levemente acinzentado e o amarelo em dois tons: um pouco
+   menos saturado nas áreas grandes (botões, etiquetas cheias) e cheio
+   só nos detalhes (texto, ícone e traço em amarelo).
+   Tema claro: fundo branco, texto quase preto. Amarelo sobre branco não
+   se lê (manual 3.4), então o amarelo continua só como fundo de botão e
+   etiqueta (com texto preto) e o "texto amarelo" vira um dourado escuro.
+
+   Todos os pares texto/fundo passam no AA (4,5:1). Os números estão
+   anotados ao lado de cada cor. */
 :root {
   --ap-yellow: #ffd60a;
   --ap-yellow-hover: #ffb800;
@@ -22,47 +35,157 @@
   --ap-text-3: #737373;
   --ap-text-2: #a3a3a3;
   --ap-text-field: #d4d4d4;
+}
 
-  --color-canvas: var(--ap-black);
-  --color-surface: var(--ap-surface);
-  --color-sidebar: var(--ap-sidebar);
-  --color-ink: var(--ap-white);
-  --color-ink-2: var(--ap-text-2);
-  /* Texto terciário do manual (#737373) dá 4,2:1 sobre o preto, abaixo
-     do mínimo de 4,5:1 para texto pequeno. Ele fica só em placeholders e
-     ícones de campo (ink-3); textos pequenos usam o secundário. */
-  --color-muted: var(--ap-text-2);
-  --color-ink-3: var(--ap-text-3);
-  --color-campo: var(--ap-text-field);
-  --color-line: var(--ap-border);
-  --color-line-2: var(--ap-divider);
-  --color-line-input: var(--ap-border-input);
-  --color-line-strong: var(--ap-border-strong);
-  --color-cinza: var(--ap-gray-600);
-  --color-primary: var(--ap-yellow);
-  --color-primary-hover: var(--ap-yellow-hover);
-  --color-primary-soft: var(--ap-yellow-soft);
-  --color-primary-ink: var(--ap-black);
-  /* "Quente" (prioridade, destaque) também é o amarelo da marca. */
-  --color-hot: var(--ap-yellow);
-  --color-hot-soft: var(--ap-yellow-soft);
-  --color-hot-ink: var(--ap-yellow);
-  /* Sucesso e WhatsApp: informativo, em branco (o manual não tem verde). */
-  --color-wa: var(--ap-white);
+/* Tema escuro ------------------------------------------------------ */
+:root,
+:root[data-tema="escuro"] {
+  color-scheme: dark;
+
+  /* Fundos: do mais fundo para o mais alto. */
+  --color-canvas: #141414;
+  --color-sidebar: #171717;
+  --color-surface: #1b1b1b;
+
+  /* Texto. Contraste sobre #1B1B1B (o pior caso): */
+  --color-ink: #ececec; /* 14,6:1 */
+  --color-ink-2: #adadad; /* 7,7:1 */
+  --color-muted: var(--color-ink-2);
+  --color-ink-3: #8c8c8c; /* 5,1:1 */
+  --color-campo: #d9d9d9; /* 12,2:1 */
+
+  /* Linhas. */
+  --color-line: #2c2c2c;
+  --color-line-2: #262626;
+  --color-line-input: #383838;
+  --color-line-strong: #4a4a4a;
+  --color-cinza: #6b6b6b; /* contorno do score baixo: 3,1:1 */
+
+  /* Amarelo. primary = fundo de botão e etiqueta cheia (tom um pouco
+     menos saturado); destaque = texto, ícone, borda e traço (cheio). */
+  --color-primary: #ebc633; /* texto preto em cima: 11,9:1 */
+  --color-primary-hover: #f5d03a;
+  --color-primary-soft: rgba(255, 214, 10, 0.1);
+  --color-primary-ink: #0a0a0a;
+  --color-destaque: #ffd60a; /* 12,2:1 */
+
+  /* "Quente" (prioridade, retorno para hoje). */
+  --color-hot: var(--color-destaque);
+  --color-hot-soft: var(--color-primary-soft);
+  --color-hot-ink: var(--color-destaque);
+
+  /* Sucesso e WhatsApp: informativo, na cor do texto (o manual não tem
+     verde). */
+  --color-wa: var(--color-ink);
   --color-wa-soft: rgba(255, 255, 255, 0.06);
-  /* Erro: o manual não define cor de erro. Um vermelho claro, só em
-     mensagens de erro, legível sobre o preto e sobre #121212. */
+
+  /* Erro: o manual não define; um vermelho claro, só em mensagens de
+     erro. 7,5:1. */
   --color-danger: #ff8a80;
   --color-danger-soft: rgba(255, 138, 128, 0.1);
-  /* Etiquetas de situação (ver components/leads/EtiquetaSituacao.tsx). */
-  --color-sem-site: var(--ap-yellow);
-  --color-sem-site-soft: var(--ap-yellow);
-  --color-booking: var(--ap-yellow);
-  --color-booking-soft: transparent;
-  --color-rede: var(--ap-white);
-  --color-rede-soft: transparent;
-  --color-proprio: var(--ap-text-2);
+
+  /* Etiquetas dos leads (components/leads/EtiquetaSituacao.tsx).
+     Preenchida = mais urgente; contorno amarelo = oportunidade;
+     contorno claro = informativo. No escuro a cheia usa o amarelo
+     suave e as de contorno ganham um fundo levíssimo para não
+     "piscar" no cinza. */
+  --color-sem-site: var(--color-primary);
+  --color-sem-site-ink: #0a0a0a;
+  --color-booking: var(--color-destaque);
+  --color-booking-soft: rgba(255, 214, 10, 0.08);
+  --color-rede: var(--color-ink);
+  --color-rede-soft: rgba(255, 255, 255, 0.05);
+  --color-proprio: var(--color-ink-2);
   --color-proprio-soft: transparent;
+
+  /* Realce de hover, véu atrás de janelas e sombra. */
+  --color-realce: rgba(255, 255, 255, 0.05);
+  --color-realce-2: rgba(255, 255, 255, 0.08);
+  --color-veu: rgba(0, 0, 0, 0.75);
+  --color-sombra: rgba(0, 0, 0, 0.6);
+  --color-grade: rgba(255, 255, 255, 0.035);
+
+  /* Logo sobre fundo escuro (manual 2.4, versão principal). */
+  --logo-a: var(--ap-yellow);
+  --logo-losango: #ececec;
+  --logo-cantos: #4a4a4a;
+  --logo-nome: #ececec;
+  --logo-sub: var(--ap-yellow);
+  --logo-traco: var(--ap-yellow);
+
+  /* Moldura da mascote (manual 7): ela sempre fica sobre fundo claro,
+     porque o cabelo some no amarelo e o vestido some no preto. No
+     escuro, o círculo branco fica como o manual pede. */
+  --color-mascote: #ffffff;
+  --color-mascote-borda: transparent;
+}
+
+/* Tema claro ------------------------------------------------------- */
+:root[data-tema="claro"] {
+  color-scheme: light;
+
+  --color-canvas: #f5f5f3;
+  --color-sidebar: #fafaf9;
+  --color-surface: #ffffff;
+
+  /* Contraste sobre #F5F5F3 (o pior caso): */
+  --color-ink: #141414; /* 16,9:1 */
+  --color-ink-2: #525252; /* 7,2:1 */
+  --color-muted: var(--color-ink-2);
+  --color-ink-3: #6b6b6b; /* 4,9:1 */
+  --color-campo: #262626; /* 13,9:1 */
+
+  --color-line: #e2e2df;
+  --color-line-2: #ececea;
+  --color-line-input: #c4c4c0;
+  --color-line-strong: #8f8f8b; /* 3,2:1 */
+  --color-cinza: #8f8f8b;
+
+  --color-primary: #ffd60a; /* texto preto em cima: 14:1 */
+  --color-primary-hover: #ffc400;
+  --color-primary-soft: rgba(255, 214, 10, 0.22);
+  --color-primary-ink: #0a0a0a;
+  /* Dourado escuro no lugar do texto amarelo: 5,7:1 no fundo e 5,3:1
+     sobre o amarelo 22%. */
+  --color-destaque: #7a5c00;
+
+  --color-hot: var(--color-destaque);
+  --color-hot-soft: var(--color-primary-soft);
+  --color-hot-ink: var(--color-destaque);
+
+  --color-wa: var(--color-ink);
+  --color-wa-soft: rgba(0, 0, 0, 0.04);
+
+  --color-danger: #b3261e; /* 6:1 */
+  --color-danger-soft: rgba(179, 38, 30, 0.07);
+
+  --color-sem-site: #ffd60a;
+  --color-sem-site-ink: #0a0a0a;
+  --color-booking: var(--color-destaque);
+  --color-booking-soft: rgba(255, 214, 10, 0.16);
+  --color-rede: var(--color-ink);
+  --color-rede-soft: transparent;
+  --color-proprio: var(--color-ink-2);
+  --color-proprio-soft: transparent;
+
+  --color-realce: rgba(0, 0, 0, 0.04);
+  --color-realce-2: rgba(0, 0, 0, 0.07);
+  --color-veu: rgba(20, 20, 20, 0.5);
+  --color-sombra: rgba(0, 0, 0, 0.14);
+  --color-grade: rgba(0, 0, 0, 0.045);
+
+  /* Logo sobre branco (manual 2.4): amarelo só no traço. */
+  --logo-a: #0a0a0a;
+  --logo-losango: #0a0a0a;
+  --logo-cantos: #d4d4d4;
+  --logo-nome: #0a0a0a;
+  --logo-sub: #0a0a0a;
+  --logo-traco: var(--ap-yellow);
+
+  /* No claro, o círculo branco ganha um contorno para não sumir no
+     fundo branco. */
+  --color-mascote: #ffffff;
+  --color-mascote-borda: var(--color-line);
 }
 
 @theme inline {
@@ -83,6 +206,7 @@
   --color-primary-hover: var(--color-primary-hover);
   --color-primary-soft: var(--color-primary-soft);
   --color-primary-ink: var(--color-primary-ink);
+  --color-destaque: var(--color-destaque);
   --color-hot: var(--color-hot);
   --color-hot-soft: var(--color-hot-soft);
   --color-hot-ink: var(--color-hot-ink);
@@ -91,13 +215,19 @@
   --color-danger: var(--color-danger);
   --color-danger-soft: var(--color-danger-soft);
   --color-sem-site: var(--color-sem-site);
-  --color-sem-site-soft: var(--color-sem-site-soft);
+  --color-sem-site-ink: var(--color-sem-site-ink);
   --color-booking: var(--color-booking);
   --color-booking-soft: var(--color-booking-soft);
   --color-rede: var(--color-rede);
   --color-rede-soft: var(--color-rede-soft);
   --color-proprio: var(--color-proprio);
   --color-proprio-soft: var(--color-proprio-soft);
+  --color-realce: var(--color-realce);
+  --color-realce-2: var(--color-realce-2);
+  --color-veu: var(--color-veu);
+  --color-sombra: var(--color-sombra);
+  --color-mascote: var(--color-mascote);
+  --color-mascote-borda: var(--color-mascote-borda);
   /* Sem border-radius nos componentes (manual 6.1). rounded-full
      continua redondo: só avatares e a moldura da mascote usam. */
   --radius-xs: 0px;
@@ -121,10 +251,6 @@
   html,
   body {
     height: 100%;
-  }
-
-  html {
-    color-scheme: dark;
   }
 
   body {
@@ -152,9 +278,9 @@
   }
 
   /* Foco sempre visível para quem navega pelo teclado. Campos que já têm
-     a própria borda de foco (focus:border-primary) usam outline-none. */
+     a própria borda de foco (focus:border-destaque) usam outline-none. */
   :focus-visible {
-    outline: 3px solid var(--color-primary);
+    outline: 3px solid var(--color-destaque);
     outline-offset: 2px;
   }
 
@@ -163,11 +289,11 @@
   .ap-cut:focus-visible,
   .ap-cut-s:focus-visible {
     outline-offset: -5px;
-    outline-color: var(--ap-black);
+    outline-color: var(--color-primary-ink);
   }
 
   .ap-cut-neutro:focus-visible {
-    outline-color: var(--ap-yellow);
+    outline-color: var(--color-destaque);
   }
 
   ::selection {
@@ -205,7 +331,7 @@
     position: absolute;
     inset: 0;
     transform: translateX(-100%);
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.06), transparent);
+    background: linear-gradient(90deg, transparent, var(--color-realce-2), transparent);
     animation: brilho-esqueleto 1.4s ease-in-out infinite;
   }
 }
@@ -231,10 +357,10 @@
 /* Grade de fundo: só em áreas de destaque (hero), nunca atrás de texto
    longo. */
 @utility ap-grid {
-  background-color: var(--ap-black);
+  background-color: var(--color-canvas);
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+    linear-gradient(var(--color-grade) 1px, transparent 1px),
+    linear-gradient(90deg, var(--color-grade) 1px, transparent 1px);
   background-size: 48px 48px;
 }
 

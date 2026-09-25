@@ -376,3 +376,29 @@ export function IconeVistoDuplo(props: Props) {
     </Base>
   );
 }
+
+// Tema claro, escuro e "seguir o sistema" (components/tema/SeletorTema.tsx).
+export function IconeSol(props: Props) {
+  return (
+    <Base {...props}>
+      <circle cx="12" cy="12" r="4" />
+      <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
+    </Base>
+  );
+}
+
+export function IconeLua(props: Props) {
+  return (
+    <Base {...props}>
+      <path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z" />
+    </Base>
+  );
+}
+
+export function IconeTela(props: Props) {
+  return (
+    <Base {...props}>
+      <path d="M3 4h18v12H3zM8 20h8M12 16v4" />
+    </Base>
+  );
+}

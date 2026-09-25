@@ -14,8 +14,8 @@ export function faixaScore(pontos: number): FaixaScore {
 
 const ESTILO: Record<FaixaScore, string> = {
   alto: "bg-primary text-primary-ink",
-  medio: "text-primary shadow-[inset_0_0_0_2px_var(--ap-yellow)]",
-  baixo: "text-ink shadow-[inset_0_0_0_2px_var(--ap-gray-600)]",
+  medio: "text-destaque shadow-[inset_0_0_0_2px_var(--color-destaque)]",
+  baixo: "text-ink shadow-[inset_0_0_0_2px_var(--color-cinza)]",
 };
 
 export default function Score({

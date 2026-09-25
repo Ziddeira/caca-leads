@@ -43,7 +43,7 @@ export function contagemFunil(situacao: SituacaoFunil, n: number) {
 export const ESTILO_FUNIL: Record<SituacaoFunil, string> = {
   desbloqueado: "bg-canvas text-ink-2 border-line-strong",
   contatado: "bg-canvas text-ink border-ink/60",
-  negociacao: "bg-primary-soft text-primary border-primary/60",
+  negociacao: "bg-primary-soft text-destaque border-destaque/60",
   fechado: "bg-primary text-primary-ink border-primary",
   perdido: "bg-danger-soft text-danger border-danger/40",
 };
@@ -78,7 +78,7 @@ export const COR_STATUS_VENDA: Record<StatusVenda, string> = {
   aguardando_google: "text-hot-ink",
   nao_verificada: "text-danger",
   em_analise: "text-ink",
-  verificada: "text-primary",
+  verificada: "text-destaque",
   recusada: "text-danger",
 };
 

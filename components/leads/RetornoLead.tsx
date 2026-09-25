@@ -12,7 +12,7 @@ const ESTILO = {
   futuro: "bg-canvas text-ink border-line-strong",
 } as const;
 
-const LINK = "inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-primary underline-offset-2 hover:underline";
+const LINK = "inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-destaque underline-offset-2 hover:underline";
 
 export default function RetornoLead({
   placeId,

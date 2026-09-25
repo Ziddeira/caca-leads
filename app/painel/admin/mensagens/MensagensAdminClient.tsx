@@ -146,7 +146,7 @@ function CartaoDenuncia({ denuncia: d, urls }: { denuncia: DenunciaChat; urls: R
   return (
     <article className={`${CARTAO} p-4 sm:p-5`}>
       <header className="flex flex-wrap items-center gap-2 text-sm">
-        <span className="border border-primary px-2 py-0.5 font-display text-xs font-semibold uppercase tracking-[0.1em] text-primary">
+        <span className="border border-destaque px-2 py-0.5 font-display text-xs font-semibold uppercase tracking-[0.1em] text-destaque">
           Denúncia #{d.id}
         </span>
         <strong className="text-ink">{ehMotivoDenuncia(d.motivo) ? MOTIVOS_DENUNCIA[d.motivo] : d.motivo}</strong>

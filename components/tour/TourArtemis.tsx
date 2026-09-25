@@ -402,7 +402,7 @@ export default function TourArtemis({ concluido }: { concluido: boolean }) {
             ))}
           </mask>
         </defs>
-        <rect width="100%" height="100%" fill="rgba(0,0,0,0.8)" mask="url(#tour-artemis-recorte)" />
+        <rect width="100%" height="100%" style={{ fill: "var(--color-veu)" }} mask="url(#tour-artemis-recorte)" />
         {recortes.map((r, i) => (
           <rect
             key={i}
@@ -411,7 +411,7 @@ export default function TourArtemis({ concluido }: { concluido: boolean }) {
             width={r.w}
             height={r.h}
             fill="none"
-            stroke="var(--ap-yellow)"
+            stroke="var(--color-destaque)"
             strokeWidth={2}
           />
         ))}
@@ -426,13 +426,13 @@ export default function TourArtemis({ concluido }: { concluido: boolean }) {
         className="px-seguro absolute inset-x-0 mx-auto w-full max-w-2xl"
         style={{ bottom }}
       >
-        <div className="border-2 border-primary bg-surface p-3 shadow-[0_12px_40px_rgba(0,0,0,0.7)] sm:p-4">
+        <div className="border-2 border-destaque bg-surface p-3 shadow-[0_12px_40px_var(--color-sombra)] sm:p-4">
           <div className="flex items-start gap-3 sm:gap-4">
             <Cabeca expressao={expressao} />
 
             <div className="min-w-0 flex-1">
               <div className="flex items-center justify-between gap-2">
-                <p id={idTitulo} className="font-display text-[13px] font-semibold uppercase tracking-[0.2em] text-primary">
+                <p id={idTitulo} className="font-display text-[13px] font-semibold uppercase tracking-[0.2em] text-destaque">
                   Ártemis
                   {!despedida && indice !== null && (
                     <span className="ml-2 whitespace-nowrap tracking-[0.08em] text-ink-2">
@@ -517,7 +517,7 @@ const BOTAO_TOUR_SECUNDARIO =
 function Cabeca({ expressao }: { expressao: Expressao }) {
   return (
     <div
-      className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full border-2 border-primary bg-white sm:h-20 sm:w-20"
+      className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full border-2 border-destaque bg-mascote sm:h-20 sm:w-20"
       aria-hidden="true"
     >
       {(Object.keys(IMAGENS) as Expressao[]).map((chave) => (

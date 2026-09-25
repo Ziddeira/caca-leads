@@ -186,6 +186,11 @@ cada um no SQL Editor do Supabase:
     Cria o bucket **privado** `mensagens` e liga o Realtime nas tabelas
     `chat_conversas` e `chat_mensagens`. As imagens das denúncias abrem
     na Gestão com a `SUPABASE_SERVICE_ROLE_KEY`.
+17. `supabase/etapa17-tema.sql` — tema claro, escuro ou "seguir o
+    sistema". Cria a coluna `profiles.tema` e a função `definir_tema`,
+    para a escolha valer em qualquer aparelho. Sem este script, o botão
+    de tema funciona do mesmo jeito, mas a escolha fica só no aparelho
+    (cookie). As cores dos dois temas ficam em `app/globals.css`.
 
 ### Rotinas agendadas (Vercel Cron)
 

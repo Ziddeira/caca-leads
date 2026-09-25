@@ -88,7 +88,7 @@ export default async function UsoPage() {
                 className="group flex h-full min-w-0 flex-1 items-end"
               >
                 <div
-                  className="w-full rounded-t bg-primary transition group-hover:brightness-125"
+                  className="w-full rounded-t bg-destaque transition group-hover:brightness-125"
                   style={{ height: d.total ? `${Math.max(2, (d.total / maior) * 100)}%` : "0" }}
                 />
               </div>
@@ -102,7 +102,7 @@ export default async function UsoPage() {
         </div>
 
         <details className="mt-3">
-          <summary className="min-h-11 cursor-pointer py-2 text-sm font-semibold text-primary">Ver a tabela por dia e por tipo</summary>
+          <summary className="min-h-11 cursor-pointer py-2 text-sm font-semibold text-destaque">Ver a tabela por dia e por tipo</summary>
           <Tabela>
             <thead>
               <tr>

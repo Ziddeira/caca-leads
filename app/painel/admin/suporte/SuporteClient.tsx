@@ -124,7 +124,7 @@ function Cartao({ chamado: c }: { chamado: ChamadoAdmin }) {
         ))}
 
       <details className="mt-3">
-        <summary className="min-h-11 cursor-pointer py-2 text-sm font-semibold text-primary">Dados da conta no momento do chamado</summary>
+        <summary className="min-h-11 cursor-pointer py-2 text-sm font-semibold text-destaque">Dados da conta no momento do chamado</summary>
         <dl className="grid gap-x-4 gap-y-1 rounded-md bg-canvas p-3 text-sm sm:grid-cols-[auto_1fr]">
           {linhasDiagnostico(c.diagnostico).map(([k, v]) => (
             <div key={k} className="contents">

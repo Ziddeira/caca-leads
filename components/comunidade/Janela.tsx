@@ -45,7 +45,7 @@ export default function Janela({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-black/75 sm:items-center sm:p-6"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-veu sm:items-center sm:p-6"
       onClick={(e) => e.target === e.currentTarget && !travada && onFechar()}
     >
       <div

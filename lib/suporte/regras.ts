@@ -31,7 +31,7 @@ export type Situacao = keyof typeof SITUACOES;
 
 export const COR_SITUACAO: Record<Situacao, string> = {
   aberto: "border-primary bg-primary text-primary-ink",
-  respondido: "border-primary text-primary",
+  respondido: "border-destaque text-destaque",
   resolvido: "border-ink text-ink",
 };
 

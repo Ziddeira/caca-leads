@@ -11,11 +11,11 @@ export default function LimitePlano({ titulo, texto }: { titulo: string; texto: 
   return (
     <div
       role="status"
-      className="flex flex-col items-center gap-5 border border-primary/40 bg-surface px-6 py-8 text-center sm:flex-row sm:text-left"
+      className="flex flex-col items-center gap-5 border border-destaque/40 bg-surface px-6 py-8 text-center sm:flex-row sm:text-left"
     >
       <Mascote tamanho={112} expressao="triste" />
       <div className="min-w-0 flex-1">
-        <p className="font-display text-[13px] font-semibold uppercase tracking-[0.3em] text-primary">
+        <p className="font-display text-[13px] font-semibold uppercase tracking-[0.3em] text-destaque">
           Limite do plano
         </p>
         <h2 className="mt-2 text-xl text-ink">{titulo}</h2>

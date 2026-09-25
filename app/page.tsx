@@ -8,6 +8,7 @@ import { BOTAO_GRANDE, BOTAO_NEUTRO, BOTAO_SECUNDARIO, BOTAO_WHATSAPP, CARTAO, R
 import Logo from "@/components/marca/Logo";
 import Mira from "@/components/marca/Mira";
 import Score from "@/components/marca/Score";
+import SeletorTema from "@/components/tema/SeletorTema";
 import {
   IconeBuscar,
   IconeCadeado,
@@ -30,14 +31,17 @@ export default async function Home() {
     <div className="min-h-screen overflow-hidden bg-canvas">
       <header className="pt-seguro px-seguro relative z-10 border-b border-line-2 sm:px-6">
         <div className="mx-auto flex h-20 max-w-6xl items-center justify-between gap-4">
-          <Logo tamanho={22} className="sm:hidden" />
-          <Logo tamanho={26} className="max-sm:hidden" />
-          <Link
-            href="/login"
-            className="inline-flex min-h-11 items-center px-4 font-display text-sm font-bold uppercase tracking-[0.08em] text-ink-2 transition hover:text-ink"
-          >
-            Entrar
-          </Link>
+          <Logo tamanho={26} className="sm:hidden" />
+          <Logo tamanho={34} className="max-sm:hidden" />
+          <div className="flex items-center gap-1">
+            <SeletorTema variante="menu" />
+            <Link
+              href="/login"
+              className="inline-flex min-h-11 items-center px-4 font-display text-sm font-bold uppercase tracking-[0.08em] text-ink-2 transition hover:text-ink"
+            >
+              Entrar
+            </Link>
+          </div>
         </div>
       </header>
 
@@ -48,7 +52,7 @@ export default async function Home() {
             <div>
               <p className={ROTULO_SECAO}>Para web designers independentes</p>
               <h1 className="mt-5 text-[2.5rem] font-bold uppercase italic leading-[0.98] text-ink sm:text-6xl lg:text-[4.25rem]">
-                Ache clientes que <span className="text-primary">ainda não têm site</span>.
+                Ache clientes que <span className="text-destaque">ainda não têm site</span>.
               </h1>
               <p className="mt-6 max-w-xl text-lg leading-[1.55] text-ink-2 sm:text-[19px]">
                 Busque por nicho e bairro e veja quem não tem site, quem depende do Airbnb e

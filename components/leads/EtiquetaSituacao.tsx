@@ -2,11 +2,12 @@ import type { Situacao } from "@/lib/leads/classificacao";
 
 // Etiquetas do manual (brand/MANUAL.md, 6.3): preenchido = mais urgente;
 // contorno amarelo = oportunidade; contorno branco = informativo.
+// As cores de cada tema ficam em app/globals.css (--color-sem-site...).
 const ESTILO: Record<Situacao, string> = {
-  sem_site: "border-primary bg-primary text-primary-ink",
-  booking: "border-primary text-primary",
-  rede_social: "border-ink text-ink",
-  site_proprio: "border-line-strong text-ink-2",
+  sem_site: "border-sem-site bg-sem-site text-sem-site-ink",
+  booking: "border-booking bg-booking-soft text-booking",
+  rede_social: "border-rede bg-rede-soft text-rede",
+  site_proprio: "border-line-strong bg-proprio-soft text-proprio",
 };
 
 function rotulo(situacao: Situacao, plataforma: string | null): string {

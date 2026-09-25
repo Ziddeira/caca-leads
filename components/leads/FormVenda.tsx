@@ -78,7 +78,7 @@ export default function FormVenda({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-black/75 sm:items-center sm:p-6"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-veu sm:items-center sm:p-6"
       onClick={(ev) => ev.target === ev.currentTarget && !enviando && onCancelar()}
     >
       <div

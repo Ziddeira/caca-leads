@@ -46,7 +46,7 @@ export default async function ComunidadePage({ searchParams }: { searchParams: P
         {estado.apelido && (
           <Link
             href={`/painel/comunidade/u/${encodeURIComponent(estado.apelido)}`}
-            className="inline-flex min-h-11 items-center text-sm font-semibold text-primary hover:underline"
+            className="inline-flex min-h-11 items-center text-sm font-semibold text-destaque hover:underline"
           >
             Meu perfil na comunidade
           </Link>

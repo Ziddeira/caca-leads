@@ -192,7 +192,7 @@ export default function SeletorAvatar({
                   onClick={() => escolherPronto(id)}
                   className={`flex aspect-square min-h-11 items-center justify-center rounded-full p-1 transition disabled:cursor-wait ${
                     escolhido
-                      ? "ring-3 ring-primary ring-offset-2 ring-offset-surface"
+                      ? "ring-3 ring-destaque ring-offset-2 ring-offset-surface"
                       : "hover:scale-105 hover:ring-2 hover:ring-line-strong"
                   } ${ocupado === id ? "animate-pulse" : ""}`}
                 >
