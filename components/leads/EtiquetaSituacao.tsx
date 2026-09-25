@@ -1,10 +1,12 @@
 import type { Situacao } from "@/lib/leads/classificacao";
 
+// Etiquetas do manual (brand/MANUAL.md, 6.3): preenchido = mais urgente;
+// contorno amarelo = oportunidade; contorno branco = informativo.
 const ESTILO: Record<Situacao, string> = {
-  sem_site: "text-sem-site bg-sem-site-soft",
-  booking: "text-booking bg-booking-soft",
-  rede_social: "text-rede bg-rede-soft",
-  site_proprio: "text-proprio bg-proprio-soft",
+  sem_site: "border-primary bg-primary text-primary-ink",
+  booking: "border-primary text-primary",
+  rede_social: "border-ink text-ink",
+  site_proprio: "border-line-strong text-ink-2",
 };
 
 function rotulo(situacao: Situacao, plataforma: string | null): string {
@@ -29,7 +31,7 @@ export default function EtiquetaSituacao({
 }) {
   return (
     <span
-      className={`inline-flex items-center rounded-md px-2.5 py-0.5 text-xs font-semibold ${ESTILO[situacao]}`}
+      className={`inline-flex items-center border px-2 py-[3px] font-display text-[11px] font-semibold uppercase leading-tight tracking-[0.08em] ${ESTILO[situacao]}`}
     >
       {rotulo(situacao, plataforma)}
     </span>

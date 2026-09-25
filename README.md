@@ -1,6 +1,18 @@
-# Caça-leads
+# Ártemis Prospect
 
 SaaS de prospecção de leads para web designers independentes.
+
+## Marca
+
+A identidade visual segue o manual em `brand/` (`MANUAL.md` tem os valores
+exatos; o PDF é a referência visual). As cores e formas ficam centralizadas
+em `app/globals.css` (tokens `--ap-*`), e as peças da marca (logo, mascote,
+cantoneiras de mira, badge de score) em `components/marca/`. Os textos dos
+e-mails de autenticação para colar no Supabase estão em
+`brand/emails-supabase.md`.
+
+O nome técnico do projeto continua `caca-leads` (repositório, pacote,
+domínio `caca-leads.vercel.app`, projeto do Supabase), para não quebrar nada.
 
 ## Variáveis de ambiente
 

@@ -1,4 +1,4 @@
--- Caça-leads — Etapa 10: lembrete de retorno ("Agendar retorno")
+-- Ártemis Prospect — Etapa 10: lembrete de retorno ("Agendar retorno")
 -- Rode isto DEPOIS de todos os scripts anteriores (até a etapa 9),
 -- inteiro, de uma vez: Supabase > SQL Editor > New query > cole tudo > Run.
 -- Pode rodar de novo sem problema (é idempotente).

@@ -1,4 +1,4 @@
--- Caça-leads — Etapa 4: cache dos leads desbloqueados e lista de espera
+-- Ártemis Prospect — Etapa 4: cache dos leads desbloqueados e lista de espera
 -- da Comunidade.
 -- Rode isto DEPOIS da etapa 3, inteiro, de uma vez:
 -- Supabase > SQL Editor > New query > cole tudo > Run.

@@ -78,14 +78,14 @@ export default function FormVenda({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-ink/60 sm:items-center sm:p-6"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-black/75 sm:items-center sm:p-6"
       onClick={(ev) => ev.target === ev.currentTarget && !enviando && onCancelar()}
     >
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby={`${id}-titulo`}
-        className="max-h-dvh w-full max-w-md overflow-y-auto overscroll-contain rounded-t-lg bg-surface p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] shadow-cartao sm:rounded-lg sm:p-6 sm:pb-[calc(1.5rem+env(safe-area-inset-bottom))]"
+        className="max-h-dvh w-full max-w-md overflow-y-auto overscroll-contain border border-line bg-surface p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] shadow-cartao sm:rounded-lg sm:p-6 sm:pb-[calc(1.5rem+env(safe-area-inset-bottom))]"
       >
         <h2 id={`${id}-titulo`} className="text-lg font-bold text-ink">
           Marcar como fechado

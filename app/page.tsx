@@ -4,7 +4,11 @@ import { createClient } from "@/lib/supabase/server";
 import { PLANOS } from "@/lib/planos";
 import type { Situacao } from "@/lib/leads/classificacao";
 import EtiquetaSituacao from "@/components/leads/EtiquetaSituacao";
-import { BOTAO, BOTAO_SECUNDARIO, CARTAO } from "@/components/ui";
+import { BOTAO_GRANDE, BOTAO_NEUTRO, BOTAO_SECUNDARIO, BOTAO_WHATSAPP, CARTAO, ROTULO_SECAO } from "@/components/ui";
+import Logo from "@/components/marca/Logo";
+import Mascote from "@/components/marca/Mascote";
+import Mira from "@/components/marca/Mira";
+import Score from "@/components/marca/Score";
 import {
   IconeBuscar,
   IconeCadeado,
@@ -25,19 +29,13 @@ export default async function Home() {
 
   return (
     <div className="min-h-screen overflow-hidden bg-canvas">
-      <header className="pt-seguro px-seguro relative z-10 sm:px-6">
+      <header className="pt-seguro px-seguro relative z-10 border-b border-line-2 sm:px-6">
         <div className="mx-auto flex h-20 max-w-6xl items-center justify-between gap-4">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/logo-principal.svg"
-            alt="Caça-leads"
-            width={808}
-            height={212}
-            className="h-10 w-auto sm:h-11"
-          />
+          <Logo tamanho={22} className="sm:hidden" />
+          <Logo tamanho={26} className="max-sm:hidden" />
           <Link
             href="/login"
-            className="inline-flex min-h-11 items-center rounded-md px-4 text-sm font-semibold text-ink-2 transition hover:bg-surface hover:text-ink"
+            className="inline-flex min-h-11 items-center px-4 font-display text-sm font-bold uppercase tracking-[0.08em] text-ink-2 transition hover:text-ink"
           >
             Entrar
           </Link>
@@ -46,34 +44,23 @@ export default async function Home() {
 
       <main>
         {/* Hero ---------------------------------------------------------- */}
-        <section className="px-seguro relative sm:px-6">
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute -top-40 right-[-20%] h-[520px] w-[520px] rounded-full bg-primary-soft blur-3xl sm:right-[-5%]"
-          />
-          <div className="relative mx-auto grid max-w-6xl items-center gap-12 pb-16 pt-8 sm:pt-14 lg:grid-cols-[1.05fr_1fr] lg:gap-16 lg:pb-24 lg:pt-20">
+        <section className="ap-grid px-seguro relative sm:px-6">
+          <div className="relative mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)] items-center gap-14 pb-16 pt-10 sm:pt-14 lg:grid-cols-[1.05fr_1fr] lg:gap-16 lg:pb-24 lg:pt-20">
             <div>
-              <p className="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1 text-sm font-semibold text-ink-2">
-                <span className="h-2 w-2 rounded-full bg-hot" aria-hidden="true" />
-                Para web designers independentes
-              </p>
-              <h1 className="mt-5 text-[2.5rem] font-extrabold leading-[1.04] tracking-[-0.045em] text-ink sm:text-6xl lg:text-[4.25rem]">
-                Ache clientes que{" "}
-                <span className="text-primary underline decoration-hot decoration-[0.1em] underline-offset-[0.14em] [text-decoration-skip-ink:none]">
-                  ainda não têm site
-                </span>
-                .
+              <p className={ROTULO_SECAO}>Para web designers independentes</p>
+              <h1 className="mt-5 text-[2.5rem] font-bold uppercase italic leading-[0.98] text-ink sm:text-6xl lg:text-[4.25rem]">
+                Ache clientes que <span className="text-primary">ainda não têm site</span>.
               </h1>
-              <p className="mt-6 max-w-xl text-lg text-ink-2 sm:text-xl">
+              <p className="mt-6 max-w-xl text-lg leading-[1.55] text-ink-2 sm:text-[19px]">
                 Busque por nicho e bairro e veja quem não tem site, quem depende do Airbnb e
                 quem só usa Instagram — com o WhatsApp pronto para chamar.
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                <Link href="/cadastro" className={`${BOTAO} min-h-12! px-7! text-base!`}>
+                <Link href="/cadastro" className={BOTAO_GRANDE}>
                   Criar conta grátis
                   <IconeSeta width={18} height={18} />
                 </Link>
-                <Link href="/login" className={`${BOTAO_SECUNDARIO} min-h-12! px-7! text-base!`}>
+                <Link href="/login" className={`${BOTAO_SECUNDARIO} min-h-[54px] px-[26px]! py-4! text-base!`}>
                   Já tenho conta
                 </Link>
               </div>
@@ -89,26 +76,34 @@ export default async function Home() {
 
         {/* Como funciona --------------------------------------------------- */}
         <section className="px-seguro border-t border-line bg-surface sm:px-6">
-          <div className="mx-auto max-w-6xl py-16 sm:py-20">
-            <h2 className="text-2xl font-extrabold text-ink sm:text-3xl">Como funciona</h2>
-            <ol className="mt-8 grid gap-4 sm:grid-cols-3">
-              {PASSOS.map((passo, i) => (
-                <li key={passo.titulo} className="rounded-lg border border-line bg-canvas p-5">
-                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-sm font-extrabold text-primary-ink">
-                    {i + 1}
-                  </span>
-                  <h3 className="mt-4 text-lg font-bold text-ink">{passo.titulo}</h3>
-                  <p className="mt-1.5 text-ink-2">{passo.texto}</p>
-                </li>
-              ))}
-            </ol>
+          <div className="mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)] items-center gap-10 py-16 sm:py-20 lg:grid-cols-[minmax(0,1fr)_auto] lg:gap-16">
+            <div>
+              <p className={ROTULO_SECAO}>Passo a passo</p>
+              <h2 className="mt-3 text-3xl text-ink sm:text-4xl">Como funciona</h2>
+              <ol className="mt-8 grid gap-4 sm:grid-cols-3">
+                {PASSOS.map((passo, i) => (
+                  <li key={passo.titulo} className="border border-line bg-canvas p-5">
+                    <span className="ap-cut-s flex h-10 w-10 items-center justify-center bg-primary font-display text-lg font-bold text-primary-ink">
+                      {i + 1}
+                    </span>
+                    <h3 className="mt-4 text-lg text-ink">{passo.titulo}</h3>
+                    <p className="mt-1.5 text-ink-2">{passo.texto}</p>
+                  </li>
+                ))}
+              </ol>
+            </div>
+            <Mascote tamanho={240} className="mx-auto max-lg:order-first max-sm:hidden" />
+            <Mascote tamanho={160} className="mx-auto max-lg:order-first sm:hidden" />
           </div>
         </section>
       </main>
 
-      <footer className="px-seguro pb-seguro border-t border-line bg-surface sm:px-6">
+      <footer className="px-seguro pb-seguro border-t border-line-2 bg-canvas sm:px-6">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 py-6 text-sm text-muted">
-          <span>© {new Date().getFullYear()} Caça-leads</span>
+          <span className="flex items-center gap-3">
+            <Logo variante="simbolo" tamanho={28} />
+            <span>© {new Date().getFullYear()} Ártemis Prospect</span>
+          </span>
           <span>Feito para quem cria sites.</span>
         </div>
       </footer>
@@ -151,58 +146,51 @@ const EXEMPLOS: {
 
 function PreviaLeads() {
   return (
-    <figure className="relative isolate mx-auto w-full max-w-lg lg:max-w-none">
-      <div
-        aria-hidden="true"
-        className="absolute -inset-3 -z-10 rotate-2 rounded-[22px] bg-hot-soft sm:-inset-4"
-      />
-      <div className={`${CARTAO} overflow-hidden`} aria-hidden="true">
-        <div className="flex items-center gap-3 border-b border-line-2 px-4 py-3">
-          <div className="flex min-w-0 flex-1 items-center gap-2 rounded-md bg-canvas px-3 py-2 text-sm text-ink-2">
-            <IconeBuscar width={16} height={16} className="shrink-0 text-muted" />
-            <span className="truncate">barbearia, manicure, pousada · Palhoça SC</span>
+    <figure className="mx-auto w-full min-w-0 max-w-lg lg:max-w-none">
+      {/* As cantoneiras de mira ficam só aqui: é o elemento principal da tela. */}
+      <Mira>
+        <div className={`${CARTAO} overflow-hidden`} aria-hidden="true">
+          <div className="flex items-center gap-3 border-b border-line px-4 py-3">
+            <div className="flex min-w-0 flex-1 items-center gap-2 border border-line-input bg-canvas px-3 py-2 text-sm text-campo">
+              <IconeBuscar width={16} height={16} className="shrink-0 text-ink-3" />
+              <span className="truncate">barbearia, manicure, pousada · Palhoça SC</span>
+            </div>
+            <span className="hidden shrink-0 bg-primary px-2.5 py-1.5 font-display text-xs font-semibold uppercase tracking-[0.08em] text-primary-ink sm:inline">
+              48 leads
+            </span>
           </div>
-          <span className="hidden shrink-0 rounded-full bg-primary-soft px-2.5 py-1 text-xs font-bold text-primary sm:inline">
-            48 leads
-          </span>
-        </div>
-        <ul className="divide-y divide-line-2">
-          {EXEMPLOS.map((l) => (
-            <li key={l.nome} className="flex items-center gap-3 px-4 py-3.5">
-              <span
-                className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-extrabold ${
-                  l.pontos >= 60 ? "bg-hot-soft text-hot-ink" : "bg-canvas text-ink"
-                }`}
-              >
-                {l.pontos}
-              </span>
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-[15px] font-bold leading-snug text-ink">{l.nome}</p>
-                <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-ink-2">
-                  <EtiquetaSituacao situacao={l.situacao} plataforma={l.plataforma} />
-                  <span className="inline-flex items-center gap-0.5">
-                    <IconeEstrela width={12} height={12} className="text-hot" />
-                    {l.nota} <span className="text-muted">({l.avaliacoes})</span>
-                  </span>
-                  <span className="hidden text-muted sm:inline">· {l.bairro}</span>
+          <ul className="divide-y divide-line">
+            {EXEMPLOS.map((l) => (
+              <li key={l.nome} className="flex items-center gap-3 px-4 py-3.5">
+                <Score pontos={l.pontos} />
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-[15px] font-extrabold leading-snug text-ink">{l.nome}</p>
+                  <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-ink-2">
+                    <EtiquetaSituacao situacao={l.situacao} plataforma={l.plataforma} />
+                    <span className="inline-flex items-center gap-1">
+                      <IconeEstrela width={12} height={12} className="text-ink-2" />
+                      {l.nota} <span className="text-muted">({l.avaliacoes})</span>
+                    </span>
+                    <span className="hidden text-muted sm:inline">· {l.bairro}</span>
+                  </div>
                 </div>
-              </div>
-              {l.desbloqueado ? (
-                <span className="inline-flex shrink-0 items-center gap-1.5 rounded-md bg-wa px-2.5 py-2 text-xs font-semibold text-white">
-                  <IconeWhatsapp width={14} height={14} />
-                  <span className="hidden sm:inline">WhatsApp</span>
-                </span>
-              ) : (
-                <span className="inline-flex shrink-0 items-center gap-1.5 rounded-md border border-line px-2.5 py-2 text-xs font-semibold text-ink-2">
-                  <IconeCadeado width={14} height={14} />
-                  <span className="hidden sm:inline">Desbloquear</span>
-                </span>
-              )}
-            </li>
-          ))}
-        </ul>
-      </div>
-      <figcaption className="mt-3 text-center text-xs text-muted">
+                {l.desbloqueado ? (
+                  <span className={`${BOTAO_WHATSAPP} min-h-0! shrink-0 px-2.5! py-2! text-xs!`}>
+                    <IconeWhatsapp width={14} height={14} />
+                    <span className="hidden sm:inline">WhatsApp</span>
+                  </span>
+                ) : (
+                  <span className={`${BOTAO_NEUTRO} min-h-0! shrink-0 px-2.5! py-2! text-xs!`}>
+                    <IconeCadeado width={13} height={13} />
+                    <span className="hidden sm:inline">Desbloquear</span>
+                  </span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </Mira>
+      <figcaption className="mt-2 text-center text-xs text-muted">
         Exemplo ilustrativo da lista de leads.
       </figcaption>
     </figure>

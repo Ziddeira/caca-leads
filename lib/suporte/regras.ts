@@ -30,9 +30,9 @@ export const SITUACOES = {
 export type Situacao = keyof typeof SITUACOES;
 
 export const COR_SITUACAO: Record<Situacao, string> = {
-  aberto: "bg-hot-soft text-hot-ink",
-  respondido: "bg-primary-soft text-primary",
-  resolvido: "bg-wa-soft text-wa",
+  aberto: "border-primary bg-primary text-primary-ink",
+  respondido: "border-primary text-primary",
+  resolvido: "border-ink text-ink",
 };
 
 export function ehAssunto(v: unknown): v is Assunto {

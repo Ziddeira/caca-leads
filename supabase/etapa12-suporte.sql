@@ -1,4 +1,4 @@
--- Caça-leads — Etapa 12: "Preciso de ajuda" (chamados de suporte)
+-- Ártemis Prospect — Etapa 12: "Preciso de ajuda" (chamados de suporte)
 -- Rode DEPOIS de todos os scripts anteriores (até a etapa 11), inteiro,
 -- de uma vez: Supabase > SQL Editor > New query > cole tudo > Run.
 -- Pode rodar de novo sem problema (é idempotente).

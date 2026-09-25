@@ -42,7 +42,7 @@ export default function Avatar({
     <span
       aria-hidden="true"
       style={{ ...estilo, fontSize: Math.round(tamanho * 0.42) }}
-      className={`flex shrink-0 items-center justify-center rounded-full bg-primary-soft font-bold text-primary ${className}`}
+      className={`flex shrink-0 items-center justify-center rounded-full bg-primary-soft font-display font-bold text-primary ${className}`}
     >
       {inicial}
     </span>

@@ -26,7 +26,7 @@ export async function POST(request: Request) {
       forma: corpo.forma,
       valor: PACOTE_EXTRA.preco,
       vencimento: hojeBrasil(),
-      descricao: `Caça-leads — pacote extra (+${PACOTE_EXTRA.desbloqueios} desbloqueios e +${PACOTE_EXTRA.buscas} buscas)`,
+      descricao: `Ártemis Prospect — pacote extra (+${PACOTE_EXTRA.desbloqueios} desbloqueios e +${PACOTE_EXTRA.buscas} buscas)`,
       referencia: `pacote:${ctx.user.id}`,
     });
 

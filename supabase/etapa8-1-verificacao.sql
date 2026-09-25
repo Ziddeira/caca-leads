@@ -1,4 +1,4 @@
--- Caça-leads — Etapa 8, parte 1 de 3: mês, regras, pontos e verificação automática
+-- Ártemis Prospect — Etapa 8, parte 1 de 3: mês, regras, pontos e verificação automática
 -- Rode DEPOIS da etapa 7, inteiro, de uma vez:
 -- Supabase > SQL Editor > New query > cole tudo > Run.
 -- Pode rodar de novo sem problema (é idempotente).

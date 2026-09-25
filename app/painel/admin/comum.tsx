@@ -8,7 +8,7 @@ export function Numero({ rotulo, valor, dica }: { rotulo: string; valor: ReactNo
   return (
     <div className={`${CARTAO} p-4`}>
       <p className="text-sm font-semibold text-ink-2">{rotulo}</p>
-      <p className="mt-1 text-3xl font-extrabold tabular-nums text-ink">{valor}</p>
+      <p className="mt-1 font-display text-3xl font-bold tabular-nums text-ink">{valor}</p>
       {dica && <p className="mt-1 text-xs text-muted">{dica}</p>}
     </div>
   );

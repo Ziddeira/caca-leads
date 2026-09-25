@@ -144,8 +144,8 @@ export default async function ScorePage() {
 function Numero({ rotulo, valor, destaque = false }: { rotulo: string; valor: number; destaque?: boolean }) {
   return (
     <div className={`${CARTAO} px-3 py-4 sm:px-5`}>
-      <p className="text-xs font-semibold uppercase tracking-wide text-muted">{rotulo}</p>
-      <p className={`mt-1 text-2xl font-extrabold sm:text-3xl ${destaque ? "text-primary" : "text-ink"}`}>{valor}</p>
+      <p className="font-display text-xs font-semibold uppercase tracking-[0.2em] text-muted">{rotulo}</p>
+      <p className={`mt-1 font-display text-2xl font-bold tabular-nums sm:text-3xl ${destaque ? "text-primary" : "text-ink"}`}>{valor}</p>
     </div>
   );
 }

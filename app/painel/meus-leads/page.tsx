@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { cacheValido, type DadosLead } from "@/lib/leads/dadosLead";
 import { situacaoFunilValida, type StatusVenda, type VendaResumo } from "@/lib/leads/funil";
 import { EstadoVazio, TituloPagina, BOTAO } from "@/components/ui";
-import { IconeLeads, IconeSeta } from "@/components/Icones";
+import { IconeSeta } from "@/components/Icones";
 import MeusLeadsClient, { type LeadSalvo } from "./MeusLeadsClient";
 
 export const dynamic = "force-dynamic";
@@ -114,7 +114,7 @@ export default async function MeusLeadsPage() {
       ) : (
         <div className="mt-8">
           <EstadoVazio
-            icone={<IconeLeads width={26} height={26} />}
+            mascote
             titulo="Nenhum lead desbloqueado ainda"
             texto="Busque por nicho e bairro e desbloqueie quem vale a conversa. O WhatsApp e o link do Maps ficam salvos aqui."
           >

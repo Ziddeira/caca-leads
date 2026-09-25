@@ -24,7 +24,7 @@ import FormVenda from "@/components/leads/FormVenda";
 import FormRetorno from "@/components/leads/FormRetorno";
 import RetornoLead from "@/components/leads/RetornoLead";
 import { MSG_FALTA_ETAPA10, statusRetorno, type RetornoLead as Retorno } from "@/lib/leads/retorno";
-import { ALERTA_AVISO, BOTAO_SECUNDARIO, BOTAO_WHATSAPP, CAMPO, CARTAO } from "@/components/ui";
+import { ALERTA_AVISO, BOTAO_NEUTRO, BOTAO_WHATSAPP, CAMPO, CARTAO } from "@/components/ui";
 import {
   IconeAtualizar,
   IconeBuscar,
@@ -247,8 +247,8 @@ export default function MeusLeadsClient({
               Retornos <span className="font-normal opacity-80">({comRetorno})</span>
               {atrasados > 0 && (
                 <span
-                  className={`ml-0.5 rounded-full px-1.5 text-xs ${
-                    filtroFunil === "retorno" ? "bg-primary-ink text-danger" : "bg-danger-soft text-danger"
+                  className={`ml-0.5 px-1.5 text-xs ${
+                    filtroFunil === "retorno" ? "bg-primary-ink text-primary" : "bg-danger-soft text-danger"
                   }`}
                 >
                   {atrasados} atrasado{atrasados === 1 ? "" : "s"}
@@ -280,7 +280,7 @@ export default function MeusLeadsClient({
           <label htmlFor="filtro-leads" className="sr-only">
             Filtrar por nome ou bairro
           </label>
-          <IconeBuscar className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
+          <IconeBuscar className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-3" />
           <input
             id="filtro-leads"
             type="search"
@@ -335,7 +335,7 @@ export default function MeusLeadsClient({
       </ul>
 
       {!visiveis.length && (
-        <p className="mt-2 rounded-lg border border-dashed border-line bg-surface px-4 py-8 text-center text-sm text-ink-2">
+        <p className="mt-2 border border-dashed border-line bg-surface px-4 py-8 text-center text-sm text-ink-2">
           {filtro.trim()
             ? `Nenhum lead com “${filtro}”${rotuloFiltro ? ` em “${rotuloFiltro}”` : ""}. Tente só uma parte do nome ou o bairro.`
             : filtroFunil === "retorno"
@@ -388,8 +388,8 @@ function BotaoFiltro({
       aria-pressed={ativo}
       title={titulo}
       onClick={onClick}
-      className={`inline-flex min-h-11 shrink-0 items-center gap-1 whitespace-nowrap rounded-full border px-4 text-sm font-semibold transition ${
-        ativo ? "border-primary bg-primary text-primary-ink" : "border-line bg-surface text-ink-2 hover:text-ink"
+      className={`inline-flex min-h-11 shrink-0 items-center gap-1 whitespace-nowrap border px-4 text-sm font-semibold transition ${
+        ativo ? "border-primary bg-primary-soft text-primary" : "border-line bg-surface text-ink-2 hover:text-ink"
       }`}
     >
       {children}
@@ -420,13 +420,13 @@ function CartaoLead({
     <article className={`${CARTAO} flex h-full flex-col p-4 sm:p-5`}>
       <div className="flex items-start gap-3">
         <div
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary-soft text-sm font-extrabold text-primary"
+          className="ap-cut-s flex h-11 w-11 shrink-0 items-center justify-center bg-line font-display text-sm font-bold text-ink"
           aria-hidden="true"
         >
           {iniciais(dados.nome)}
         </div>
         <div className="min-w-0 flex-1">
-          <h3 className="break-words text-base font-bold text-ink">{dados.nome}</h3>
+          <h3 className="break-words font-sans text-base font-extrabold text-ink">{dados.nome}</h3>
           {dados.bairro && <p className="mt-0.5 text-sm text-ink-2">{dados.bairro}</p>}
         </div>
       </div>
@@ -435,7 +435,7 @@ function CartaoLead({
         <EtiquetaSituacao situacao={dados.situacao} plataforma={dados.plataforma} />
         {dados.nota > 0 && (
           <span className="inline-flex items-center gap-1">
-            <IconeEstrela className="text-hot" />
+            <IconeEstrela className="text-ink-2" />
             <span className="font-semibold text-ink">{dados.nota.toFixed(1).replace(".", ",")}</span>
             <span className="text-muted">({dados.avaliacoes} avaliações)</span>
           </span>
@@ -466,13 +466,13 @@ function CartaoLead({
           </a>
         )}
         {dados.maps && (
-          <a target="_blank" rel="noopener" href={dados.maps} className={`${BOTAO_SECUNDARIO} px-4!`}>
+          <a target="_blank" rel="noopener" href={dados.maps} className={BOTAO_NEUTRO}>
             <IconeMapa width={18} height={18} />
             Maps
           </a>
         )}
         {dados.site && (
-          <a target="_blank" rel="noopener" href={dados.site} className={`${BOTAO_SECUNDARIO} px-4!`}>
+          <a target="_blank" rel="noopener" href={dados.site} className={BOTAO_NEUTRO}>
             <IconeLink width={18} height={18} />
             Link
           </a>
@@ -491,7 +491,7 @@ function CartaoErro({ erro, onTentar }: { erro: string; onTentar: () => void }) 
     <div className={`${CARTAO} flex h-full flex-col items-start gap-3 p-4 sm:p-5`}>
       <p className="text-sm font-semibold text-ink">Lead desbloqueado</p>
       <p className="text-sm text-danger">{erro}</p>
-      <button type="button" onClick={onTentar} className={BOTAO_SECUNDARIO}>
+      <button type="button" onClick={onTentar} className={BOTAO_NEUTRO}>
         <IconeAtualizar width={18} height={18} />
         Tentar de novo
       </button>

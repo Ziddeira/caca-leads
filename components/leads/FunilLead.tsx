@@ -92,7 +92,7 @@ export default function FunilLead({
                 if (nova === "fechado") onMarcarFechado();
                 else onMudarSituacao(nova);
               }}
-              className={`min-h-11 cursor-pointer rounded-md border px-3 py-2 text-sm font-semibold outline-none transition focus:ring-4 focus:ring-primary-soft disabled:cursor-wait disabled:opacity-70 ${ESTILO_FUNIL[funil.situacao]}`}
+              className={`min-h-11 cursor-pointer rounded-md border px-3 py-2 text-sm font-semibold outline-none transition focus:border-primary disabled:cursor-wait disabled:opacity-70 ${ESTILO_FUNIL[funil.situacao]}`}
             >
               {SITUACOES_FUNIL.map((s) => (
                 <option key={s} value={s}>

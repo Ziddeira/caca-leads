@@ -1,4 +1,4 @@
--- Caça-leads — Etapa 8, parte 3 de 3: rank mensal e prêmio do mês
+-- Ártemis Prospect — Etapa 8, parte 3 de 3: rank mensal e prêmio do mês
 -- Rode DEPOIS da parte 2 (etapa8-2-comprovante-admin.sql), inteiro, de uma vez:
 -- Supabase > SQL Editor > New query > cole tudo > Run.
 -- Pode rodar de novo sem problema (é idempotente).
@@ -313,7 +313,7 @@ grant execute on function public.meu_plano() to authenticated;
 notify pgrst, 'reload schema';
 
 -- 14. Cadastre você como administrador (rode SEPARADO, uma vez) --------------
--- Troque pelo e-mail com que você entra no Caça-leads:
+-- Troque pelo e-mail com que você entra no Ártemis Prospect:
 --
 --   insert into public.administradores (user_id)
 --   select id from auth.users where email = 'SEU-EMAIL@exemplo.com'

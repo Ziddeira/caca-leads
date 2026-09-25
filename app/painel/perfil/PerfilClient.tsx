@@ -7,6 +7,7 @@ import { Alerta, chamar, type Mensagem } from "@/components/perfil/comum";
 import {
   ALERTA_AVISO,
   BOTAO,
+  BOTAO_SECUNDARIO,
   CAMPO,
   CARTAO as CARTAO_BASE,
   ROTULO,
@@ -296,7 +297,7 @@ function CartaoEmail({
           </p>
         </div>
         <Alerta mensagem={mensagem} />
-        <button type="submit" disabled={enviando} className={`${BOTAO} w-full sm:w-auto sm:self-start`}>
+        <button type="submit" disabled={enviando} className={`${BOTAO_SECUNDARIO} w-full sm:w-auto sm:self-start`}>
           {enviando ? "Enviando…" : "Trocar e-mail"}
         </button>
       </form>
@@ -397,7 +398,7 @@ function CartaoSenha() {
           />
         </div>
         <Alerta mensagem={mensagem} />
-        <button type="submit" disabled={salvando} className={`${BOTAO} w-full sm:w-auto sm:self-start`}>
+        <button type="submit" disabled={salvando} className={`${BOTAO_SECUNDARIO} w-full sm:w-auto sm:self-start`}>
           {salvando ? "Salvando…" : "Trocar senha"}
         </button>
       </form>

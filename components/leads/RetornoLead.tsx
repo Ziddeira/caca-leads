@@ -7,9 +7,9 @@ import { linkIcs, statusRetorno, textoRetorno, type RetornoLead as Retorno } fro
 import { IconeCalendario } from "@/components/Icones";
 
 const ESTILO = {
-  atrasado: "bg-danger-soft text-danger border-danger/25",
-  hoje: "bg-hot-soft text-hot-ink border-hot/30",
-  futuro: "bg-primary-soft text-primary border-primary/25",
+  atrasado: "bg-danger-soft text-danger border-danger/40",
+  hoje: "bg-hot-soft text-hot-ink border-hot/50",
+  futuro: "bg-canvas text-ink border-line-strong",
 } as const;
 
 const LINK = "inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-primary underline-offset-2 hover:underline";

@@ -1,4 +1,4 @@
--- Caça-leads: tabela de perfis dos usuários
+-- Ártemis Prospect: tabela de perfis dos usuários
 -- Cole este script inteiro no Supabase: SQL Editor > New query > Run
 
 -- 1. Tabela profiles ---------------------------------------------------

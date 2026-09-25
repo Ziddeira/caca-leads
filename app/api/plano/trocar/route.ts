@@ -29,7 +29,7 @@ export async function POST(request: Request) {
     await alterarValorAssinatura(
       assinatura.asaas_subscription_id,
       plano.preco,
-      `Caça-leads — plano ${plano.nome} (mensal)`,
+      `Ártemis Prospect — plano ${plano.nome} (mensal)`,
     );
   } catch (e) {
     return erro(mensagemDeErro(e), 502);

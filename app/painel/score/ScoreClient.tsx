@@ -20,7 +20,7 @@ import {
   emAberto,
   podeEnviarComprovante,
 } from "@/lib/vendas/regras";
-import { ALERTA_ERRO, ALERTA_SUCESSO, BOTAO, BOTAO_SECUNDARIO, CAMPO, CARTAO } from "@/components/ui";
+import { ALERTA_AVISO, ALERTA_ERRO, ALERTA_SUCESSO, BOTAO, BOTAO_SECUNDARIO, CAMPO, CARTAO } from "@/components/ui";
 import { IconeEnviar, IconeLink } from "@/components/Icones";
 
 export interface VendaScore {
@@ -82,11 +82,11 @@ function CartaoVenda({ venda, onMudar }: { venda: VendaScore; onMudar: (m: Parti
         </div>
         <div className="flex items-center gap-2">
           <span
-            className={`inline-flex items-center rounded-md border px-2.5 py-1 text-xs font-semibold ${ESTILO_STATUS_VENDA[venda.status]}`}
+            className={`inline-flex items-center border px-2 py-[3px] font-display text-[11px] font-semibold uppercase leading-tight tracking-[0.08em] ${ESTILO_STATUS_VENDA[venda.status]}`}
           >
             {ROTULO_STATUS_VENDA[venda.status]}
           </span>
-          <span className="text-sm font-bold text-ink" aria-label={`${venda.pontos} pontos`}>
+          <span className="font-display text-sm font-bold text-ink" aria-label={`${venda.pontos} pontos`}>
             {venda.pontos} pts
           </span>
         </div>
@@ -103,7 +103,7 @@ function CartaoVenda({ venda, onMudar }: { venda: VendaScore; onMudar: (m: Parti
       </a>
 
       {mostraMotivo && (
-        <p className={`mt-2 ${venda.status === "aguardando_google" ? "rounded-md border border-hot/30 bg-hot-soft px-3 py-2.5 text-sm text-hot-ink" : ALERTA_ERRO}`}>
+        <p className={`mt-2 ${venda.status === "aguardando_google" ? ALERTA_AVISO : ALERTA_ERRO}`}>
           {venda.status === "recusada" ? <strong>Motivo da recusa: </strong> : null}
           {venda.motivo}
         </p>

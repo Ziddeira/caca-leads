@@ -182,8 +182,8 @@ function CartaoAviso({ aviso: a, hoje }: { aviso: Aviso; hoje: string }) {
       <div className="flex flex-wrap items-start justify-between gap-2">
         <h3 className="min-w-0 break-words font-bold text-ink">{a.titulo}</h3>
         <span
-          className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-            situacao === "No ar" ? "bg-wa-soft text-wa" : situacao === "Agendado" ? "bg-primary-soft text-primary" : "bg-canvas text-muted"
+          className={`border px-2 py-[3px] font-display text-[11px] font-semibold uppercase leading-tight tracking-[0.08em] ${
+            situacao === "No ar" ? "border-primary bg-primary text-primary-ink" : situacao === "Agendado" ? "border-primary text-primary" : "border-line-strong text-ink-2"
           }`}
         >
           {situacao}
