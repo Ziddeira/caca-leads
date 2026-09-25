@@ -257,3 +257,77 @@ export function IconeAjuda(props: Props) {
     </Base>
   );
 }
+
+// Comunidade ------------------------------------------------------------
+export function IconeCurtir(props: Props) {
+  return (
+    <Base {...props}>
+      <path d="M12 20s-8-4.6-8-10.2A4.3 4.3 0 0 1 8.3 5.5c1.6 0 2.9.8 3.7 2 .8-1.2 2.1-2 3.7-2A4.3 4.3 0 0 1 20 9.8C20 15.4 12 20 12 20z" />
+    </Base>
+  );
+}
+
+export function IconeComentar(props: Props) {
+  return (
+    <Base {...props}>
+      <path d="M4 5h16v11H9l-5 4z" />
+    </Base>
+  );
+}
+
+export function IconeRepublicar(props: Props) {
+  return (
+    <Base {...props}>
+      <path d="M4 11V8h14" />
+      <path d="m15 5 3 3-3 3" />
+      <path d="M20 13v3H6" />
+      <path d="m9 19-3-3 3-3" />
+    </Base>
+  );
+}
+
+export function IconeCompartilhar(props: Props) {
+  return (
+    <Base {...props}>
+      <path d="M12 3v12" />
+      <path d="m7 8 5-5 5 5" />
+      <path d="M5 13v8h14v-8" />
+    </Base>
+  );
+}
+
+export function IconeMais(props: Props) {
+  return (
+    <Base {...props}>
+      <path d="M5 12h.01M12 12h.01M19 12h.01" strokeWidth="3" />
+    </Base>
+  );
+}
+
+export function IconeImagem(props: Props) {
+  return (
+    <Base {...props}>
+      <rect x="3" y="4" width="18" height="16" />
+      <circle cx="9" cy="10" r="2" />
+      <path d="m21 16-5-5-9 9" />
+    </Base>
+  );
+}
+
+export function IconeBandeira(props: Props) {
+  return (
+    <Base {...props}>
+      <path d="M5 21V4h12l-2 4 2 4H5" />
+    </Base>
+  );
+}
+
+export function IconeLixeira(props: Props) {
+  return (
+    <Base {...props}>
+      <path d="M4 7h16M10 11v6M14 11v6" />
+      <path d="M6 7l1 13h10l1-13" />
+      <path d="M9 7V4h6v3" />
+    </Base>
+  );
+}

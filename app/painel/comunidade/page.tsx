@@ -1,53 +1,86 @@
+import Link from "next/link";
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import IlustracaoObra from "@/components/IlustracaoObra";
-import { CARTAO } from "@/components/ui";
-import BotaoAvisar from "./BotaoAvisar";
+import { TituloPagina } from "@/components/ui";
+import AbasFeed from "@/components/comunidade/AbasFeed";
+import { ComunidadeProvider } from "@/components/comunidade/Contexto";
+import Feed from "@/components/comunidade/Feed";
+import { lerEstado } from "@/lib/comunidade/paginas";
+import { MSG_FALTA_ETAPA14, faltaEtapa14 } from "@/lib/comunidade/regras";
+import type { Post } from "@/lib/comunidade/tipos";
 
 export const dynamic = "force-dynamic";
 
-export default async function ComunidadePage() {
-  const supabase = await createClient();
+const POR_PAGINA = 15;
 
-  // Se a pessoa já clicou em "Quero ser avisado", mostra isso de cara.
-  // Se a tabela ainda não existe (script da etapa 4), só trata como "não".
-  let jaInscrito = false;
-  if (supabase) {
-    const { data } = await supabase
-      .from("interesse_comunidade")
-      .select("user_id")
-      .limit(1)
-      .maybeSingle();
-    jaInscrito = !!data;
+// Feed da comunidade. Todo mundo logado lê, curte e comenta; o que cada
+// plano pode publicar é conferido pelo banco (etapa 14).
+export default async function ComunidadePage({ searchParams }: { searchParams: Promise<{ aba?: string }> }) {
+  const supabase = await createClient();
+  if (!supabase) return <Aviso texto="Supabase não configurado neste ambiente." />;
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const aba = (await searchParams).aba === "alta" ? "alta" : "recentes";
+  const [{ estado, erro }, feed] = await Promise.all([
+    lerEstado(supabase),
+    supabase.rpc("comunidade_feed", { p_aba: aba, p_limite: POR_PAGINA }),
+  ]);
+  const falha = erro ?? feed.error;
+  if (falha || !estado) {
+    if (!faltaEtapa14(falha?.code)) console.error("[comunidade]", falha?.code, falha?.message);
+    return (
+      <Aviso texto={faltaEtapa14(falha?.code) ? MSG_FALTA_ETAPA14 : "Não foi possível carregar a comunidade agora."} />
+    );
   }
+  const posts = (feed.data ?? []) as Post[];
 
   return (
+    <div className="mx-auto max-w-2xl">
+      <TituloPagina
+        titulo="Comunidade"
+        descricao="Layouts, ferramentas, dúvidas e conquistas de quem vive de fazer sites."
+      >
+        {estado.apelido && (
+          <Link
+            href={`/painel/comunidade/u/${encodeURIComponent(estado.apelido)}`}
+            className="inline-flex min-h-11 items-center text-sm font-semibold text-primary hover:underline"
+          >
+            Meu perfil na comunidade
+          </Link>
+        )}
+      </TituloPagina>
+      <div className="mt-6">
+        <AbasFeed atual={aba} />
+        <ComunidadeProvider estado={estado} userId={user.id}>
+          <Feed
+            key={aba}
+            postsIniciais={posts}
+            temMaisInicial={posts.length === POR_PAGINA}
+            aba={aba}
+            comNovoPost
+            vazio={
+              aba === "alta"
+                ? {
+                    titulo: "Nada em alta agora",
+                    texto: "Nenhum post recebeu curtidas ou comentários nas últimas 48 horas. Que tal começar?",
+                  }
+                : { titulo: "A comunidade está começando", texto: "Ainda não há posts. Seja o primeiro a publicar!" }
+            }
+          />
+        </ComunidadeProvider>
+      </div>
+    </div>
+  );
+}
+
+function Aviso({ texto }: { texto: string }) {
+  return (
     <div>
-      <section className={`${CARTAO} mx-auto max-w-3xl overflow-hidden`}>
-        <div className="ap-grid px-4 pt-8 sm:px-10">
-          <IlustracaoObra className="mx-auto h-auto w-full max-w-md" />
-        </div>
-        <div className="px-5 pb-8 pt-2 text-center sm:px-10 sm:pb-10">
-          <span className="inline-flex items-center gap-2 border border-primary px-3 py-1 font-display text-xs font-semibold uppercase tracking-[0.2em] text-primary">
-            <span className="h-2 w-2 bg-primary" aria-hidden="true" />
-            Em construção
-          </span>
-          <h1 className="mt-4 text-3xl font-bold text-ink sm:text-4xl">
-            A Comunidade vem aí
-          </h1>
-          <p className="mx-auto mt-3 max-w-md text-base text-ink-2">
-            Uma vitrine de templates feita por web designers. Veja os sites da comunidade, curta
-            os que gostar e, se quiser, acesse o prompt e o design para usar nos seus trabalhos.
-          </p>
-          <p className="mx-auto mt-3 max-w-md text-base text-ink-2">
-            Quem capta um cliente, fecha a venda e entrega o site publica o resultado aqui. Assim
-            a comunidade cresce sozinha, a cada projeto. Estamos levantando as paredes e ela chega
-            em breve.
-          </p>
-          <div className="mt-6 flex justify-center">
-            <BotaoAvisar jaInscrito={jaInscrito} />
-          </div>
-        </div>
-      </section>
+      <TituloPagina titulo="Comunidade" />
+      <p className="mt-4 text-ink-2">{texto}</p>
     </div>
   );
 }

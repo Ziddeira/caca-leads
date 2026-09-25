@@ -28,6 +28,15 @@ export default async function PerfilPage({
   const { perfil, pendente } = await lerPerfil(supabase, user.id);
   const aviso = (await searchParams).email;
 
+  // Preferência da Comunidade. Sem o script da etapa 14 a coluna não
+  // existe (null): o cartão avisa em vez de quebrar a página.
+  const { data: comunidade, error: erroComunidade } = await supabase
+    .from("profiles")
+    .select("mostrar_vendas_comunidade")
+    .eq("id", user.id)
+    .maybeSingle();
+  const mostrarVendas = erroComunidade ? null : !!comunidade?.mostrar_vendas_comunidade;
+
   return (
     <PerfilClient
       userId={user.id}
@@ -38,6 +47,7 @@ export default async function PerfilPage({
       avisoEmail={aviso === "confirmado" || aviso === "parcial" ? aviso : null}
       perfil={perfil}
       pendente={pendente}
+      mostrarVendas={mostrarVendas}
     />
   );
 }
