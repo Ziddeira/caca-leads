@@ -75,14 +75,14 @@ export function EstadoVazio({
   texto: ReactNode;
   // Mostra a Ártemis (num círculo branco) no lugar do ícone.
   mascote?: boolean;
-  // Mostra a logo vertical no lugar do ícone.
+  // Mostra o símbolo da logo no lugar do ícone.
   logo?: boolean;
   children?: ReactNode;
 }) {
   return (
     <div className="flex flex-col items-center border border-dashed border-line bg-surface px-6 py-12 text-center">
       {logo ? (
-        <Logo variante="vertical" tamanho={30} className="mb-6" />
+        <Logo variante="simbolo" tamanho={72} className="mb-5" />
       ) : mascote ? (
         <Mascote tamanho={132} className="mb-5" />
       ) : (
