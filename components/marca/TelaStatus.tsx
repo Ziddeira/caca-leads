@@ -9,9 +9,11 @@ export default function TelaStatus({
   codigo,
   titulo,
   texto,
+  expressao = "padrao",
   children,
 }: {
   codigo: string;
+  expressao?: "padrao" | "triste";
   titulo: string;
   texto: string;
   children: ReactNode;
@@ -21,7 +23,7 @@ export default function TelaStatus({
       <Link href="/" aria-label="Ártemis Prospect — voltar para o início" className="mb-10 block">
         <Logo tamanho={24} />
       </Link>
-      <Mascote tamanho={148} />
+      <Mascote tamanho={148} expressao={expressao} />
       <p className="mt-6 font-display text-6xl font-bold italic leading-none text-primary sm:text-7xl">
         {codigo}
       </p>

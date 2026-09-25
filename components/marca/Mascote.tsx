@@ -4,20 +4,28 @@
 // (741 × 1024) é mantida pelo object-contain.
 import Image from "next/image";
 
+// As duas imagens têm o mesmo tamanho (741 × 1024).
 const LARGURA = 741;
 const ALTURA = 1024;
+const IMAGEM = {
+  padrao: "/brand/artemis-mascote.png",
+  // Chorando: para erro e página não encontrada.
+  triste: "/brand/artemis-mascote-triste.jpg",
+};
 
 export default function Mascote({
   tamanho = 160,
   forma = "circulo",
   className = "",
   prioridade = false,
+  expressao = "padrao",
 }: {
   // Diâmetro do círculo, ou a altura do card, em px.
   tamanho?: number;
   forma?: "circulo" | "card";
   className?: string;
   prioridade?: boolean;
+  expressao?: keyof typeof IMAGEM;
 }) {
   // No círculo, a figura ocupa 80% da altura para não encostar na borda.
   const altura = Math.round(tamanho * (forma === "circulo" ? 0.8 : 0.88));
@@ -34,7 +42,7 @@ export default function Mascote({
       aria-hidden="true"
     >
       <Image
-        src="/brand/artemis-mascote.png"
+        src={IMAGEM[expressao]}
         alt=""
         width={largura}
         height={altura}

@@ -335,7 +335,7 @@ export default function BuscaClient({ perfilInicial }: { perfilInicial: Perfil }
       {!buscaFeita && !carregando && !semBuscas && (
         <div className="mt-6">
           <EstadoVazio
-            mascote
+            logo
             titulo="Sua lista de leads aparece aqui"
             texto={
               <>

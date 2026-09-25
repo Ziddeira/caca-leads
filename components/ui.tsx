@@ -2,6 +2,7 @@
 // cartão, título de página e estado vazio. Mantém a mesma cara em tudo.
 // Valores do manual da marca: brand/MANUAL.md, seção 6.
 import type { ReactNode } from "react";
+import Logo from "@/components/marca/Logo";
 import Mascote from "@/components/marca/Mascote";
 
 // Área de toque mínima de 44px (min-h-11) em tudo que é clicável.
@@ -66,6 +67,7 @@ export function EstadoVazio({
   titulo,
   texto,
   mascote = false,
+  logo = false,
   children,
 }: {
   icone?: ReactNode;
@@ -73,11 +75,15 @@ export function EstadoVazio({
   texto: ReactNode;
   // Mostra a Ártemis (num círculo branco) no lugar do ícone.
   mascote?: boolean;
+  // Mostra a logo vertical no lugar do ícone.
+  logo?: boolean;
   children?: ReactNode;
 }) {
   return (
     <div className="flex flex-col items-center border border-dashed border-line bg-surface px-6 py-12 text-center">
-      {mascote ? (
+      {logo ? (
+        <Logo variante="vertical" tamanho={30} className="mb-6" />
+      ) : mascote ? (
         <Mascote tamanho={132} className="mb-5" />
       ) : (
         icone && (
