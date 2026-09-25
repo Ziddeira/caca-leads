@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import Sidebar from "@/components/Sidebar";
 import { NotificacoesProvider, Sino } from "@/components/notificacoes/Notificacoes";
 import BotaoAjuda from "@/components/suporte/BotaoAjuda";
+import TourArtemis from "@/components/tour/TourArtemis";
 import { createClient } from "@/lib/supabase/server";
 import { lerPerfil } from "@/lib/perfil/dados";
 
@@ -90,6 +91,9 @@ export default async function PainelLayout({
           </div>
         </main>
         <BotaoAjuda />
+        {/* Tour guiado da Ártemis: sozinho uma vez, logo depois das
+            boas-vindas; depois, só pelo "Rever o tour" do Perfil. */}
+        <TourArtemis concluido={perfil?.tourConcluido ?? true} />
       </div>
     </NotificacoesProvider>
   );

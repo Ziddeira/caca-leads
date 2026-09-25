@@ -72,9 +72,34 @@ export default function PerfilClient({
         <div className="flex flex-col gap-6">
           <CartaoEmail email={email} emailPendente={emailPendente} aviso={avisoEmail} />
           <CartaoSenha />
+          <CartaoTour />
         </div>
       </div>
     </div>
+  );
+}
+
+// Tour guiado da Ártemis ----------------------------------------------
+// Abre a tela de Buscar com ?tour=1; o tour (components/tour/TourArtemis.tsx)
+// começa sozinho lá.
+function CartaoTour() {
+  const router = useRouter();
+  return (
+    <section aria-labelledby="titulo-tour" className={CARTAO}>
+      <h2 id="titulo-tour" className={TITULO_CARTAO}>
+        Tour guiado
+      </h2>
+      <p className="mt-1 mb-4 text-sm text-ink-2">
+        A Ártemis mostra de novo, em 5 passos, onde fica cada coisa no painel.
+      </p>
+      <button
+        type="button"
+        onClick={() => router.push("/painel/buscar?tour=1")}
+        className={BOTAO_SECUNDARIO}
+      >
+        Rever o tour
+      </button>
+    </section>
   );
 }
 
