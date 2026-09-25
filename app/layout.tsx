@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Chakra_Petch, Manrope } from "next/font/google";
 import "./globals.css";
 import { ScriptTema, TemaDoAparelho } from "@/components/tema/Tema";
+import { DESCRICAO_SITE, NOME_SITE, TITULO_INICIO, URL_SITE } from "@/lib/site";
 
 // Fontes da marca (brand/MANUAL.md, seção 4): Chakra Petch nos títulos,
 // botões, rótulos e números; Manrope no texto e na interface.
@@ -18,38 +19,29 @@ const manrope = Manrope({
   weight: ["400", "500", "600", "700", "800"],
 });
 
-const TITULO = "Ártemis Prospect";
-const DESCRICAO =
-  "Ache clientes que ainda não têm site. Busque por nicho e bairro e veja quem não tem site, quem depende do Airbnb e quem só usa Instagram, com o WhatsApp pronto para chamar.";
-
-// Endereço público usado para montar os links absolutos do Open Graph.
-// Na Vercel, cada deploy tem o próprio endereço (preview ou produção).
-const URL_BASE = process.env.VERCEL_PROJECT_PRODUCTION_URL
-  ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-  : process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : "http://localhost:3000";
-
+// Metadados padrão de todas as páginas (lib/site.ts). Cada página
+// pública completa com o próprio título e a URL canônica; o painel sai
+// da indexação no app/painel/layout.tsx.
 export const metadata: Metadata = {
-  metadataBase: new URL(URL_BASE),
+  metadataBase: new URL(URL_SITE),
   title: {
-    default: TITULO,
-    template: `%s · ${TITULO}`,
+    default: TITULO_INICIO,
+    template: `%s · ${NOME_SITE}`,
   },
-  description: DESCRICAO,
-  applicationName: TITULO,
-  appleWebApp: { title: TITULO, statusBarStyle: "black" },
+  description: DESCRICAO_SITE,
+  applicationName: NOME_SITE,
+  appleWebApp: { title: NOME_SITE, statusBarStyle: "black" },
   openGraph: {
     type: "website",
     locale: "pt_BR",
-    siteName: TITULO,
-    title: `${TITULO} · Ache clientes que ainda não têm site`,
-    description: DESCRICAO,
+    siteName: NOME_SITE,
+    title: TITULO_INICIO,
+    description: DESCRICAO_SITE,
   },
   twitter: {
     card: "summary_large_image",
-    title: `${TITULO} · Ache clientes que ainda não têm site`,
-    description: DESCRICAO,
+    title: TITULO_INICIO,
+    description: DESCRICAO_SITE,
   },
 };
 

@@ -1,10 +1,14 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
+import { SEM_INDEXACAO } from "@/lib/site";
 import TelaAuth, { LINK_AUTH } from "@/components/TelaAuth";
 import { ALERTA_ERRO } from "@/components/ui";
 import FormRedefinirSenha from "./FormRedefinirSenha";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = { title: "Criar senha nova", robots: SEM_INDEXACAO };
 
 // Chega aqui pelo link de "esqueci minha senha": o /auth/callback já
 // validou o link e abriu a sessão. Sem sessão, o link expirou.
