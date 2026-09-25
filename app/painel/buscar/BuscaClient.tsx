@@ -1,7 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import type { LeadResultado, Situacao } from "@/lib/leads/classificacao";
+import { VALIDADE_CACHE_DIAS } from "@/lib/leads/dadosLead";
+import { dataCurta, quandoFoi, type UltimaBusca } from "@/lib/leads/ultimaBusca";
 import {
   MSG_PADRAO_HOSPEDAGEM,
   MSG_PADRAO_NEGOCIOS,
@@ -44,6 +47,19 @@ interface Perfil {
   creditosDesbloqueio: number;
 }
 
+// Termos, regiões e data da busca que está na tela (a salva no banco).
+type InfoBusca = Omit<UltimaBusca, "leads" | "totalLeads" | "aviso">;
+
+function infoDe(busca: UltimaBusca): InfoBusca {
+  return {
+    termos: busca.termos,
+    areas: busca.areas,
+    modo: busca.modo,
+    feitaEm: busca.feitaEm,
+    expiraEm: busca.expiraEm,
+  };
+}
+
 const ROTULO_PLANO: Record<string, string> = {
   gratis: "Grátis",
   solo: "Solo",
@@ -73,16 +89,33 @@ function dividirLista(valor: string): string[] {
   return resultado;
 }
 
-export default function BuscaClient({ perfilInicial }: { perfilInicial: Perfil }) {
-  const [nicho, setNicho] = useState("");
-  const [areas, setAreas] = useState("");
-  const [modo, setModo] = useState<Modo>("negocios");
+export default function BuscaClient({
+  perfilInicial,
+  ultimaBusca,
+}: {
+  perfilInicial: Perfil;
+  // Última busca salva no banco (lida pelo servidor, sem chamar o Google).
+  ultimaBusca: UltimaBusca | null;
+}) {
+  const salvaValida = ultimaBusca?.leads ? ultimaBusca : null;
+  const [nicho, setNicho] = useState(ultimaBusca?.termos.join(", ") ?? "");
+  const [areas, setAreas] = useState(ultimaBusca?.areas.join(", ") ?? "");
+  const [modo, setModo] = useState<Modo>(
+    ultimaBusca?.modo === "hospedagem" && perfilInicial.plano === "pro" ? "hospedagem" : "negocios",
+  );
   const [perfil, setPerfil] = useState(perfilInicial);
-  const [leads, setLeads] = useState<LeadResultado[]>([]);
+  const [leads, setLeads] = useState<LeadResultado[]>(salvaValida?.leads ?? []);
   const [carregando, setCarregando] = useState(false);
+  const [limpando, setLimpando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
-  const [aviso, setAviso] = useState<string | null>(null);
-  const [buscaFeita, setBuscaFeita] = useState(false);
+  const [aviso, setAviso] = useState<string | null>(salvaValida?.aviso ?? null);
+  const [buscaFeita, setBuscaFeita] = useState(!!salvaValida);
+  const [infoBusca, setInfoBusca] = useState<InfoBusca | null>(salvaValida ? infoDe(salvaValida) : null);
+  // Busca salva que passou do prazo do cache do Google: a lista foi
+  // apagada, mas a tela avisa em vez de sumir com tudo.
+  const [expirada, setExpirada] = useState<InfoBusca | null>(
+    ultimaBusca && !ultimaBusca.leads ? infoDe(ultimaBusca) : null,
+  );
   const [desbloqueando, setDesbloqueando] = useState<Record<string, boolean>>({});
   const [filtrosAbertos, setFiltrosAbertos] = useState(false);
 
@@ -172,10 +205,19 @@ export default function BuscaClient({ perfilInicial }: { perfilInicial: Perfil }
         setErro(dados.erro || "Não foi possível buscar agora.");
         return;
       }
+      // Só aqui (busca nova, já cobrada) o resultado anterior é substituído.
       setLeads(dados.leads as LeadResultado[]);
       setPerfil((p) => ({ ...p, buscasRestantes: dados.buscasRestantes }));
       setAviso(dados.aviso || null);
       setBuscaFeita(true);
+      setExpirada(null);
+      setInfoBusca({
+        termos: dados.termos,
+        areas: dados.areas,
+        modo: dados.modo,
+        feitaEm: dados.feitaEm,
+        expiraEm: dados.expiraEm,
+      });
     } catch {
       setErro("Não foi possível falar com o servidor agora.");
     } finally {
@@ -183,8 +225,37 @@ export default function BuscaClient({ perfilInicial }: { perfilInicial: Perfil }
     }
   }
 
+  async function limparPesquisa() {
+    const ok = window.confirm(
+      "Limpar esta pesquisa? O resultado sai da tela e não volta sem uma busca nova (que gasta do seu saldo). Os leads que você já desbloqueou continuam em Meus leads.",
+    );
+    if (!ok) return;
+    setErro(null);
+    setLimpando(true);
+    try {
+      const res = await fetch("/api/leads/ultima-busca", { method: "DELETE" });
+      if (!res.ok) {
+        const dados = await res.json().catch(() => ({}));
+        setErro(dados.erro || "Não foi possível limpar a pesquisa agora.");
+        return;
+      }
+      setLeads([]);
+      setBuscaFeita(false);
+      setInfoBusca(null);
+      setExpirada(null);
+      setAviso(null);
+      setNicho("");
+      setAreas("");
+    } catch {
+      setErro("Não foi possível falar com o servidor agora.");
+    } finally {
+      setLimpando(false);
+    }
+  }
+
   async function desbloquear(lead: LeadResultado) {
-    if (perfil.creditosDesbloqueio < 1) {
+    // Lead já desbloqueado antes não gasta crédito de novo.
+    if (!lead.desbloqueado && perfil.creditosDesbloqueio < 1) {
       setErro("Você não tem créditos de desbloqueio disponíveis.");
       return;
     }
@@ -337,7 +408,30 @@ export default function BuscaClient({ perfilInicial }: { perfilInicial: Perfil }
 
       {carregando && !buscaFeita && <ListaEsqueleto quantidade={3} />}
 
-      {!buscaFeita && !carregando && !semBuscas && (
+      {expirada && !buscaFeita && !carregando && (
+        <div data-tour="resultado" className="mt-6">
+          <EstadoVazio
+            icone={<IconeBuscar width={26} height={26} />}
+            titulo="Esta busca expirou"
+            texto={
+              <>
+                A busca por <strong>{expirada.termos.join(", ")}</strong> em{" "}
+                <strong>{expirada.areas.join(", ")}</strong>, feita{" "}
+                <span suppressHydrationWarning>{quandoFoi(expirada.feitaEm)}</span>, ficou salva por{" "}
+                {VALIDADE_CACHE_DIAS} dias, o prazo máximo que o Google permite guardar esses dados. Os termos
+                já estão preenchidos acima: é só buscar de novo (gasta do seu saldo). Os leads que você
+                desbloqueou continuam em <Link href="/painel/meus-leads" className="font-semibold text-primary underline">Meus leads</Link>.
+              </>
+            }
+          >
+            <button type="button" onClick={limparPesquisa} disabled={limpando} className={BOTAO_NEUTRO}>
+              {limpando ? "Limpando..." : "Limpar pesquisa"}
+            </button>
+          </EstadoVazio>
+        </div>
+      )}
+
+      {!buscaFeita && !expirada && !carregando && !semBuscas && (
         <div data-tour="resultado" className="mt-6">
           <EstadoVazio
             logo
@@ -349,6 +443,32 @@ export default function BuscaClient({ perfilInicial }: { perfilInicial: Perfil }
               </>
             }
           />
+        </div>
+      )}
+
+      {buscaFeita && infoBusca && (
+        <div className={`${CARTAO} mt-6 flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between`}>
+          <div className="min-w-0 text-sm text-ink-2">
+            <p>
+              Resultado de <strong className="text-ink" suppressHydrationWarning>{quandoFoi(infoBusca.feitaEm)}</strong>
+              {infoBusca.modo === "hospedagem" ? " (Hospedagem)" : ""}:{" "}
+              <strong className="break-words text-ink">{infoBusca.termos.join(", ")}</strong> em{" "}
+              <strong className="break-words text-ink">{infoBusca.areas.join(", ")}</strong>
+            </p>
+            <p className="mt-0.5 text-xs text-muted">
+              {infoBusca.expiraEm
+                ? `Fica salvo até ${dataCurta(infoBusca.expiraEm)}, mesmo se você sair desta página. Voltar aqui não gasta busca.`
+                : "Não foi possível salvar este resultado: ele some se você sair desta página."}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={limparPesquisa}
+            disabled={limpando || carregando}
+            className={`${BOTAO_NEUTRO} w-full shrink-0 sm:w-auto`}
+          >
+            {limpando ? "Limpando..." : "Limpar pesquisa"}
+          </button>
         </div>
       )}
 
@@ -583,7 +703,11 @@ function LeadCard({
             className={BOTAO_NEUTRO}
           >
             <IconeCadeado width={13} height={13} />
-            {carregando ? "Desbloqueando..." : "Desbloquear (1 crédito)"}
+            {carregando
+              ? "Desbloqueando..."
+              : lead.desbloqueado
+                ? "Ver contato (já pago)"
+                : "Desbloquear (1 crédito)"}
           </button>
         )}
       </div>
