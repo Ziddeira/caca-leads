@@ -2,6 +2,7 @@ import { timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { registrarErro } from "@/lib/erros/registrar";
+import { voltarPrecoNormal } from "@/lib/pagamentos/cupons";
 
 export const dynamic = "force-dynamic";
 
@@ -110,6 +111,14 @@ export async function POST(request: Request) {
       pagamento: e.payment?.id,
     });
     return NextResponse.json({ erro: "Falha ao processar o evento." }, { status: 500 });
+  }
+
+  // Cupom com desconto por tempo limitado: se esta mensalidade era a
+  // última com desconto, a assinatura volta ao preço cheio no Asaas agora
+  // (antes da próxima cobrança). Falhas aqui não derrubam o webhook — a
+  // rotina diária tenta de novo.
+  if (typeof data === "string" && data.startsWith("plano_renovado")) {
+    await voltarPrecoNormal(admin);
   }
 
   return NextResponse.json({ ok: true, resultado: data });

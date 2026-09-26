@@ -41,6 +41,18 @@ export default async function PlanoPage() {
     .limit(1)
     .maybeSingle();
 
+  // Desconto de cupom da assinatura atual (etapa 19). Se o script ainda
+  // não foi rodado, a consulta falha e a tela segue sem ele.
+  const { data: desconto } = await supabase.rpc("meu_desconto").maybeSingle<{
+    codigo: string;
+    valor_cheio: number;
+    valor_com_desconto: number;
+    duracao_meses: number | null;
+    ciclos_pagos: number;
+    status: string;
+    proxima_cobranca_cheia: string | null;
+  }>();
+
   return (
     <PlanoClient
       perfil={{
@@ -58,6 +70,19 @@ export default async function PlanoPage() {
               status: assinatura.status,
               forma: assinatura.forma_pagamento,
               link: assinatura.link_pagamento,
+            }
+          : null
+      }
+      desconto={
+        desconto
+          ? {
+              codigo: desconto.codigo,
+              valorCheio: Number(desconto.valor_cheio),
+              valorComDesconto: Number(desconto.valor_com_desconto),
+              duracaoMeses: desconto.duracao_meses,
+              ciclosPagos: desconto.ciclos_pagos,
+              status: desconto.status,
+              proximaCobrancaCheia: desconto.proxima_cobranca_cheia,
             }
           : null
       }
