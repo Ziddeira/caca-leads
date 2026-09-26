@@ -2,13 +2,15 @@ import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { cronAutorizado } from "@/lib/cron/autorizacao";
 import { registrarErro } from "@/lib/erros/registrar";
+import { faltaEtapa19, voltarPrecoNormal } from "@/lib/pagamentos/cupons";
 
 export const dynamic = "force-dynamic";
 
 // Rotina agendada (Vercel Cron, todo dia de manhã no horário de
 // Brasília): gera as notificações do sino — renovação, saldo baixo,
 // novidades do site, o incentivo do dia, os retornos agendados para
-// hoje e os avisos escritos na Gestão. Toda a regra fica nas
+// hoje, os avisos escritos na Gestão e o aviso de fim do desconto do
+// cupom (etapa 19), uma semana antes da primeira mensalidade cheia. Toda a regra fica nas
 // funções SQL "gerar_notificacoes" (etapa 9), "gerar_notificacoes_retorno"
 // (etapa 10) e "entregar_avisos" (etapa 11), que não repetem aviso já
 // dado; rodar duas vezes no mesmo dia não duplica nada.
@@ -60,10 +62,23 @@ export async function GET(request: Request) {
     }
   }
 
+  // Cupons (etapa 19): reserva para voltar ao preço cheio no Asaas quem
+  // o webhook não conseguiu acertar, e o aviso de fim do desconto.
+  const precoNormal = await voltarPrecoNormal(admin);
+  const cupons = await admin.rpc("gerar_notificacoes_cupom");
+  if (cupons.error && !faltaEtapa19(cupons.error.code)) {
+    console.error("[cron/notificacoes] cupons:", cupons.error.code, cupons.error.message);
+    await registrarErro("notificacoes", `gerar_notificacoes_cupom falhou: ${cupons.error.message}`, {
+      codigo: cupons.error.code,
+    });
+  }
+
   const geradas = {
     ...(data as object),
     ...(retorno.data as object | null),
     ...(avisos.error ? {} : { avisos: avisos.data }),
+    ...(cupons.error ? {} : { fim_cupom: cupons.data }),
+    preco_normal: precoNormal,
   };
   console.log("[cron/notificacoes] geradas:", JSON.stringify(geradas));
   return NextResponse.json({ geradas });

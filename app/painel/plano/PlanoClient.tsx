@@ -23,6 +23,7 @@ import {
   ROTULO,
   TituloPagina,
 } from "@/components/ui";
+import { textoDuracao } from "@/lib/cupons";
 
 const CARTAO = `${CARTAO_BASE} p-5 sm:p-6`;
 
@@ -42,6 +43,26 @@ interface Assinatura {
   link: string | null;
 }
 
+interface Desconto {
+  codigo: string;
+  valorCheio: number;
+  valorComDesconto: number;
+  duracaoMeses: number | null;
+  ciclosPagos: number;
+  status: string;
+  proximaCobrancaCheia: string | null;
+}
+
+// Resultado da conferência do cupom, feita no servidor. Só para mostrar:
+// ao assinar, o navegador manda apenas o código e o servidor recalcula.
+interface CupomConferido {
+  codigo: string;
+  plano: PlanoPago;
+  valorCheio: number;
+  valorFinal: number;
+  duracaoMeses: number | null;
+}
+
 type Checkout = { tipo: "assinar"; plano: PlanoPago } | { tipo: "pacote" };
 
 function formatarData(iso: string | null) {
@@ -53,12 +74,20 @@ function nomePlano(id: string) {
   return PLANOS[id as PlanoId]?.nome ?? id;
 }
 
+function dataDoDia(aaaammdd: string | null) {
+  if (!aaaammdd) return null;
+  const [a, m, d] = aaaammdd.split("-");
+  return `${d}/${m}/${a}`;
+}
+
 export default function PlanoClient({
   perfil,
   assinatura,
+  desconto,
 }: {
   perfil: Perfil;
   assinatura: Assinatura | null;
+  desconto: Desconto | null;
 }) {
   const router = useRouter();
   const [checkout, setCheckout] = useState<Checkout | null>(null);
@@ -69,11 +98,55 @@ export default function PlanoClient({
   const [erro, setErro] = useState<string | null>(null);
   const [linkPagamento, setLinkPagamento] = useState<string | null>(null);
   const [mensagem, setMensagem] = useState<string | null>(null);
+  const [codigoCupom, setCodigoCupom] = useState("");
+  const [cupom, setCupom] = useState<CupomConferido | null>(null);
+  const [erroCupom, setErroCupom] = useState<string | null>(null);
+  const [conferindo, setConferindo] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
     if (checkout) formRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
   }, [checkout]);
+
+  // Cupom conferido para outro plano não vale: trocou de plano, confere de novo.
+  const cupomValido = cupom && checkout?.tipo === "assinar" && cupom.plano === checkout.plano ? cupom : null;
+
+  function abrirCheckout(novo: Checkout) {
+    setCheckout(novo);
+    setErroCupom(null);
+    if (novo.tipo === "assinar" && cupom && cupom.plano !== novo.plano) {
+      setCupom(null);
+      if (codigoCupom.trim()) setErroCupom("Aplique o cupom de novo para ver o preço deste plano.");
+    }
+  }
+
+  async function aplicarCupom() {
+    if (checkout?.tipo !== "assinar") return;
+    setErroCupom(null);
+    setCupom(null);
+    if (!codigoCupom.trim()) {
+      setErroCupom("Digite o código do cupom.");
+      return;
+    }
+    setConferindo(true);
+    try {
+      const res = await fetch("/api/plano/cupom", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ codigo: codigoCupom, plano: checkout.plano }),
+      });
+      const dados = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setErroCupom(dados.erro || "Não foi possível conferir o cupom.");
+        return;
+      }
+      setCupom(dados as CupomConferido);
+    } catch {
+      setErroCupom("Não foi possível falar com o servidor agora.");
+    } finally {
+      setConferindo(false);
+    }
+  }
 
   const viva = assinatura && assinatura.status !== "cancelada" ? assinatura : null;
   const validoAte = formatarData(perfil.validoAte);
@@ -110,12 +183,24 @@ export default function PlanoClient({
     e.preventDefault();
     if (!checkout) return;
     const dadosCliente = perfil.temClienteAsaas ? {} : { nome, cpfCnpj };
+    // Só o CÓDIGO do cupom vai ao servidor; o preço é calculado lá.
+    if (checkout.tipo === "assinar" && codigoCupom.trim() && !cupomValido) {
+      setErroCupom("Clique em \"Aplicar\" para conferir o cupom antes de gerar a cobrança, ou apague o código.");
+      return;
+    }
     const dados =
       checkout.tipo === "assinar"
-        ? await enviar("/api/plano/assinar", { plano: checkout.plano, forma, ...dadosCliente })
+        ? await enviar("/api/plano/assinar", {
+            plano: checkout.plano,
+            forma,
+            ...(cupomValido ? { cupom: cupomValido.codigo } : {}),
+            ...dadosCliente,
+          })
         : await enviar("/api/plano/pacote", { forma, ...dadosCliente });
     if (!dados) return;
     setCheckout(null);
+    setCupom(null);
+    setCodigoCupom("");
     setLinkPagamento(dados.link ?? null);
     setMensagem(
       checkout.tipo === "assinar"
@@ -197,6 +282,24 @@ export default function PlanoClient({
             {viva.link && <LinkPagamento href={viva.link} />}
           </Alerta>
         )}
+        {desconto && (
+          <p className="mt-4 text-sm text-ink-2">
+            Cupom <strong className="text-ink">{desconto.codigo}</strong>:{" "}
+            {desconto.status === "voltando"
+              ? `o período de desconto terminou. A partir da próxima renovação${
+                  desconto.proximaCobrancaCheia ? ` (${dataDoDia(desconto.proximaCobrancaCheia)})` : ""
+                }, a mensalidade volta ao preço normal de ${formatarPreco(desconto.valorCheio)}.`
+              : `você paga ${formatarPreco(desconto.valorComDesconto)} em vez de ${formatarPreco(desconto.valorCheio)} ${textoDuracao(
+                  desconto.duracaoMeses,
+                )}${
+                  desconto.duracaoMeses
+                    ? ` (${Math.min(desconto.ciclosPagos, desconto.duracaoMeses)} de ${desconto.duracaoMeses} já pago${
+                        desconto.duracaoMeses > 1 ? "s" : ""
+                      }). Depois, volta sozinho ao preço normal.`
+                    : "."
+                }`}
+          </p>
+        )}
         {trocaAgendada && (
           <p className="mt-4 text-sm text-ink-2">
             Troca agendada: a partir da próxima renovação seu plano será o{" "}
@@ -262,7 +365,7 @@ export default function PlanoClient({
                   // Um primário por tela: o do plano Pro (ou o "Gerar cobrança",
                   // quando o pagamento está aberto).
                   <button
-                    onClick={() => setCheckout({ tipo: "assinar", plano: id as PlanoPago })}
+                    onClick={() => abrirCheckout({ tipo: "assinar", plano: id as PlanoPago })}
                     disabled={carregando}
                     className={id === "pro" && !checkout ? BOTAO : BOTAO_SECUNDARIO}
                   >
@@ -286,7 +389,7 @@ export default function PlanoClient({
             volta ao limite do plano (não acumula).
           </p>
         </div>
-        <button onClick={() => setCheckout({ tipo: "pacote" })} disabled={carregando} className={BOTAO_SECUNDARIO}>
+        <button onClick={() => abrirCheckout({ tipo: "pacote" })} disabled={carregando} className={BOTAO_SECUNDARIO}>
           Comprar pacote extra
         </button>
       </section>
@@ -296,9 +399,61 @@ export default function PlanoClient({
         <form ref={formRef} onSubmit={confirmarCheckout} className={`${CARTAO} mt-4`}>
           <h2 className="text-lg font-bold text-ink">
             {checkout.tipo === "assinar"
-              ? `Assinar o plano ${PLANOS[checkout.plano].nome} — ${formatarPreco(PLANOS[checkout.plano].preco)}/mês`
+              ? `Assinar o plano ${PLANOS[checkout.plano].nome} — ${formatarPreco(
+                  cupomValido ? cupomValido.valorFinal : PLANOS[checkout.plano].preco,
+                )}/mês`
               : `Pacote extra — ${formatarPreco(PACOTE_EXTRA.preco)}`}
           </h2>
+
+          {checkout.tipo === "assinar" && (
+            <div className="mt-3">
+              <label htmlFor="cupom" className={ROTULO}>
+                Cupom de desconto (opcional)
+              </label>
+              <div className="flex flex-col gap-2 sm:flex-row">
+                <input
+                  id="cupom"
+                  value={codigoCupom}
+                  onChange={(e) => {
+                    setCodigoCupom(e.target.value.toUpperCase().replace(/\s/g, ""));
+                    setCupom(null);
+                    setErroCupom(null);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      aplicarCupom();
+                    }
+                  }}
+                  maxLength={30}
+                  autoCapitalize="characters"
+                  autoComplete="off"
+                  placeholder="EX.: LANCAMENTO50"
+                  className={`${CAMPO} uppercase sm:max-w-xs`}
+                />
+                <button type="button" onClick={aplicarCupom} disabled={conferindo || carregando} className={BOTAO_SECUNDARIO}>
+                  {conferindo ? "Conferindo..." : "Aplicar"}
+                </button>
+              </div>
+              {erroCupom && (
+                <p role="alert" className={`mt-2 ${ALERTA_ERRO}`}>
+                  {erroCupom}
+                </p>
+              )}
+              {cupomValido && (
+                <div role="status" className={`mt-2 ${ALERTA_SUCESSO}`}>
+                  Cupom <strong>{cupomValido.codigo}</strong> aplicado:{" "}
+                  <span className="line-through">{formatarPreco(cupomValido.valorCheio)}</span>{" "}
+                  <strong>{formatarPreco(cupomValido.valorFinal)}/mês</strong> {textoDuracao(cupomValido.duracaoMeses)}.
+                  {cupomValido.duracaoMeses
+                    ? ` Depois, a assinatura volta sozinha ao preço normal de ${formatarPreco(
+                        cupomValido.valorCheio,
+                      )}/mês — avisamos pelo sino uma semana antes.`
+                    : ""}
+                </div>
+              )}
+            </div>
+          )}
 
           <fieldset className="mt-3">
             <legend className="mb-1 text-sm font-semibold text-ink-2">Forma de pagamento</legend>
@@ -363,7 +518,14 @@ export default function PlanoClient({
             <button type="submit" disabled={carregando} className={BOTAO}>
               {carregando ? "Gerando cobrança..." : "Gerar cobrança"}
             </button>
-            <button type="button" onClick={() => setCheckout(null)} className={BOTAO_SECUNDARIO}>
+            <button
+              type="button"
+              onClick={() => {
+                setCheckout(null);
+                setErroCupom(null);
+              }}
+              className={BOTAO_SECUNDARIO}
+            >
               Voltar
             </button>
           </div>

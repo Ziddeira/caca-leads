@@ -17,6 +17,7 @@ const NOME_ORIGEM: Record<string, string> = {
   verificar_vendas: "Verificação de vendas",
   busca: "Busca",
   notificacoes: "Notificações",
+  cupons: "Cupons",
 };
 
 // Gestão > Erros: falhas das rotinas do servidor (tabela
